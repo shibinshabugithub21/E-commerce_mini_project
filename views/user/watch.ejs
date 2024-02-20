@@ -1,0 +1,72 @@
+<%- include("header") -%>
+
+<style>
+    .container .row {
+        display: flex;
+        flex-wrap: wrap-reverse; /* Allow cards to wrap to the next line */
+        justify-content: space-between; /* Add space between cards */
+    }
+
+    .card {
+        width: 100%; /* Make each card take up the full width of the column */
+        margin-bottom: 20px; /* Add some margin between cards */
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="row row-cols-3">
+      <% product.forEach(element => { %>
+        <div class="col-md-4 col-lg-3">
+          <div class="card">
+            <img class="card-img-top" style="width: 100%; height: 21.1em;" src="/productImages/<%= element.Image[0] %>" />
+            <div class="card-body">
+              <h5 class="card-title"><%= element.Productname %></h5>
+              <p class="card-text">₹<%= element.Price %></p>
+              <div class="d-flex justify-content-between align-items-center">
+                <form action="/cart/<%= element._id %>" method="post">
+                  <button class="add-to-cart btn btn-warning"  data-product-id="<%= element._id %>" data-product-price="<%= element.Price %>" type="submit">Add to Cart</button>
+                </form>
+                <a href="/details/<%= element._id%>" class="btn btn-primary">Buy Now</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+  
+
+  
+  <script>
+  // Assume this function is called when the user clicks the "Add to Cart" button
+const addToCart = async (productId) => {
+    try {
+        // Make a request to your server to add the product to the cart
+        const response = await fetch(`/add-to-cart/${productId}`, {
+            method: 'POST',
+            // You can include any necessary headers or data here
+        });
+        
+        if (!response.ok) {
+            // If the server responds with an error, handle it accordingly
+            throw new Error('Failed to add product to cart');
+        }
+
+        // Assuming the server responds with JSON indicating success
+        const data = await response.json();
+        // Show a popup message to the user indicating the product was added to the cart
+        alert('Product added to cart');
+
+        // Optionally, you can update the cart count displayed on the front end
+        updateCartCount(data.cartItemsCount);
+    } catch (error) {
+        // If an error occurs, log it to the console and display a generic error message
+        console.error('Error adding product to cart:', error);
+        alert('An error occurred while adding the product to the cart. Please try again.');
+    }
+};
+
+
+  </script>
+
+<%- include("footer") -%>

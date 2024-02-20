@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/img/istore.png" type="image/x-icon">
+    <title>istore</title>
+    
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <!---Boxicons CDN Setup for icons-->
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <!-- navrbar starts -->
+
+<div class="main-navbar shadow-sm sticky-top">
+    <div class="top-navbar">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-2 my-auto d-none d-sm-none d-md-block d-lg-block">
+                    <a href="/">
+                        <img class="logo"style="width:75px" height="75px; justify-content-center" src="/img/bg.png">
+                    </a>
+                </div>
+             </div>
+          </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <div class="icon-nav-toggler">
+                <a class="navbar-brand d-block d-sm-block d-md-none d-lg-none" href="#">
+                    Istore
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            
+        </div>
+    </nav>
+<!-- navbar ends -->
+
+<div class="text-center center-div" id="login" style="background-color:white; height: 600px; padding-top: 100px;" >
+  <div class="container w-25 border py-5"  style="border-radius: 25px; color: white; background-color:rgb(74, 69, 69);" >
+      <div class="title pb-5">
+          <h2 class="font-weight-bold">
+              Login 
+          </h2>
+          
+      </div>
+      
+      <form  class="pt-3" action="/login" method="post" >
+      <!-- <form  class="pt-3"  onsubmit="submitForm(event)"> -->
+          
+          <div class="form-group">
+              <div id="error" ></div>
+              
+              <input type="email"  id="email" class="form-control" placeholder="email" name="email" required>
+              <!-- <small class="form-text text-muted text-left">Log In</small> -->
+          </div>
+          <div class="form-group">
+              <input type="password"  id="password" class="form-control" name="password" placeholder="password" required>
+          </div>
+          <a href="/forget">Forget Password</a>
+          <br>
+          
+          <button type="submit" class="btn btn-outline-success">Submit</button>
+          <p>Don't have any account? <a href="/signup">signup</a></p>
+          <div class="d-flex align-items-center justify-content-center pb-4">
+            </div>
+      </form>
+  </div>
+   </div>
+   <script>
+      let emailUser = document.getElementById("email");
+      let passwordUser = document.getElementById("password");
+               
+      if ( window.history.replaceState ) {
+    window.history.replaceState( null, null, window.location.href );
+  }
+  
+      let errorId  = document.getElementById("error");
+      
+      function showError(message) {
+// Create a new div element
+const errorDiv = document.createElement("div");
+
+// Set the error message
+errorDiv.textContent = message;
+
+// Add a class or styles if needed
+errorDiv.classList.add("error-message");
+
+// Append the new div to the existing div with id "error"
+
+errorId .appendChild(errorDiv);
+
+// After 5 seconds, remove the child div
+setTimeout(() => {
+  errorId .removeChild(errorDiv);
+}, 5000);
+}
+
+      async function submitForm(e){
+          e.preventDefault();
+
+const data = {
+email: emailUser.value,
+password: passwordUser.value
+};
+
+
+const response = await fetch("/login", {
+  method: "POST",
+  headers: {
+      "Content-Type": "application/json",
+  },
+  body: JSON.stringify(data),
+});
+console.log(data)
+
+if (response.ok) {
+  console.log("ok")
+  const responseData = await response.json();
+  console.log("Response Data:", responseData);
+
+  // window.location.href("http://localhost:3001/home")
+  window.location.href = "/home";
+} else {
+
+  const errorMessage = await response.json();
+  console.log(errorMessage)
+  showError(errorMessage.mes)
+
+}
+
+      }
+
+  </script>
+<%- include("footer")-%>

@@ -1,0 +1,64 @@
+<%-include("header")%>
+<style>
+    .custom-list-group-item{
+      background-color: rgb(243, 237, 237);
+        margin-bottom: 10px;
+        border-radius: 10px;
+        margin-top: 10px;
+        padding: 6px;
+    }
+</style>
+
+<div class="container-xl px-4 mt-4">
+    <!-- Account page navigation-->
+    <nav class="nav nav-borders">
+        <a class="nav-link active ms-0" href="/profile">Profile</a>
+        <a class="nav-link" href="/managePassword">Manage Password</a>
+        <a class="nav-link" href="/manageAddress">Manage Address</a>
+        <a class="nav-link" href="/orderdetails">Order</a>
+    </nav>
+    <hr class="mt-0 mb-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="custom-address-list">
+                <h4>Your Custom Addresses</h4>
+                <!-- Button to trigger add address modal -->
+                <a href="/addAddress"><button class="addAddressbtn">Add New Address</button></a>
+
+                <!-- Address list -->
+                <ul class="custom-list-group" style="max-height: 380px;">
+                    <% userData.profile.address.forEach(address => { %>
+                    <li class="custom-list-group-item">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <span><%= address.name %>, 
+                                            <%= address.houseName %>,
+                                            <%= address.postalCode %>,
+                                            <%= address.email %>,
+                                            <%= address.city %>,
+                                            <%= address.phone %></span>
+                                    </div>
+                                </div>
+                                <hr>
+                            </div>
+                            <div class="col-md-3">
+                                <!-- Edit and Delete buttons -->
+                                <div class="custom-address-buttons">
+                                    <a href="/editAddress/<%= address._id %>"><button class="btn btn-sm btn-info">Edit</button></a>
+
+                                    <!-- <button class="btn btn-sm btn-danger">Delete</button> -->
+                                      <a href="/deleteAddress/<%= address._id %>"><button type="submit" class="btn btn-sm btn-danger">Delete</button></a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%-include("footer")%>

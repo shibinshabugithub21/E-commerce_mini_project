@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .side-nav {
+            background-color:black;
+            color:white;
+            padding: 15px;
+            text-align: left;
+            width: 200px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            height: 1000px;
+        
+        }
+
+        .side-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: absolute;
+            left: 45px;
+            top: 120px;
+
+        }
+
+        .side-nav a {
+            text-decoration: none;
+            color: #fff;
+            text-align: center;
+            display: block;
+            padding: 10px;
+            margin-top: 40px;
+            border-radius: 3px;
+            border-radius: 20px;
+            transition:  0.33s ease-in-out;  
+            font-weight: 500; 
+            
+            
+            /* transition: background-color 0.3s; */
+        /* transition: background-color 0.3s; */
+        }
+
+        .side-nav a:hover{
+            color: black;
+            background-color: white;
+            border-radius: 20px;
+        }
+
+        /* Main Content Area */
+        .content {
+            flex: 1;
+            overflow-x: hidden;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            width: 100%;
+            height: 50px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            background-color: rgb(255, 255, 255);
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            /* z-index: 1; Ensure top-nav is above sidebar */
+        
+        }
+
+        .search-bar {
+            margin-top: 20px;
+            display: flex;
+            margin-left: 100px;
+        }
+
+        .search-bar input {
+            margin-right: 10px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin-top: 20px;
+            margin-left: 100px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #FF6347;
+            color: white;
+        }
+
+        .action-btn {
+            padding: 8px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .block-btn-notBlock {
+            background-color:green;
+            color: white;
+        }
+        .block-btn-Block {
+            background-color: red;
+            color: white;
+        }
+
+        /* Pagination Styling */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 10px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .pagination button.active {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div class="side-nav">
+        <ul>
+            <li><a href="/admin/home">Dashboard</a></li>
+            <li><a href="/admin/user">User</a></li>
+            <li><a href="/admin/category">Category</a></li>
+            <li><a href="/admin/product">Product</a></li>
+            <li><a href="/admin/order">Order</a></li>
+            <li><a href="/admin/logout">logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <h1>User Management</h1>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <form action="/admin/user" method="GET">
+                <input type="text" name="username" id="search-input" class="search-input" placeholder="Search..." style="border-color : black" value="<%= searchQuery %>"> 
+                <button type="submit">Search</button>
+            </form>            
+        </div>
+
+      <!-- User Detail List Table -->
+<table border="2">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% userDetails.forEach((user, index) => { %>
+            <tr>
+                <td><%= index + 1 %></td>
+                <td><%= user.name %></td>
+                <td><%= user.email %></td>
+                <td>
+                   <!-- Form for blocking -->
+<% if (user.isBlocked === false) { %>
+    <form action="/admin/isblocked/<%= user.email %>" method="post">
+        <button class="action-btn block-btn-Block">Block</button>
+    </form>
+<% } else { %>
+    <!-- Form for unblocking -->
+    <form action="/admin/notblocked/<%= user.email %>" method="post">
+        <button class="action-btn block-btn-notBlock">Unblock</button>
+    </form>
+<% } %>
+
+                </td>
+            </tr>
+        <% }); %>
+    </tbody>
+</table>
+        <!-- Pagination -->
+        <!-- <div class="pagination">
+            <button>Previous</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>Next</button>
+        </div> -->
+
+</body>
+
+</html>

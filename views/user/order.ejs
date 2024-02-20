@@ -1,0 +1,74 @@
+<%- include("header") %>
+<style>
+    body{
+background:#eee;
+}
+.panel-order .row {
+	border-bottom: 1px solid #ccc;
+}
+.panel-order .row:last-child {
+	border: 0px;
+}
+.panel-order .row .col-md-1  {
+	text-align: center;
+	padding-top: 15px;
+}
+.panel-order .row .col-md-1 img {
+	width: 50px;
+	max-height: 50px;
+}
+.panel-order .row .row {
+	border-bottom: 0;
+}
+.panel-order .row .col-md-11 {
+	border-left: 1px solid #ccc;
+}
+.panel-order .row .row .col-md-12 {
+	padding-top: 7px;
+	padding-bottom: 7px; 
+}
+.panel-order .row .row .col-md-12:last-child {
+	font-size: 11px; 
+	color: #555;  
+	background: #efefef;
+}
+.panel-order .btn-group {
+	margin: 0px;
+	padding: 0px;
+}
+.panel-order .panel-body {
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+.panel-order .panel-deading {
+	margin-bottom: 0;
+}                    
+</style>
+
+<div class="container">
+    <h1>Order Details</h1>
+    <% if (orders.length > 0) { %>
+        <% orders.forEach(order => { %>
+            <div>
+                <p>Order ID: <%= order._id %></p>
+                <p>Order Status: <%= order.status %></p>
+                <!-- Display other order details as needed -->
+                <!-- For example: -->
+                <h3>Products:</h3>
+                <% order.products.forEach(product => { %>
+                    <div class="product-item">
+                        <img src="<%= product.image %>" alt="<%= product.name %>">
+                        <p><strong>Name:</strong> <%= product.name %></p>
+                        <p><strong>Price:</strong> <%= product.price %></p>
+                        <!-- Add cancel order button here -->
+                        <button class="cancel-order" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>">Cancel Order</button>
+                    </div>
+                <% }); %>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <p>No orders found.</p>
+    <% } %>
+</div>
+
+<%- include("footer") %>

@@ -1,0 +1,456 @@
+<%-include("header")-%>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    :root {
+        --primary-color: #5344db;
+        --accent-color: #5344db;
+        --grey: #484848;
+        --bg-grey: #efefef;
+        --shadow: #949494;
+    }
+
+    .single-product {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px; /* Adjust margin as needed */
+    }
+
+    .product-image {
+        flex: 1;
+        margin-right: 20px; /* Adjust margin as needed */
+        position: relative;
+    }
+
+    .product-image-main {
+    height: 300px;
+    /* background: var(--bg-grey); */
+    overflow: hidden;
+    margin-left: 63px;
+    }
+    .product-image-main img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .product-image-slider {
+        display: flex;
+        gap: 10px;
+        margin: 50px 20px;
+        justify-content: center;
+    }
+
+    .product-image-slider img {
+        width: 15%;
+        height: 50%;
+        /* background: var(--bg-grey); */
+        padding: 6px;
+        cursor: pointer;
+    }
+
+    .product-details {
+        flex: 1;
+        /* margin-left: 20px; */
+    }
+
+    .product-title h2 {
+        font-size: 32px;
+        line-height: 2.4rem;
+        font-weight: 700;
+        letter-spacing: -0.02rem;
+    }
+
+    .product-rating {
+        display: flex;
+        margin-top: 4px;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+
+    .product-rating span:not(:last-child) {
+        color: #ffc600;
+    }
+
+    .product-rating .review {
+        color: var(--grey);
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .product-price {
+        display: flex;
+        position: relative;
+        margin: 10px 0;
+        align-items: center;
+    }
+
+    .product-price .offer-price {
+        font-size: 48px;
+        font-weight: 700;
+    }
+
+    .product-price .sale-price {
+        font-size: 22px;
+        font-weight: 500;
+        text-decoration: line-through;
+        color: var(--grey);
+        margin-left: 12px;
+    }
+
+    .product-details h3 {
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    .product-details p {
+        margin: 5px 0;
+        font-size: 14px;
+        line-height: 1.2rem;
+    }
+
+    /* Zoom styles */
+   /* Zoom styles */
+.container-img {
+    position:absolute;
+    /* overflow: hidden; */
+}
+
+.image {
+    width: 100%;
+    height: auto;
+}
+
+.lens {
+    width: 100px;
+    height: 100px;
+    /* position: relative; */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* background-color: rgba(255, 255, 255, 0.6); */
+    /* display: none; */
+}
+
+.result {
+    position: absolute;
+    left: 100%; /* Change this to the desired position */
+    top: 0;
+    width: 500px;
+    height: 500px;
+    background-repeat: no-repeat;
+    background-color: white;
+    /* display: none; */
+}
+
+
+    .product-image:hover .lens,
+    .product-image:hover .result {
+        display: block;
+    }
+
+    .breadcrumb {
+        background: #48484810;
+        padding: 8px 4px;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    .breadcrumb span {
+        display: inline-flex;
+        flex-direction: row;
+        gap: 8px;
+        margin-left: 8px;
+    }
+
+    .breadcrumb span:not(:last-child)::after {
+        content: '/';
+    }
+
+    .breadcrumb span a {
+        text-decoration: none;
+        color: var(--primary-color);
+    }
+
+    .divider {
+        display: block;
+        height: 1px;
+        width: 100%;
+        background: #48484830;
+        margin: 20px 0;
+    }
+
+    .product-btn-group {
+        display: flex;
+        gap: 15px;
+    }
+
+    .product-btn-group .button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 10px 24px;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .product-btn-group .buy-now {
+        background-color:blue;
+        color: #fff;
+        border: 1px solid var(--accent-color);
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .product-btn-group .buy-now i {
+        font-size: 20px;
+    }
+
+    .product-btn-group .buy-now:hover {
+        box-shadow: 0 3px 6px var(--shadow);
+    }
+
+    .product-btn-group .add-cart {
+        background-color:orange;
+        color:black;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .product-btn-group .add-cart i {
+        font-size: 20px;
+    }
+
+    .product-btn-group .add-cart:hover {
+        box-shadow: 0 3px 6px var(--shadow);
+        background: var(--grey);
+        color: #fff;
+    }
+
+    .product-btn-group .heart {
+        color: var(--grey);
+        cursor: pointer;
+    }
+
+    .product-btn-group .heart i {
+        font-size: 20px;
+    }
+
+    .product-btn-group .heart:hover {
+        color: var(--accent-color);
+    }
+
+    /* Responsive Mobile */
+    @media screen and (max-width: 520px) {
+        .container {
+            padding: 20px;
+            height: auto;
+        }
+
+        .row {
+            display: block;
+        }
+
+        .col-6 {
+            width: 100%;
+            display: block;
+        }
+
+        .product-image-main {
+            width: 100%;
+            height: 200px;
+        }
+
+        .product-image-slider {
+            gap: 5px;
+            margin: 50px;
+        }
+
+        .breadcrumb {
+            display: none;
+        }
+
+        .product-title h2 {
+            font-size: 24px;
+            line-height: 1.6rem;
+        }
+
+        .product-size {
+            display: block;
+        }
+
+        .product-size .size-layout {
+            display: block;
+            margin: 10px 0;
+        }
+
+        .product-size .size-layout .size {
+            padding: 6px 10px;
+        }
+
+        .product-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+
+    /* Responsive Tablet */
+    @media (min-width: 520px) and (max-width: 1080px) {
+        .container {
+            display: block;
+            height: auto;
+            padding: 20px;
+        }
+    }
+
+</style>
+
+<div class="container">
+    <% product.forEach(element => { %>
+    <div class="single-product">
+        <div class="product-image">
+            <div class="product-image-main">
+                <div class="container-img">
+                    <div id="zoomContainer-<%= element.id %>" class="zoom-container">
+                    <img id="image-<%= element.id %>" class="card-img-top image" style="width: 100%; height: 21.1em;" src="/productImages/<%= element.Image[0] %>" />
+                    <div class="lens" data-productid="<%= element.id %>"></div>
+                    <div class="result" data-productid="<%= element.id %>" style="z-index: 1000;"></div>
+                </div>
+                </div>
+            </div>
+            <div class="product-image-slider">
+                <!-- Update IDs for zoom functionality -->
+                <img id="zoom-image-<%= element._id %>-0" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= element.Image[0] %>" />
+                <img id="zoom-image-<%= element._id %>-1" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= element.Image[1] %>" />
+                <img id="zoom-image-<%= element._id %>-2" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= element.Image[2] %>" />
+                <img id="zoom-image-<%= element._id %>-3" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= element.Image[3] %>" />
+                <img id="zoom-image-<%= element._id %>-4" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= element.Image[4] %>" />
+            </div>
+        </div>
+        
+        <div class="product-details">
+            <div class="breadcrumb">
+                <span><a href="#">Home</a></span>
+                <span><a href="#">Product</a></span>
+                <span class="active">details</span>
+            </div>
+
+            <div class="product">
+                <div class="product-title">
+                    <h2><%= element.Productname %></h2>
+                </div>
+                <div class="product-rating">
+                    <span><i class="bx bxs-star"></i></span>
+                    <span><i class="bx bxs-star"></i></span>
+                    <span><i class="bx bxs-star"></i></span>
+                    <span><i class="bx bxs-star"></i></span>
+                    <span><i class="bx bxs-star"></i></span>
+                    <span class="review">(<%= element.Rating %>.rating)</span>
+                </div>
+                
+                <div class="d-flex flex-column">
+                    <div class="product-price">
+                        <span class="offer-price">₹<%= element.Price %></span>
+                        <!-- <span class="sale-price">₹156,990</span> -->
+                    </div>
+    
+                    <div class="product-details mb-4">
+                        <h3>About</h3>
+                        <p><%= element.Description %></p>
+                    </div>
+    
+                    <div class="product-btn-group">
+                        <form action="/cart/<%= element._id %>" method="post">
+                            <button class="add-to-cart btn btn-warning"  data-product-id="<%= element._id %>" data-product-price="<%= element.Price %>" type="submit">Add to Cart</button>
+                        </form>                  
+                        <!-- <button type="button" class="btn btn-primary btn-lg btn-block">
+                            <a href="/CheckOutPage/<%= element._id %>" style="text-decoration: none; color: white;">Buy Now</a>
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%})%>
+</div>
+
+
+<script>
+    const containers = document.querySelectorAll(".container-img");
+
+    containers.forEach(container => {
+        const productId = container.querySelector(".lens").getAttribute("data-productid");
+        const image = container.querySelector(`#image-${productId}`);
+        const lens = container.querySelector(".lens");
+        const result = container.querySelector(".result");
+
+
+        const containerRect = container.getBoundingClientRect();
+        const imageRect = image.getBoundingClientRect();
+        const lensRect = lens.getBoundingClientRect();
+        const resultRect = result.getBoundingClientRect();
+
+        container.addEventListener("mousemove", zoomImage);
+        container.addEventListener("mouseenter", () => {
+            lens.style.display = "block";
+            result.style.display = "block";
+        });
+        container.addEventListener("mouseleave", () => {
+            lens.style.display = "none";
+            result.style.display = "none";
+        });
+
+        result.style.backgroundImage = `url(${image.src})`;
+
+        function zoomImage(e) {
+            const { x, y } = getMousePos(e);
+
+            lens.style.left = x + "px";
+            lens.style.top = y + "px";
+
+
+            let fx = resultRect.width / lensRect.width;
+            let fy = resultRect.height / lensRect.height;
+
+            result.style.backgroundSize = `${imageRect.width * fx}px ${imageRect.height * fy}px`;
+            result.style.backgroundPosition = `-${x * fx}px -${y * fy}px`;
+        }
+
+        function getMousePos(e) {
+            let x = e.clientX - containerRect.left - lensRect.width / 2;
+            let y = e.clientY - containerRect.top - lensRect.height / 2;
+
+            let minX = 0;
+            let minY = 0;
+            let maxX = containerRect.width - lensRect.width;
+            let maxY = containerRect.height - lensRect.height;
+
+            if (x <= minX) {
+                x = minX;
+            } else if (x >= maxX) {
+                x = maxX;
+            }
+            if (y <= minY) {
+                y = minY;
+            } else if (y >= maxY) {
+                y = maxY;
+            }
+
+            return { x, y };
+        }
+        
+        
+        result.style.display = "none";
+    });
+
+</script>
+
+<%-include('footer')-%>

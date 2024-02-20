@@ -1,0 +1,87 @@
+<%- include("header") -%>
+
+<style>
+    /* CSS for success page */
+
+    /* Base styles */
+    .success-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+    }
+
+    .success-image {
+        width: 200px;
+        margin-bottom: 20px;
+    }
+
+    .success-message {
+        text-align: center;
+    }
+
+    .success-button {
+        background-color: #4CAF50; /* Green */
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin-top: 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .success-button:hover {
+        background-color: #45a049;
+    }
+
+    .success-link {
+        color: #007bff; /* Bootstrap primary color */
+        text-decoration: none;
+        margin-top: 10px;
+        display: inline-block;
+    }
+
+    .success-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Media queries for responsiveness */
+    @media screen and (max-width: 600px) {
+        .success-container {
+            padding: 20px;
+        }
+
+        .success-image {
+            width: 150px;
+            margin-bottom: 10px;
+        }
+
+        .success-button {
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .success-link {
+            margin-top: 5px;
+        }
+    }
+</style>
+
+<div class="success-container">
+    <img src="img/ordersucess.png" alt="Success Image" class="success-image">
+    <p class="success-message">Thank you for your order!</p>
+    <p class="success-message">Your order has been successfully placed.</p>
+    <!-- View Order Button -->
+    <button class="success-button" id="view-order-btn">View Order</button>
+    <!-- Go to Home Link -->
+    <a href="/home" class="success-link">Go to Home</a>
+</div>
+
+<%- include("footer") -%>

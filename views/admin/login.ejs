@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+</head>
+<body style="background-color: white;">
+
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="text-center center-div border py-5" style="border-radius: 25px; background-color: whitesmoke;">
+                    <div class="title pb-5">
+                        <h2 class="font-weight-bold">Admin Login System</h2>
+                    </div>
+
+                    <form class="pt-3" action="/admin/login" method="post" id="loginForm">
+                        <div class="form-group mb-3">
+                            <input type="text" class="form-control" placeholder="Username" name="username" id="username" required >
+                            <span id="emailErrorMsg"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <input type="password" class="form-control form-control-sm" name="password" id="password" placeholder="Password" required>
+                            <span id="passwordErrorMsg"></span>
+                        </div>
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        let loginForm = document.getElementById('loginForm');
+
+        // loginForm.addEventListener('submit', (e) => {
+        //     e.preventDefault();
+        //     let emailInput = document.getElementById('username');
+        //     let passwordInput = document.getElementById('password')
+        //     var email = document.getElementById('username').value.trim();
+        //     var password = document.getElementById('password').value.trim();
+            
+        //     let emailErrorMsg = document.getElementById('emailErrorMsg')
+        //     let passwordErrorMsg = document.getElementById('passwordErrorMsg')
+
+        //     let isEmailValid = validateEmail(email);
+        //     let isPasswordValid = validatePassword(password)
+
+        //     if(!isEmailValid){
+        //         emailErrorMsg.innerHTML = "Please Enter a valid Email";
+        //         emailInput.style.borderColor = 'red'
+        //     }
+        //     else{
+        //         emailErrorMsg.innerHTML = "";
+        //         emailInput.style.borderColor = 'gray'
+        //     }
+
+        //     if(!isPasswordValid){
+        //         passwordErrorMsg.innerHTML = "Please enter a valid password"
+        //         passwordInput.style.borderColor = 'red'
+        //     }
+        //     else{
+        //         passwordErrorMsg.innerHTML = "";
+        //         passwordInput.style.borderColor = 'gray'
+        //     }
+
+            
+        //     if(isEmailValid && isPasswordValid){
+        //         fetch("http://localhost:4000/admin/login", {
+        //             method: "POST", 
+        //             headers: {
+        //                 "Content-Type": "application/json"
+        //             },
+        //             body: JSON.stringify({
+        //                 username: email, 
+        //                 password
+        //             })
+        //         })
+        //         // .then(res => )
+        //         // .then( res => res.json())
+        //         .then( data => {
+        //             if(data.status == 200)
+        //             location.href = "http://localhost:4000/admin/home"
+        //             else  
+        //             alert(data.msg)
+        //         })
+        //         .catch( data => {
+        //             console.log(data)
+        //         })
+        //     }
+
+
+
+        //     // You can add more complex validation if needed
+
+        //     // return true;
+        // })
+    
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function validatePassword(password) {
+            // Minimum 8 characters, at least one number, and one special character
+            const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            return passwordRegex.test(password);
+        }
+
+
+        function emailError(msg){
+
+        }
+    </script>
+
+</body>
+</html>

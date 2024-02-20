@@ -1,0 +1,716 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/img/istore.png" type="image/x-icon">
+    <title>istore</title>
+    
+    <!-- <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> -->
+
+    <script src="https://kit.fontawesome.com/d66066a26b.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/cart.css">
+    <!---Boxicons CDN Setup for icons-->
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <!-- navrbar starts -->
+
+<div class="main-navbar shadow-sm sticky-top">
+    <div class="top-navbar">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-2 my-auto d-none d-sm-none d-md-block d-lg-block">
+                    <a href="/">
+                        <img class="logo"style="width:60px" height="60px" src="/img/bg.png">
+                    </a>
+                    <!-- <h4 class="brand-name">Istore</h4> -->
+
+                </div>
+                <div class="col-md-5 my-auto">
+                    <form role="search">
+                        <div class="input-group">
+                            <input type="search" placeholder="Search your product" class="form-control" >
+                            <button class="search-btn" type="submit" style="background-color: white; height:45px">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-5 my-auto">
+                    <ul class="nav justify-content-end">
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cart">
+                                <i class="fa fa-shopping-cart"></i> Cart
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa fa-heart"></i> Wishlist
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-user"></i>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/profile"><i class="fa fa-user"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fa fa-list"></i> My Orders</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fa fa-heart"></i> My Wishlist</a></li>
+                            <li><a class="dropdown-item" href="/cart"><i class="fa fa-shopping-cart"></i> My Cart</a></li>
+                            <li><a class="dropdown-item" href="/"><i class="fa fa-sign-out"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <div class="icon-nav-toggler">
+                <a class="navbar-brand d-block d-sm-block d-md-none d-lg-none" href="#">
+                    Istore
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="second" style="align-items: center;">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="secnav-item ">
+                            <a class="nav-link" href="/home">Home</a>
+                        </li>
+                        <li class="secnav-item ">
+                            <a class="nav-link" href="/products">Iphone</a>
+                        </li>
+                        <li class="secnav-item ">
+                            <a class="nav-link" href="/mac">Mac</a>
+                        </li>
+                        <li class="secnav-item">
+                            <a class="nav-link" href="/airpod">Airpods</a>
+                        </li>
+                        <li class="secnav-item">
+                            <a class="nav-link" href="/watch">Watchs</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+<!-- navbar ends -->
+
+<style>
+     /* checkout */
+     body{
+      overflow-x: hidden;
+     }
+     .row {
+        display: -ms-flexbox; /* IE10 */
+        display: flex;
+        -ms-flex-wrap: wrap; /* IE10 */
+        flex-wrap: wrap;
+        margin: 0 -16px;
+      }
+      
+      .col-25 {
+        -ms-flex: 25%; /* IE10 */
+        flex: 25%;
+      }
+      
+      .col-50 {
+        -ms-flex: 50%; /* IE10 */
+        flex: 50%;
+      }
+      
+      .col-75 {
+        -ms-flex: 75%; /* IE10 */
+        flex: 75%;
+      }
+      
+      .col-25,
+      .col-50,
+      .col-75 {
+        padding: 0 16px;
+      }
+      
+      .container {
+        background-color: #f2f2f2;
+        padding: 5px 20px 15px 20px;
+        border: 1px solid lightgrey;
+        border-radius: 3px;
+      }
+      
+      input[type=text] {
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 10px; /* Adjusted padding */
+        border: 1px solid #ccc;
+        border-radius: 5px; /* Adjusted border radius */
+      }
+      
+      label {
+        margin-bottom: 10px;
+        display: block;
+      }
+      
+      .icon-container {
+        margin-bottom: 20px;
+        padding: 7px 0;
+        font-size: 24px;
+      }
+      
+      .btn {
+    background-color: #2196F3;
+    color: white;
+    padding: 12px;
+    margin: 10px 0;
+    border: none;
+    width: 100%;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 17px;
+}
+
+/* Remove hover effect */
+.btn:hover {
+    background-color: #2196F3;
+    color: white;
+}      
+      hr {
+        border: 1px solid lightgrey;
+      }
+      
+      span.price {
+        float: right;
+        color: grey;
+      }
+      
+      /* Added styles for the modal */
+       .modal {
+       display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        padding-top: 60px;
+      }
+      
+      /* Modal content */
+      .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more or less, depending on screen size */
+      } 
+       
+      /* Close button */
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      
+      /* Style for the address list */
+      #addressList {
+        list-style-type: none;
+        padding: 0;
+      }
+      
+      .address-item {
+    margin-bottom: 10px;
+    padding: 10px; /* Add padding to the address card */
+    border: 1px solid #ccc; /* Add border to the address card */
+    border-radius: 5px; /* Add border-radius for rounded corners */
+    background-color: #f9f9f9; /* Add background color */
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1); /* Add box shadow for depth */
+    width: 100%; /* Ensure the address card occupies full width */
+}
+ 
+
+  a {
+    text-decoration: none;
+    color: #0070c9;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  footer {
+    background-color: #f2f2f2;
+    font-family: calibri;
+    padding: 0 22px;
+    padding-bottom: 21px;
+    overflow: hidden;
+  }
+  
+  .footer-content {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  
+  .footer-menu {
+    padding-top: 21px;
+    overflow: hidden;
+  }
+  
+  .footer-col {
+    width: 20%;
+    float: left;
+  }
+  
+ 
+  
+  h3 {
+      color: #333;
+      font-size: 14px;
+      position: relative;
+      z-index: 1;
+      background: #f2f2f2;
+      margin-bottom: 6px;
+      margin-top: 0;
+  }
+  
+  .product-list {
+      padding: 0;
+      list-style: none;
+      margin: 0;
+  }
+  
+  .product-list li {
+    margin-bottom: 5px;
+    line-height: 1;
+  }
+  
+  .product-list a {
+    color: #555;
+    display: inline-block;
+    font-size: 12px;
+  }
+  
+  .product-list a:hover {
+    color: #333;
+  }
+  
+  input[type="checkbox"]:checked+.col-section .product-list {
+      transition: transform 300ms ease, -webkit-transform 300ms ease;
+      visibility: visible;
+      position: static;
+      transform: none;
+  }
+  
+  input[type="checkbox"]:checked+.col-section h3::after {
+      transform: rotate(45deg) scale(1.08);
+  }
+  
+  .footer-base {
+    padding-top: 34px;
+    padding-bottom: 21px;
+    color: #888;
+    font-size: 12px; 
+  }
+  
+  .footer-more-ways {
+    margin-bottom: 7px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #d6d6d6;
+  }
+  
+  .nowrap {
+      white-space: nowrap;
+  }
+  
+  @media only screen and (max-width: 767px) {
+    
+    footer {
+      padding: 0 16px;
+      padding-bottom: 21px;
+    }
+    
+    .footer-col {
+      width: 100%;
+    }
+    
+    .item {
+      border-bottom: 1px solid #d6d6d6;
+    }
+    
+    h3 {
+      padding: 10px 0;
+      margin: 0;
+      cursor: pointer;
+    }
+    
+    h3::after {
+      content: '+';
+      float: right;
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: -2px;
+      margin-right: 8px;
+      transition: transform .3s ease
+    }
+    
+    .product-list {
+      visibility: hidden;
+      position: absolute;
+      transform: translateY(-100px);
+      z-index: 1;
+      padding: 5px 0 16px 0;
+    }
+    
+    .product-list li {
+      margin: 0;
+    }
+    
+    .product-list a {
+      display: block;
+      padding: 6px 14px;
+    }
+    
+    .footer-col {
+      overflow: hidden;
+    }
+  }
+  
+  @media only screen and (min-width: 767px) {
+    .item-padding-top {
+      padding-top: 24px;
+    }
+  }
+  
+  .footer-legal-copyright {
+      margin-right: 30px;
+      float: left;
+      margin-top: 3px;
+  }
+  
+  .footer-legal-links {
+    float: left;
+  }
+  
+  .footer-legal-links a {
+    /* border-right: 1px solid #d6d6d6; */
+    margin-right: 10px;
+    padding-right: 12px;
+    display: inline-block;
+    margin-top: 3px;
+    white-space: nowrap;
+    color: #555;
+  }
+  
+  .footer-legal-links a:last-child {
+    border-right: none;
+  }
+  
+  .footer-legal-links a:hover {
+    color: #333;
+  }
+
+   
+    </style>
+
+<div class="row">
+  <div class="col-75">
+      <div class="container">
+          <select id="existing-address">
+              <option value="">Select an existing address</option>
+              <% user.profile.address.forEach(function(address) { %>
+                  <option value="<%= address._id %>"><%= address.houseName %> - <%= address.city %>, <%= address.postalCode %></option>
+              <% }); %>
+          </select>
+          <form>
+              <div class="row">
+                  <div class="col-50">
+                      <label for="fname">Full Name</label>
+                      <input type="text" id="fname" name="firstname"  disabled>
+                      <label for="email"> Email</label>
+                      <input type="text" id="email" name="email" value="" placeholder="john@example.com" disabled>
+                      <label for="adr">HouseName</label>
+                      <input type="text" id="adr" name="address" placeholder="542 W. 15th Street" disabled>
+                      <label for="city">City</label>
+                      <input type="text" id="city" name="city" placeholder="New York" disabled>
+                      <label for="pincode">Pincode</label>
+                      <input type="text" id="pincode" name="postalCode" disabled>
+                      <label for="phone">Phone</label>
+                      <input type="text" id="inputPhone" name="phonee" disabled>
+                  </div>
+              </div>
+          </form>
+          <a href="/"><button> Add New Address</button></a>
+        </div>
+      </div>
+      <div class="col-25">
+        <div class="container">
+          
+          <h4>Cart <span class="price" style="color:black"><i class="fa fa-shopping-cart"><%=cartCount%></i> </span></h4>
+          <!-- <h4>Cart <span class="price" style="color:black"><i class="fa fa-shopping-cart"></i> <b>4</b></span></h4> -->
+          <% result.forEach(element => {%>
+            <p><a href="#"><%=element.name%></a> <span class="price">₹<%= element.price %></span></p>
+             
+            <% }); %>
+          <hr>
+          <div class="col-50">
+            <h3>Payment</h3>
+            <div style="display: block;">
+              <input type="checkbox" id="cashOnDelivery" name="cashondelivery"> Cash on Delivery
+            </div>
+            <!-- <label>
+                <input type="checkbox" id="paypal" name="paypal"> Paypal
+            </label> -->
+        </div>
+        
+        
+            <hr>
+          <p>Total <span class="price" style="color:black"><b>₹<%= total %></b></span></p>
+          <button class="btn" onclick="checkoutChecking()" >buynow</button>
+    
+        </div>
+      </div>
+    </div>
+   
+
+  <footer>
+      <div class="footer-content">
+      <nav class="footer-menu">
+        <div class="footer-col">
+          <div class="item">
+            <div  id="products" class="col-section">
+              <label for="products">
+              <h3>Shop and learn</h3>  
+            </label>
+              <ul class="product-list">
+                <li><a href="#">Mac</a></li>
+                <li><a href="#">iPad</a></li>
+                <li><a href="#">iPhone</a></li>
+                <li><a href="#">Watch</a></li>
+                <li><a href="#">TV</a></li>
+                <li><a href="#">Music</a></li>
+                <li><a href="#">iTunes</a></li>
+                <li><a href="#">HomePod</a></li>
+                <li><a href="#">iPod touch</a></li>
+                <li><a href="#">Accessories</a></li>
+                <li><a href="#">Gift Cards</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+    
+        <div class="footer-col">
+          <div class="item">
+            <div id="store" class="col-section">
+              <label for="store">
+              <h3>Apple Store</h3>  
+            </label>
+              <ul class="product-list">
+                <li><a href="#">Find a Store</a></li>
+                <li><a href="#">Genius Bar</a></li>
+                <li><a href="#">Today at Apple</a></li>
+                <li><a href="#">Apple Camp</a></li>
+                <li><a href="#">Field Trip</a></li>
+                <li><a href="#">Apple Store App</a></li>
+                <li><a href="#">Refurbished and Clearance</a></li>
+                <li><a href="#">Financing</a></li>
+                <li><a href="#">Reuse and Recycling</a></li>
+                <li><a href="#">Order Status</a></li>
+                <li><a href="#">Shopping Help</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-col">
+          <div class="item">
+            <div id="education" class="col-section">
+              <label for="education">
+              <h3>For Education</h3>  
+            </label>
+              <ul class="product-list">
+                <li><a href="#">Apple and Education</a></li>
+                <li><a href="#">Shop for College</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="item item-padding-top">
+            <input type="checkbox" id="business">
+            <div class="col-section">
+              <label for="business">
+              <h3>For Business</h3>  
+            </label>
+              <ul class="product-list">
+                <li><a href="#">Apple and Business</a></li>
+                <li><a href="#">Shop for Business</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+    
+        <div class="footer-col">
+          <div class="item">
+            <div id="acccount" class="col-section">
+              <label for="acccount">
+              <h3>Account</h3>  
+            </label>
+              <ul class="product-list">
+                <li><a href="#">Manage Your Apple ID</a></li>
+                <li><a href="#">Apple Store Account</a></li>
+                <li><a href="#">iCloud.com</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="item item-padding-top">
+            <input type="radio" id="values">
+            <div class="col-section">
+              <label for="values">
+              <h3>Apple Values</h3>  
+            </label>
+              <ul class="product-list">
+                <li><a href="#">Accessibility</a></li>
+                <li><a href="#">Education</a></li>
+                <li><a href="#">Environment</a></li>
+                <li><a href="#">Inclusion and Diversity</a></li>
+                <li><a href="#">Privacy</a></li>
+                <li><a href="#">Supplier Responsibility</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+    
+        <div class="footer-col">
+          <div class="item">
+           <div id="about" class="col-section">
+              <label for="about">
+              <h3>About Apple</h3>  
+            </label>
+              <ul class="product-list">
+                <li><a href="#">Newsroom</a></li>
+                <li><a href="#">Apple Leadership</a></li>
+                <li><a href="#">Job Opportunities</a></li>
+                <li><a href="#">Investors</a></li>
+                <li><a href="#">Events</a></li>
+                <li><a href="#">Contact Apple</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <section class="footer-base">
+        <div class="footer-more-ways" x-ms-format-detection="none">
+            More ways to shop: Visit an <a href="/retail/">Apple Store</a>, <span class="nowrap">call 1-800-MY-APPLE, or <a href="#">find a reseller</a></span>.
+        </div>
+        <div class="footer-legal">
+              <div class="footer-legal-copyright">Copyright © 2024 Apple Inc. All rights reserved.</div>
+              <div class="footer-legal-links">
+                  <a href="#">Privacy Policy</a>
+                  <a href="#">Terms of Use</a>
+                  <a href="#">Sales and Refunds</a>
+                  <a href="#">Legal</a>
+                  <a href="#">Site Map</a>
+              </div>
+          </div>
+      </section>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script> -->
+  <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script> -->
+  <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+  <script>
+    document.getElementById('existing-address').addEventListener('change', function() {
+    var selectedIndex = this.selectedIndex;
+    if (selectedIndex !== 0) {
+        var Address = JSON.parse('<%- JSON.stringify(user.profile.address) %>');
+        var selectedAddress = Address[selectedIndex - 1]; // Adjust index to match array index
+        console.log(selectedAddress);
+        document.getElementById('adr').value = selectedAddress.houseName;
+        document.getElementById('city').value = selectedAddress.city;
+        document.getElementById('pincode').value = selectedAddress.postalCode;
+        document.getElementById('inputPhone').value = selectedAddress.phone;
+        document.getElementById('fname').value = selectedAddress.name;
+        document.getElementById('email').value = selectedAddress.emailid;
+    } else {
+        // Reset fields if "Select an existing address" is chosen
+        document.getElementById('adr').value = "";
+        document.getElementById('city').value = "";
+        document.getElementById('pincode').value = "";
+        document.getElementById('inputPhone').value = "";
+    }
+});
+
+</script>
+
+
+
+ 
+<script>
+  const email = document.getElementById("email");
+  const addressid = this.value;
+
+ async function checkoutChecking(){
+    console.log("checkout")
+    try {
+      const response = await fetch("/CheckOut",{method:"post",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+      emailAddress:email.value,
+      method:"COD",
+      addressid : addressid
+
+    })
+  })
+  // if (response.ok){
+  //   // alert("ok it s fine")
+  //   const result = await response.json()
+  //   alert(result.data)
+  // }
+  if (response.ok) {
+    const result = await response.json();
+    // Use SweetAlert to display a success message
+    Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: result.data
+    }).then((result) => {
+        // Redirect to /success
+        if (result.isConfirmed || result.isDismissed) {
+            window.location.href = '/success';
+        }
+    });
+}
+
+
+    } catch (error) {
+      
+    }
+  }
+</script>
+</body>
+  </html>

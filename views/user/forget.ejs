@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/img/istore.png" type="image/x-icon">
+    <title>istore</title>
+    
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <!---Boxicons CDN Setup for icons-->
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <!-- navrbar starts -->
+
+<div class="main-navbar shadow-sm sticky-top">
+    <div class="top-navbar">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-2 my-auto d-none d-sm-none d-md-block d-lg-block">
+                    <a href="/">
+                        <img class="logo"style="width:75px" height="75px; justify-content-center" src="/img/bg.png">
+                    </a>
+                    <!-- <h4 class="brand-name">Istore</h4> -->
+
+                </div>
+           </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <div class="icon-nav-toggler">
+                <a class="navbar-brand d-block d-sm-block d-md-none d-lg-none" href="#">
+                    Istore
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            
+        </div>
+    </nav>
+<!-- navbar ends -->
+  
+<body>
+
+    <div class="container reset-container">
+        <h2 class="text-center mb-4">Reset Password</h2>
+        <form onsubmit="return validateForm()">
+            <div class="form-group">
+                <label for="password">New Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Enter new password">
+                <span id="passwordError" class="error-message"></span>
+            </div>
+            <div class="form-group">
+                <label for="repassword">Confirm New Password</label>
+                <input type="password" class="form-control" id="repassword" placeholder="Confirm new password">
+                <span id="repasswordError" class="error-message"></span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Reset Password</button>
+            <p id="successMessage" class="success-message"></p>
+        </form>
+    </div>
+
+    <script>
+        function validateForm() {
+            // Reset error messages
+            document.getElementById("passwordError").innerHTML = "";
+            document.getElementById("repasswordError").innerHTML = "";
+            document.getElementById("successMessage").innerHTML = "";
+
+            // Get input values
+            var password = document.getElementById("password").value;
+            var repassword = document.getElementById("repassword").value;
+
+            // Validate password
+            if (password.length < 8) {
+                document.getElementById("passwordError").innerHTML = "Password must be at least 8 characters";
+                return false;
+            }
+
+            // Validate password confirmation
+            if (password !== repassword) {
+                document.getElementById("repasswordError").innerHTML = "Passwords do not match";
+                return false;
+            }
+
+            // Add logic to handle password reset (e.g., send request to server)
+            // For demonstration purposes, show success message
+            document.getElementById("successMessage").innerHTML = "Password reset successfully!";
+
+            // Prevent form submission (remove for actual implementation)
+            return false;
+        }
+        </script>
+
+    <%-include("footer")-%>

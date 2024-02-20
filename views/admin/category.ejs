@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .side-nav {
+            background-color:black;
+            color:white;
+            padding: 15px;
+            text-align: left;
+            width: 200px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            height: 800px;
+        
+        }
+
+        .side-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: absolute;
+            left: 45px;
+            top: 120px;
+
+        }
+
+
+        .side-nav a {
+            text-decoration: none;
+            color: #fff;
+            text-align: center;
+            display: block;
+            padding: 10px;
+            margin-top: 40px;
+            border-radius: 3px;
+            border-radius: 20px;
+            transition:  0.33s ease-in-out;  
+            font-weight: 500; 
+            
+            
+            /* transition: background-color 0.3s; */
+        }
+
+        .side-nav a:hover{
+            color: black;
+            background-color: white;
+            border-radius: 20px;
+        }
+
+        /* Main Content Area */
+        .content {
+            /* text-align: center; */
+            flex: auto;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            width: 100%;
+            height: 50px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            background-color: gray;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1; /* Ensure top-nav is above sidebar */
+        }
+
+        /* Add New Category Button Styling */
+        .add-category-btn {
+            margin: 20px auto;
+            margin-left: 110px;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            display: block;
+        }
+
+        /* Table Styling */
+        table {
+            border-collapse: collapse;
+            border-radius: 30px;
+            width: 80%;
+            margin: 20px auto; /* Center the table on the page */
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #FF6347;
+            color: white;
+        }
+        .btnn{
+            display: flex;
+         }
+        /* Action Button Styling */
+        .action-btn {
+            padding: 8px;
+            margin-left: 10px;
+            margin-bottom: 5px; /* Added margin to separate buttons */
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .update-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .remove-btn {
+            background-color: red;
+            color: white;
+        }
+
+        /* Pagination Styling */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 10px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .pagination button.active {
+            background-color: black;
+            color: white;
+        }
+
+        /* Responsive Styles */
+        @media only screen and (max-width: 600px) {
+            .side-nav {
+                display: none;
+            }
+
+            .top-nav {
+                padding: 10px;
+            }
+
+            .content {
+                padding: 10px;
+            }
+
+            .add-category-btn {
+                margin: 10px auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div class="side-nav">
+        <!-- <img src="/Public/img/bg.png" width="100px",height="150px"> -->
+        <ul>
+            <li><a href="/admin/home">Dashboard</a></li>
+            <li><a href="/admin/user">User</a></li>
+            <li><a href="/admin/category">Category</a></li>
+            <li><a href="/admin/product">Product</a></li>
+            <li><a href="/admin/order">Order</a></li>
+            <li><a href="/admin/logout">logout</a></li>
+
+            <!-- Add more navigation items as needed -->
+        </ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <!-- Add top navigation content here if needed -->
+            <h1><u>Category Management</u></h1>
+        </div>
+
+        <!-- Add New Category Button -->
+       <a href="/admin/addcategory" style="text-decoration: none;"><button class="add-category-btn">Add New Category</button></a> 
+
+ 
+        <!-- Category List Table -->
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Category Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <% category.forEach((category,index)=>{%>
+                <!-- Replace the following rows with actual data from your backend -->
+                <tr>
+                    <td><%=index +1%></td>
+                    <td><%=category.Category%></td>
+                    <td class="btnn ">
+                   <a href="/admin/editcatgory/<%=category._id%>"><button class="action-btn update-btn"  >Update</button></a>
+                      <a href="/admin/delete/<%=category.id%>"> <button class="action-btn remove-btn">Remove</button></a>  
+
+                    </td>
+                </tr>
+            <% }) %>
+            </tbody>
+        </table>
+        <!-- Pagination -->
+        <div class="pagination">
+            <button>Previous</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>Next</button>
+        </div>
+    </div>
+</body>
+
+</html>

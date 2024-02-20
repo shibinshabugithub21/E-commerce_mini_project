@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/img/istore.png" type="image/x-icon">
+    <title>istore</title>
+    
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <!---Boxicons CDN Setup for icons-->
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+    
+
+   
+</head>
+<body>
+    <!-- navrbar starts -->
+
+<div class="main-navbar shadow-sm sticky-top">
+    <div class="top-navbar">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-2 my-auto d-none d-sm-none d-md-block d-lg-block">
+                    <a href="/">
+                        <img class="logo"style="width:75px" height="75px; justify-content-center" src="/img/bg.png">
+                    </a>
+                    <!-- <h4 class="brand-name">Istore</h4> -->
+
+                </div>
+           </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <div class="icon-nav-toggler">
+                <a class="navbar-brand d-block d-sm-block d-md-none d-lg-none" href="#">
+                    Istore
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+<!-- navbar ends -->
+<div class="container signup-container-sm custom-container">
+    <h2 class="text-center mb-4">Sign Up</h2>
+    <div id="validationMessage" class="validation-message"></div>
+    <form id="signupForm" action="/signup" method="post">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" name="name" placeholder="Enter username" required>
+            <div id="errorUsername" class="error-message"></div>
+        </div>
+        <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+            <div id="errorEmail" class="error-message"></div>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+            <div id="errorPassword" class="error-message"></div>
+        </div>
+        <!-- Uncomment this section if you want to confirm the password -->
+        <div class="form-group">
+            <label for="confirmPassword">confirm Password</label>
+            <input type="password" class="form-control" id="confirmPassword" name="repassword" placeholder="Confirm password" required>
+            <div id="errorConfirmPassword" class="error-message"></div>
+        </div>
+           
+       
+        <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter phone number" required>
+            <div id="errorPhone" class="error-message"></div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('signupForm');
+        form.addEventListener('submit', function (event) {
+            var username = form.querySelector('#username').value.trim();
+            var email = form.querySelector('#email').value.trim();
+            var password = form.querySelector('#password').value.trim();
+            var confirmPassword = form.querySelector('#confirmPassword').value.trim();
+            var phone = form.querySelector('#phone').value.trim();
+
+            var errorUsername = document.getElementById('errorUsername');
+            var errorEmail = document.getElementById('errorEmail');
+            var errorPassword = document.getElementById('errorPassword');
+            var errorConfirmPassword = document.getElementById('errorConfirmPassword');
+            var errorPhone = document.getElementById('errorPhone');
+            var validationMessage = document.getElementById('validationMessage');
+
+            errorUsername.innerHTML = '';
+            errorEmail.innerHTML = '';
+            errorPassword.innerHTML = '';
+            errorConfirmPassword.innerHTML = '';
+            errorPhone.innerHTML = '';
+            validationMessage.innerHTML = '';
+
+            if (username === '' || email === '' || password === '' || confirmPassword === '' || phone === '') {
+                validationMessage.innerHTML = 'Please fill in all fields.';
+                event.preventDefault();
+                return;
+            }
+
+            if (/\s/.test(username) || /\s/.test(password)) {
+                validationMessage.innerHTML = 'Username and password should not contain whitespace.';
+                event.preventDefault();
+                return;
+            }
+
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorEmail.innerHTML = 'Enter a valid email address.';
+                event.preventDefault();
+                return;
+            }
+
+            if (password !== confirmPassword) {
+    errorConfirmPassword.innerHTML = 'Passwords do not match.';
+    event.preventDefault(); // Prevent form submission if passwords don't match
+    return; // Stop further execution of the validation process
+}
+
+
+            form.submit()
+
+
+        });
+    });
+</script>
+
+
+
+
+    <%-include("footer")-%>
+
+
