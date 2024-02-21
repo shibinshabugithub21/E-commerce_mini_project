@@ -50,25 +50,24 @@ background:#eee;
     <% if (orders.length > 0) { %>
         <% orders.forEach(order => { %>
             <div>
-                <p>Order ID: <%= order._id %></p>
-                <p>Order Status: <%= order.status %></p>
-                <!-- Display other order details as needed -->
-                <!-- For example: -->
-                <h3>Products:</h3>
-                <% order.products.forEach(product => { %>
+                <p><u><strong>OrderID:<%= order._id %></strong></u></p>
+                <p>Order_Status: <%= order.status %></p>                
                     <div class="product-item">
-                        <img src="<%= product.image %>" alt="<%= product.name %>">
-                        <p><strong>Name:</strong> <%= product.name %></p>
-                        <p><strong>Price:</strong> <%= product.price %></p>
+                        <img style="width: 50px; height: 55px" src="/productImages/<%= order.products[0].image[0]  %>"/>
+                        <p><strong>Name: <%= order.products[0].p_name %></strong></p><br>
+                        <p><strong>Price:<%= order.products[0].price %></strong> </p>
                         <!-- Add cancel order button here -->
-                        <button class="cancel-order" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>">Cancel Order</button>
+                        <button class="btn btn-outline-danger" data-order-id="<%= order._id %>" data-product-id="<%= order.products._id %>">Cancel Order</button>
+                        <hr>
                     </div>
-                <% }); %>
+                
             </div>
         <% }); %>
     <% } else { %>
         <p>No orders found.</p>
     <% } %>
 </div>
+<!-- < -->
+
 
 <%- include("footer") %>

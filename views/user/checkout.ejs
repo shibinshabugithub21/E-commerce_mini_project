@@ -439,7 +439,7 @@
           <select id="existing-address">
               <option value="">Select an existing address</option>
               <% user.profile.address.forEach(function(address) { %>
-                  <option value="<%= address._id %>"><%= address.houseName %> - <%= address.city %>, <%= address.postalCode %></option>
+                  <option value="<%= address._id %>"><%=address.name %> - <%= address.houseName %> - <%= address.city %>, <%= address.postalCode %>,<%=address.phone %></option>
               <% }); %>
           </select>
           <form>
@@ -448,11 +448,11 @@
                       <label for="fname">Full Name</label>
                       <input type="text" id="fname" name="firstname"  disabled>
                       <label for="email"> Email</label>
-                      <input type="text" id="email" name="email" value="" placeholder="john@example.com" disabled>
+                      <input type="text" id="email" name="email"  disabled>
                       <label for="adr">HouseName</label>
-                      <input type="text" id="adr" name="address" placeholder="542 W. 15th Street" disabled>
+                      <input type="text" id="adr" name="address"  disabled>
                       <label for="city">City</label>
-                      <input type="text" id="city" name="city" placeholder="New York" disabled>
+                      <input type="text" id="city" name="city"  disabled>
                       <label for="pincode">Pincode</label>
                       <input type="text" id="pincode" name="postalCode" disabled>
                       <label for="phone">Phone</label>
@@ -460,7 +460,7 @@
                   </div>
               </div>
           </form>
-          <a href="/"><button> Add New Address</button></a>
+          <a href="/addAddress"><button> Add New Address</button></a>
         </div>
       </div>
       <div class="col-25">

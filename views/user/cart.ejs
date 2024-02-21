@@ -1,5 +1,6 @@
 <%- include('header') %>
 
+
 <style>
 #removebtn{
   background-color: red;
@@ -109,6 +110,7 @@
   </div>
 </section>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
 // Function to update quantity and send request to server
 // async function updateQuantity(itemId, quantityChange) {
@@ -141,6 +143,51 @@
 //     }
 // }
 
+// async function updateQuantity(itemId, direction) {
+//     const quantityInput = document.getElementById(`quantity_${itemId}`);
+//     let newQuantity = parseInt(quantityInput.value);
+
+//     // Increment or decrement the quantity based on the direction
+//     if (direction === 'increment') {
+//         newQuantity++;
+//     } else if (direction === 'decrement' && newQuantity > 1) {
+//         newQuantity--;
+//     } else {
+//         // Don't allow the quantity to go below 1
+//         return;
+//     }
+
+//     try {
+//         // Send a fetch request to update the quantity on the server
+//         const response = await fetch(`/cartupdate/${itemId}`, {
+//             method: 'post',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({ quantity: newQuantity }),
+//         });
+//         if (!response.ok) {
+//             throw new Error('Failed to update quantity');
+//         }
+//         // Parse the JSON response
+//         const data = await response.json();
+//         // Update the quantity and total price on the page
+//         quantityInput.value = newQuantity;
+//         const totalPriceElement = document.getElementById(`totalPrice_${itemId}`);
+//         totalPriceElement.innerText = `₹${data.grantTotal}`;
+        
+//         // Check if the server response contains showAlert flag
+//         if (data.showAlert) {
+//             // Display a SweetAlert if showAlert is true
+//             swal("Out of Stock", data.alertMessage, "warning");
+//         }
+//     } catch (error) {
+//         console.error('Error updating quantity:', error);
+//         // Handle the error (e.g., show a message to the user)
+//     }
+// }
+
+
 async function updateQuantity(itemId, direction) {
     const quantityInput = document.getElementById(`quantity_${itemId}`);
     let newQuantity = parseInt(quantityInput.value);
@@ -164,15 +211,36 @@ async function updateQuantity(itemId, direction) {
             },
             body: JSON.stringify({ quantity: newQuantity }),
         });
-        if (!response.ok) {
-            throw new Error('Failed to update quantity');
+        
+        // Check if the response is okay
+        if (response.ok) {
+            console.log("Checked");
+            // Parse the JSON response
+            const data = await response.json();
+            // Update the quantity and total price on the page
+            quantityInput.value = newQuantity;
+            const totalPriceElement = document.getElementById(`totalPrice_${itemId}`);
+            totalPriceElement.innerText = `₹${data.grantTotal}`;
+            
+            // Check if the server response contains showAlert flag
+            if (data.showAlert) {
+                // Display a SweetAlert if showAlert is true
+                Swal.fire({
+                    title: 'Out of Stock',
+                    text: data.alertMessage,
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+            }
+        } else {
+            // Display the existing alert
+            Swal.fire({
+                title: 'Error',
+                text: 'Maximum Quantity Reached.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
         }
-        // Parse the JSON response
-        const data = await response.json();
-        // Update the quantity and total price on the page
-        quantityInput.value = newQuantity;
-        const totalPriceElement = document.getElementById(`totalPrice_${itemId}`);
-        totalPriceElement.innerText = `₹${data.grantTotal}`;
     } catch (error) {
         console.error('Error updating quantity:', error);
         // Handle the error (e.g., show a message to the user)
@@ -180,21 +248,23 @@ async function updateQuantity(itemId, direction) {
 }
 
 
-// Add event listener to remove buttons
+
 document.addEventListener('DOMContentLoaded', () => {
     const removeButtons = document.querySelectorAll('.remove-from-cart');
     removeButtons.forEach(button => {
         button.addEventListener('click', async () => {
             const itemId = button.getAttribute('data-product-id');
-            // Display a SweetAlert confirmation dialog
-            swal({
-                title: "Are you sure?",
-                text: "Once removed, you will not be able to recover this item!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then(async (willDelete) => {
+            // Display a SweetAlert2 confirmation dialog
+            try {
+                const { value: willDelete } = await Swal.fire({
+                    title: "Are you sure?",
+                    text: "Once removed, you will not be able to recover this item!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, remove it!'
+                });
                 if (willDelete) {
                     try {
                         // Send a fetch request to remove the item from the cart
@@ -202,24 +272,38 @@ document.addEventListener('DOMContentLoaded', () => {
                             method: 'POST', // Assuming your backend expects POST requests for deletion
                         });
                         if (response.ok) {
-                            // Display SweetAlert modal for successful removal
-                            swal("Item removed from cart!", {
-                                icon: "success",
-                            }).then(() => {
-                                // Refresh the page to reflect the updated cart
-                                location.reload();
+                            // Display SweetAlert2 modal for successful removal
+                            await Swal.fire({
+                                title: 'Deleted!',
+                                text: 'Your item has been removed from cart.',
+                                icon: 'success'
                             });
+                            // Refresh the page to reflect the updated cart
+                            location.reload();
                         } else {
                             throw new Error('Failed to remove item from cart');
                         }
                     } catch (error) {
                         console.error('Error removing item from cart:', error);
                         // Handle the error (e.g., show a message to the user)
+                        await Swal.fire({
+                            title: 'Error',
+                            text: 'Failed to remove item from cart',
+                            icon: 'error'
+                        });
                     }
                 } else {
-                    swal("Your item is safe!");
+                    Swal.fire('Cancelled', 'Your item is safe :)', 'info');
                 }
-            });
+            } catch (error) {
+                console.error('Error displaying confirmation dialog:', error);
+                // Handle the error (e.g., show a message to the user)
+                await Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to display confirmation dialog',
+                    icon: 'error'
+                });
+            }
         });
     });
 });

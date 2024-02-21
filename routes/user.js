@@ -30,7 +30,7 @@ router.post('/otppost',usercontroller.otppost)
 // resend otp
 router.get('/resendotp',usercontroller.resendOtp)
 
-router.get('/home',checkSessionAndBlocked,isUser,usercontroller.home);
+router.get('/home',checkSessionAndBlocked,usercontroller.home);
 // router.get('/home',checkSessionAndBlocked,usercontroller.home);
 
 // user accouts detals 

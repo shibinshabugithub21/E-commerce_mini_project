@@ -1,7 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
-const morgan=require('morgan')
+// const morgan=require('morgan')
 // const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const app = express();
@@ -11,7 +11,7 @@ require('dotenv').config()
 app.use(express.urlencoded({ extended: true }));
 app.use('/productImages', express.static(path.resolve(__dirname, 'productImages')));
 
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 app.use(express.json()) 
 // Session middleware
 app.use(session({

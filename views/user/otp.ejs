@@ -68,6 +68,13 @@
                       </button>
                     </form>
 
+                    <% if (error) { %>
+                        <!-- Display the error message -->
+                        <div class="alert alert-danger" role="alert">
+                            <%= error %>
+                        </div>
+                    <% } %>
+                    
 
                    <!-- Example of a button triggering OTP resend -->
                     <div>

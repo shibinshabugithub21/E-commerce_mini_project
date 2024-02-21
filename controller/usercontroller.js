@@ -124,7 +124,7 @@ const forget= (req, res) => {
 
 const otp=(req,res)=>{
     if(req.session.otpGerner){
-        res.render('user/otp')
+        res.render('user/otp',{ error: null })
     }else{
         res.redirect("/login")
     }
@@ -132,40 +132,72 @@ const otp=(req,res)=>{
 
 }
 
+// const otppost = async (req, res) => {
+//     try {
+      
+//         console.log(req.body)
+//         const isNumber = req.body.num1 * 10000 + req.body.num2 * 1000 + req.body.num3 * 100 + req.body.num4 * 10 + req.body.num5 * 1;
+//         console.log(typeof(isNumber));
+//         const result = await collectionOtp.findOne({ number: isNumber });
+//         console.log(result);
+//         if(result){
+//             req.session.user  = req.session.otpGerner.email;
+//             delete req.session.otpGerner;
+//             res.redirect("/home")
+//         }else{
+//             res.redirect("/login")
+//         }
+
+//             // .then((found) => {
+//             //     if (found.length > 0) {
+//             //         // Your logic for a successful OTP verification
+//             //     } else {
+//             //         res.render('user/otp', { fal: "Please Check Your OTP", user: req.session.user, cartCount })
+//             //     }
+//             // })
+//             // .catch((err) => {
+//             //     res.render('user/otp', { fal: "Please Check Your OTP", user: req.session.user, cartCount })
+//             // })
+            
+//     } catch (error) {
+//         console.log(error.message)
+//         res.status(500).send("Otp error")
+//         const message = error.message
+//         res.status(500).render('404-error', { error, message })
+//     }
+// }
+
 const otppost = async (req, res) => {
     try {
-      
-        console.log(req.body)
-        const isNumber = req.body.num1 * 10000 + req.body.num2 * 1000 + req.body.num3 * 100 + req.body.num4 * 10 + req.body.num5 * 1;
-        console.log(typeof(isNumber));
-        const result = await collectionOtp.findOne({ number: isNumber });
-        console.log(result);
-        if(result){
-            req.session.user  = req.session.otpGerner.email;
-            delete req.session.otpGerner;
-            res.redirect("/home")
-        }else{
-            res.redirect("/login")
+        const num1 = req.body.num1 || '';
+        const num2 = req.body.num2 || '';
+        const num3 = req.body.num3 || '';
+        const num4 = req.body.num4 || '';
+        const num5 = req.body.num5 || '';
+
+        // Check if any of the input fields are empty
+        if (!num1 || !num2 || !num3 || !num4 || !num5) {
+            return res.status(400).render('user/otp', { error: 'Please enter all the OTP digits' });
         }
 
-            // .then((found) => {
-            //     if (found.length > 0) {
-            //         // Your logic for a successful OTP verification
-            //     } else {
-            //         res.render('user/otp', { fal: "Please Check Your OTP", user: req.session.user, cartCount })
-            //     }
-            // })
-            // .catch((err) => {
-            //     res.render('user/otp', { fal: "Please Check Your OTP", user: req.session.user, cartCount })
-            // })
-            
+        const isNumber = parseInt(num1 + num2 + num3 + num4 + num5);
+        console.log(typeof(isNumber));
+        const result = await collectionOtp.findOne({ number: isNumber });
+
+        if (result) {
+            req.session.user = req.session.otpGerner.email;
+            delete req.session.otpGerner;
+            return res.redirect("/login");
+        } else {
+            return res.status(400).render('user/otp', { error: 'Invalid OTP. Please try again.' });
+        }
     } catch (error) {
-        console.log(error.message)
-        res.status(500).send("Otp error")
-        const message = error.message
-        res.status(500).render('404-error', { error, message })
+        console.log(error.message);
+        const message = error.message;
+        res.status(500).render('404-error', { error, message });
     }
-}
+};
+
 
 
 //resend otp
@@ -371,56 +403,45 @@ const home =async (req,res)=>{
         }
     };
 
-    // const cartQuantityUpdate = async (req, res) => {
-    //     try {
-    //         const cartId = req.params.id;
-    //         console.log(cartId);
-    //         const quantity = req.body.quantity; 
-    //         const userEmail = req.session.user;
-            
-          
-    //         const userDetails = await collectionModel.findOne({ email: userEmail });
-    //         console.log(userDetails);
-    //         // const cartItem = userDetails.cart.items.id(cartId);
-    //         const cartItem = userDetails.cart.items.find(item => item.productname == cartId);
-
-    //         console.log(cartItem);
-    //         const product = await collectionProduct.findById(cartId);
-            
-    //         cartItem.quantity = quantity;
-    
-    //         const totalPrice = product.Price * quantity;
-    //         cartItem.totalprice = totalPrice;
-    
-    //         userDetails.cart.grantTotal = userDetails.cart.items.reduce((accu, element) => accu + element.totalprice, 0);
-    //         userDetails.total = userDetails.cart.items.reduce((accu, element) => accu + (element.quantity * element.Price), 0);
-        
-    
-    //         await userDetails.save();
-    
-    //         res.json({ grantTotal: userDetails.grantTotal, total: userDetails.total });
-    //     } catch (error) {
-    //         console.error('Error from the cartQuantityUpdate:', error);
-    //         res.status(500).json({ error: 'Internal server error' });
-    //     }
-    // };
-    
     const cartQuantityUpdate = async (req, res) => {
         try {
             const cartId = req.params.id;
             const quantity = req.body.quantity; 
             const userEmail = req.session.user;
             
+            // Find the user details
             const userDetails = await collectionModel.findOne({ email: userEmail });
+    
+            // Find the cart item corresponding to the provided ID
             const cartItem = userDetails.cart.items.find(item => item.productname == cartId);
+    
+            // Find the product details from the product collection
             const product = await collectionProduct.findById(cartId);
-            
+    
+            // Check if the product exists
+            if (!product) {
+                return res.status(404).json({ error: 'Product not found' });
+            }
+    
+            // Check if the requested quantity exceeds the available stock
+            if (quantity > product.Stock) {
+                // If quantity exceeds stock, return a client-side alert
+                return res.status(400).json({ 
+                    error: 'Requested quantity exceeds available stock', 
+                    showAlert: true, 
+                    alertMessage: 'The product is out of stock now.' 
+                });
+            }
+    
+            // Update the cart item quantity and total price
             cartItem.quantity = quantity;
             cartItem.totalprice = product.Price * quantity;
     
+            // Recalculate grantTotal and total
             userDetails.cart.grantTotal = userDetails.cart.items.reduce((accu, element) => accu + element.totalprice, 0);
             userDetails.total = userDetails.cart.items.reduce((accu, element) => accu + (element.quantity * element.Price), 0);
     
+            // Save the changes to the user details
             await userDetails.save();
     
             res.json({ grantTotal: userDetails.cart.grantTotal, total: userDetails.total });
@@ -429,6 +450,9 @@ const home =async (req,res)=>{
             res.status(500).json({ error: 'Internal server error' });
         }
     };
+    
+    
+    
     
     const cartDelete = async (req, res) => {
         try {
@@ -862,7 +886,7 @@ const changePassword = async (req, res) => {
 
         // Verify current password
         if (user.password !== currentPassword) {
-            return res.status(400).json({ error: ' current password' });
+            // return res.status(400).json({ error: ' current password' });
         }
 
         if (newPassword !== confirmPassword) {
@@ -879,22 +903,38 @@ const changePassword = async (req, res) => {
 
 const logout =(req,res)=>{
     
-    res.render("user/landing");
-    }
+    req.session.destroy((err) => {
+        console.log("req.session logout" , req.session);
+        if (err) {
+            console.error('Error destroying session:', err);
+        }
+    });
+    res.redirect("/login");
+}
 
 
 // order
 const order=async(req,res)=>{
     try {
         // Fetch orders from the database, you'll need to replace this with your actual logic
-        const orders = await collectionOrder.find({ user: req.session.user });
+        const orders = await collectionOrder.find({ userId: req.session.userid });
         // Render the "user/order" view and pass the orders data
-        res.render('user/order', { orders: orders });
+        console.log(orders[0].products,"here")
+        let listItems = [];
+        for(let order of orders){
+            console.log("1");
+            listItems.push(order.products)
+        }
+        console.log(orders);
+        res.render('user/order', { orders,listItems });
     } catch (error) {
         console.error('Error fetching orders:', error);
         res.status(500).send('Internal Server Error');
     }
+    
 }
+
+
 
 // success
 const success=(req,res)=>{

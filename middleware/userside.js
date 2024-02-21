@@ -3,8 +3,9 @@ const collectionModel = require('../models/mongodb');
 const checkSessionAndBlocked = async (req, res, next) => {
     try {
         // Check if session exists
-        if (req.session.userid) {
-            const userDetials = await collectionModel.findOne({ _id: req.session.userid });
+        console.log("check session" ,req.session.user)
+        if (req.session.user) {
+            const userDetials = await collectionModel.findOne({ email: req.session.user});
 
             // Check if user is blocked
             if (!userDetials.isBlocked) {
@@ -25,7 +26,7 @@ const checkSessionAndBlocked = async (req, res, next) => {
         }
     } catch (error) {
         console.error("Error checking session and blocked status:", error);
-        res.status(500).send("Internal Server Error");
+        res.status(500).send("Internal Server Error middle" );
     }
 };
 
