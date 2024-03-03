@@ -43,7 +43,6 @@
                 <p><strong><%=cartItem.productname.Productname %></strong></p>
                 <p><strong>₹<%=cartItem.totalprice %></strong></p>
               </div>
-              
               <button type="button" id="removebtn" class="remove-from-cart btn btn-danger" data-product-id="<%= cartItem.productname._id %>">Remove</button>
 
               <div class="col-lg-4 col-md-6 mb-4 mb-lg-0" id="plusmin">
@@ -86,6 +85,7 @@
               <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
                 Products
                 <span>₹<%= grantTotal  %></span>
+                
               </li>
               <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                 Shipping
@@ -96,7 +96,7 @@
                   <strong>Total amount</strong>
                  
                 </div>
-                <span><strong>₹<%= grantTotal %></strong></span>
+                <span><strong id="Totalamount">₹<%= grantTotal %></strong></span>
               </li>
             </ul>
 
@@ -219,8 +219,9 @@ async function updateQuantity(itemId, direction) {
             const data = await response.json();
             // Update the quantity and total price on the page
             quantityInput.value = newQuantity;
-            const totalPriceElement = document.getElementById(`totalPrice_${itemId}`);
-            totalPriceElement.innerText = `₹${data.grantTotal}`;
+            console.log(data.grantTotal);
+            const totalPriceElement = document.getElementById(`Totalamount`);
+            totalPriceElement.innerHTML = `₹${data.grantTotal}`;
             
             // Check if the server response contains showAlert flag
             if (data.showAlert) {
@@ -269,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     try {
                         // Send a fetch request to remove the item from the cart
                         const response = await fetch(`/cartDelete/${itemId}`, {
-                            method: 'POST', // Assuming your backend expects POST requests for deletion
+                            method: 'DELETE', // Assuming your backend expects POST requests for deletion
                         });
                         if (response.ok) {
                             // Display SweetAlert2 modal for successful removal

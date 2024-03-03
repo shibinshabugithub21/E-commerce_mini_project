@@ -2,6 +2,8 @@ const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
 // const morgan=require('morgan')
+const nocache = require("nocache");
+
 // const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const app = express();
@@ -9,6 +11,8 @@ const path = require('path');
 require('dotenv').config()
 // Body parsing middleware (for handling form data)
 app.use(express.urlencoded({ extended: true }));
+app.use(nocache()); // use destroy cache 
+
 app.use('/productImages', express.static(path.resolve(__dirname, 'productImages')));
 
 // app.use(morgan('dev'));

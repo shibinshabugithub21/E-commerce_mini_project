@@ -1,7 +1,16 @@
-const collectionModel = require('../models/mongodb');
+const collectionModel = require('../models/userdb');
 const collectionCat=require('../models/category');
 const collectionProduct = require('../models/product');
 const { products } = require('./usercontroller');
+const collectionOrder = require('../models/order');
+const collectionCoupoun = require('../models/coupoun');
+const collectionBanner=require("../models/bannerdb")
+const { render } = require('ejs');
+const PDFDocument = require('pdfkit');
+const excelJS = require('exceljs');
+const fs = require('fs');
+
+
 // const collectionProduct=require('../models/product');
 
 const login = (req, res) => {
@@ -141,19 +150,15 @@ const category = async (req, res) => {
 };
 
 
-const addcategory=(req,res)=>{
-    res.render('admin/addcategory',{status:true,mes: ""})
+const addcategory = (req, res) => {
+    res.render('admin/addcategory', { status: true, mes: "" })
 }
 
 const addcategorypost = async (req, res) => {
     try {
-        const category = req.body.category;
-        console.log(category, "admin side category");
+        const category = req.body.category.trim().toLowerCase(); // Convert to lowercase
 
-        const existingCategory = await collectionCat.findOne({ Category: req.body.category });
-        console.log(existingCategory)
-
-
+        const existingCategory = await collectionCat.findOne({ Category: { $regex: new RegExp("^" + category + "$", "i") } });
 
         if (!existingCategory) {
             const insertingObject = {
@@ -163,11 +168,9 @@ const addcategorypost = async (req, res) => {
 
             console.log("New category successfully added:", newCategory);
 
-            // res.render('admin/category',{category})
             res.status(201).json({ mes: "success" });
         } else {
-            console.log(" item is existed in ");
-            console.log("Error: Category already exists");
+            console.log("Item already exists");
             res.status(400).json({ mes: "Category already exists" });
         }
     } catch (error) {
@@ -307,15 +310,15 @@ const editproductpost = async(req,res)=>{
     console.log("we are here")
     try {
         const productId =req.params.id;
+        console.log("hello",productId);
         const image = req.files;
-        console.log(req.image, req.files, req.file)
+        console.log("img",req.image, req.files, req.file)
         const products = await collectionProduct.findById(productId);
 
         if(!productId){
             return res.status(404).send("priduct not found");
         }
-
-            products.Productname = req.body.productName;  // Use the correct case
+            products.Productname = req.body.productName;  
             products.Category = req.body.category;
             products.Stock= req.body.stock;
             products.Rating= req.body.rating;
@@ -325,7 +328,6 @@ const editproductpost = async(req,res)=>{
             if(req.files && req.files.length > 0){
                 products.Image =products.Image.concat(image.map(file=>file.filename));
             }
-
   await products.save();
   res.redirect('/admin/product');
     } catch (error) {
@@ -335,6 +337,20 @@ const editproductpost = async(req,res)=>{
 }
 
 
+const deletImage = async(req,res)=>{
+    try {
+        console.log("here in the deleting phase");
+        const {productId,imgName} = req.body;
+      
+        const product = await collectionProduct.findById(productId);
+       const filteredImg = product.Image.filter(item => item != imgName );
+       product.Image = filteredImg;
+       await product.save()
+    } catch (error) {
+        console.log(error.message)
+
+    }
+}
 // const update = async (req, res) => {
 //     try {
 //       const productId = req.params.id;
@@ -384,15 +400,12 @@ const deleteproduct = async(req,res)=>{
 
 const isdelete = async (req, res) => {
     try {
-        // Get the username from the query parameters
         const productId =req.params.id;
         console.log(req.params.id);
 
-        // Update the user's record in the database to set isblocked to true
         let nproduct = await collectionProduct.updateOne({ _id:productId }, { $set: { isDelete: true } });
           console.log();
 
-        // Redirect back to the user management page
         res.redirect('/admin/product');
     } catch (err) {
         console.log(err);
@@ -417,6 +430,411 @@ const notdelete = async (req, res) => {
     }
 };
 
+const order = async(req,res)=>{
+    const orderList = await collectionOrder.find();
+
+    const user = orderList.map(item => item.userId);
+    const userData = await collectionModel.find({ _id: { $in: user } });
+   // console.log('hello man i am inside')
+    //console.log(userData)
+    const ordersWithData = orderList.map(order => {
+       // console.log(' man its fear')
+        const user = userData.find(user => user._id.toString() === order.userId.toString());
+        return {
+            ...order.toObject(),
+            user: user
+        };
+    });
+    const ordersWithDataSorted = ordersWithData.sort((a, b) => b.createdAt - a.createdAt);
+
+    res.render("admin/order",{ordersWithDataSorted})
+}
+
+const orderput = async (req, res) => {
+    try {
+        const status = req.body.status;
+        const { itemId, orderId } = req.params;
+
+        console.log(orderId);
+        console.log(status);
+        console.log(itemId);
+
+        // Find the order by ID
+        const order = await collectionOrder.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+        
+        // Find the item within the order
+        const item = order.products.find(item => item._id.toString() === itemId.toString());
+        console.log(item)
+        if (!item) {
+            return res.status(404).json({ error: "Item not found in the order" });
+        }
+        console.log(item)
+
+        // Update the status of the item
+        item.status = status;
+
+        // Save the order with updated status
+        await order.save();
+
+        res.json(status);
+    } catch (error) {
+        console.error("Error updating order status:", error);
+        res.status(500).json("Error updating order status");
+    }
+};
+
+
+// coupoun managment
+
+const coupounsList = async (req, res) => {
+    try {
+        // Fetch all coupons from the database
+        const coupons = await collectionCoupoun.find();
+
+        // Render the admin/coupoun view with the list of coupons
+        res.render("admin/coupoun", { coupons });
+    } catch (error) {
+        // Handle any errors
+        console.error(error);
+        res.status(500).render('error', { message: "Internal Server Error" });
+    }
+};
+
+const couponsAdding = async (req,res)=>{
+   
+    res.render("admin/AddCoupoun",)
+}
+const couponCreation = async (req, res) => {
+    try {
+        console.log('Received data:', req.body);
+        const { couponCode, discountAmount, discountType, expiryDate } = req.body;
+
+        // Create a new coupon instance with the received data
+        const couponDetails = new collectionCoupoun({
+            couponName:couponCode,
+            couponValue:discountType,
+           maxValue: discountAmount,
+            expiryDate:expiryDate,
+        });
+
+        // Save the coupon details to the database
+        // await couponDetails.save();
+
+        // Send a success response
+        res.status(201).json({ message: "Coupon created successfully" });
+        res.redirect("/admin/coupoun");
+    } catch (error) {
+        // Handle errors
+        console.error('Error creating coupon:', error);
+        res.status(500).json({ message: "Coupon creation failed: " + error.message });
+    }
+};
+
+const coupounDelete = async (req, res) => {
+    try {
+        const couponId = req.params.id; // Assuming the coupon ID is passed in the URL params
+
+        // Find the coupon by ID and delete it
+        await collectionCoupoun.findByIdAndDelete(couponId);
+
+        // Redirect to the coupon list page or send a success response
+        res.redirect('/admin/coupoun');
+        // Or send a JSON response if it's an API endpoint
+        // res.status(200).json({ message: 'Coupon deleted successfully' });
+    } catch (error) {
+        // Handle errors
+        console.error('Error deleting coupon:', error);
+        res.status(500).json({ message: 'Coupon deletion failed: ' + error.message });
+    }
+};
+
+// const blockCoupon = async (req, res) => {
+//     try {
+//         const couponId = req.params.id;
+//         const updatedCoupon = await collectionCoupoun.findByIdAndUpdate(couponId, { blocked: true }, { new: true });
+//         res.json(updatedCoupon);
+//     } catch (error) {
+//         res.status(500).json({ error: "Error blocking coupon" });
+//     }
+// };
+
+// const unblockCoupon = async (req, res) => {
+//     try {
+//         const couponId = req.params.id;
+//         const updatedCoupon = await collectionCoupoun.findByIdAndUpdate(couponId, { blocked: false }, { new: true });
+//         res.json(updatedCoupon);
+//     } catch (error) {
+//         res.status(500).json({ error: "Error unblocking coupon" });
+//     }
+// };
+
+// banner
+
+const BannerList = async(req,res)=>{
+    try {
+        
+
+        // Fetch products from the database
+        const BannerList = await collectionBanner.find({});
+        
+        // Render the product page with the fetched products
+        res.render('admin/banner', { Banner: BannerList });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+const AddBanner=async(req,res)=>{
+    res.render('admin/AddBanner')
+}
+
+const AddBannerPost = async (req, res) => {
+    try {
+        // Extract title and image files from the request body
+        const { bannername } = req.body;
+        const imageFiles = req.files; // Assuming Multer middleware is used for file upload
+        console.log(imageFiles);
+        // Extract filenames from the uploaded files
+        const imageUrl = imageFiles.map(file => file.path);
+
+        // Create a new banner object
+        const newBanner = new collectionBanner({
+            bannername,
+             imageUrl, // Array of image filenames
+            status: 'active' // Default status
+        });
+
+        // Save the banner object to the database
+        await newBanner.save();
+
+        // Redirect or respond with success message
+        res.redirect('/admin/banner'); // Redirect to the banners page or any other appropriate route
+    } catch (error) {
+        // Handle errors
+        console.error('Error adding banner:', error);
+        res.status(500).send('Error adding banner. Please try again.'); // Respond with an error message
+    }
+};
+
+const DeleteBanner = async (req, res) => {
+    try {
+        const bannerId = req.params.id;
+        console.log("hrryt",bannerId);
+
+        // Delete the banner from the database based on the provided bannerId
+        await collectionBanner.findByIdAndDelete(bannerId);
+
+        // Redirect back to the admin page or any other appropriate route
+        res.redirect('/admin/banner');
+    } catch (error) {
+        console.error('Error deleting banner:', error);
+        res.status(500).send('Error deleting banner. Please try again.');
+    }
+};
+
+const BlockBanner = async (req, res) => {
+    try {
+        const bannerId = req.params.id;
+        const banner = await collectionBanner.findById(bannerId);
+
+        // Toggle the status of the banner
+        banner.status = banner.status === 'active' ? 'blocked' : 'active';
+        await banner.save();
+
+        // Redirect back to the admin page or any other appropriate route
+        res.redirect('/admin/banner');
+    } catch (error) {
+        console.error('Error blocking/unblocking banner:', error);
+        res.status(500).send('Error blocking/unblocking banner. Please try again.');
+    }
+};
+
+// sales starts
+
+// const sales = async(req, res) => {
+//     try {
+    
+//         const orderList = await collectionOrder.find();
+//         let salesReport= [];
+//         orderList.forEach((item)=>{
+//             item.products.forEach((productList)=>{
+
+//                 salesReport.push({
+//                     _id:productList._id,
+//                     p_name:productList.p_name,
+//                     quantity:productList.quantity,
+//                     price:productList.realPrice,
+//                     createdAt:item.createdAt,
+//                 })
+//             })
+//         })
+
+//         console.log("hjjhjh", salesReport);
+        
+
+//         // Render the admin/sales view with the sales report data
+//         res.render('admin/sales', { salesReport });
+//     } catch (error) {
+//         console.error("Error generating sales report:", error);
+//         res.status(500).send("Internal server error");
+//     }
+// };
+
+const sales = async (req, res) => {
+    try {
+        let startDate = req.query.startDate;
+        let endDate = req.query.endDate;
+        let salesReport = [];
+
+        // Add logic to construct MongoDB query based on the start and end dates
+        let query = {};
+
+        if (startDate && endDate) {
+            query.createdAt = { $gte: new Date(startDate), $lte: new Date(endDate) };
+        } else if (startDate) {
+            query.createdAt = { $gte: new Date(startDate) };
+        } else if (endDate) {
+            query.createdAt = { $lte: new Date(endDate) };
+        }
+
+        const orderList = await collectionOrder.find(query);
+
+       
+        orderList.forEach((item) => {
+            item.products.forEach((productList) => {
+                salesReport.push({
+                    _id: productList._id,
+                    p_name: productList.p_name,
+                    quantity: productList.quantity,
+                    price: productList.realPrice,
+                    createdAt: item.createdAt,
+                });
+            });
+        });
+
+        req.session.salesReport = salesReport;
+
+        // Render the admin/sales view with the filtered sales report data
+        res.render('admin/sales', { salesReport });
+        console.log(salesReport);
+    } catch (error) {
+        console.error("Error generating sales report:", error);
+        res.status(500).send("Internal server error");
+    }
+};
+
+
+
+// Function to generate the PDF
+// Function to generate the PDF
+const generatePDF = async (req, res) => {
+    try {
+        // Create a new PDF document
+        const doc = new PDFDocument();
+
+        // Ensure salesReport is an array before proceeding
+        let salesReport = req.session.salesReport;
+
+        if (!Array.isArray(salesReport)) {
+            salesReport = [];
+        }
+
+        // Set response headers for PDF download
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="sales_report.pdf"');
+
+        // Pipe the PDF document to the response
+        doc.pipe(res);
+
+        // Add content to the PDF document
+        doc.fontSize(18).text('Sales Report', { align: 'center' }).moveDown();
+
+        // Loop through the sales report data and add rows to the PDF
+        for (let i = 0; i < salesReport.length; i++) {
+            const report = salesReport[i];
+
+            // Format each row with proper spacing and alignment
+            doc.fontSize(12).text(`Product ID: ${report._id}`, { align: 'left' }).moveDown();
+            doc.fontSize(12).text(`Product Name: ${report.p_name}`, { align: 'left' }).moveDown();
+            doc.fontSize(12).text(`Date: ${report.createdAt}`, { align: 'left' }).moveDown();
+            doc.fontSize(12).text(`Quantity: ${report.quantity}`, { align: 'left' }).moveDown();
+            doc.fontSize(12).text(`Price: ${report.price}`, { align: 'left' }).moveDown();
+
+            // Move the starting point of the line downwards for spacing
+            doc.moveTo(50, doc.y + 20)
+               .lineTo(550, doc.y + 20)
+               .stroke();
+
+            // Add some space after each product except for the last one
+            if (i !== salesReport.length - 1) {
+                doc.moveDown(2); // Add 2 lines of space
+            }
+        }
+
+        // Finalize the PDF
+        doc.end();
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
+const downloadExcel = async (req, res) => {
+    try {
+        const salesReport = req.body;
+        console.log(salesReport);
+        // Check if data is present and is an array
+        if (!Array.isArray(salesReport) || salesReport.length === 0) {
+            throw new Error('Data is empty or not an array');
+        }
+
+        // Create a new workbook and add a worksheet
+        const workbook = new excelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Sales Report');
+
+        // Define column headers and widths
+        worksheet.columns = [
+            { header: 'Product ID', key: 'productId', width: 15 },
+            { header: 'Product Name', key: 'productName', width: 20 },
+            { header: 'Date', key: 'date', width: 15 },
+            { header: 'Total Quantity', key: 'totalQuantity', width: 15 },
+            { header: 'Total Price', key: 'totalSales', width: 15 },
+        ];
+
+        // Add rows to the worksheet
+        salesReport.forEach((item) => {
+            worksheet.addRow({
+                productId: item._id || '', // Adjust if necessary
+                productName: item.p_name || '', // Adjust if necessary
+                date: item.createdAt || '', // Adjust if necessary
+                totalQuantity: item.quantity || 0, // Default to 0 if not provided
+                totalSales: item.price || 0, // Default to 0 if not provided
+            });
+        });
+
+        // Set response headers
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=sales_report.xlsx');
+
+        // Write the workbook to the response stream
+        await workbook.xlsx.write(res);
+
+        // End the response
+        res.end();
+    } catch (error) {
+        console.error('Error generating Excel:', error.message); // Log error message
+        res.status(500).send('Internal Server Error: ' + error.message); // Send error message as response
+    }
+};
+
+
 module.exports = {
-    login,loginpost,logout,home,user,category,product,addcategory,addcategorypost,editcategory,update,deletecategory,isBlocked,notBlocked,addproduct,addproductpost,editproduct,editproductpost,deleteproduct,isdelete,notdelete
+    login,loginpost,logout,home,
+    user,category,product,addcategory,addcategorypost,editcategory,update,deletecategory,isBlocked,notBlocked,addproduct,addproductpost,editproduct,editproductpost,deleteproduct,isdelete,notdelete,order,orderput,coupounsList,couponsAdding,couponCreation
+    ,coupounDelete,deletImage,BannerList,AddBanner,AddBannerPost,DeleteBanner,BlockBanner,sales,generatePDF,downloadExcel
 };

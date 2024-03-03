@@ -1,4 +1,4 @@
-const collectionModel = require('../models/mongodb');
+const collectionModel = require('../models/userdb');
 
 const checkSessionAndBlocked = async (req, res, next) => {
     try {
@@ -10,6 +10,7 @@ const checkSessionAndBlocked = async (req, res, next) => {
             // Check if user is blocked
             if (!userDetials.isBlocked) {
                 // User is not blocked, proceed to the next middleware or route handler
+                req.session.userid = userDetials._id;
                 next();
             } else {
                 // Admin is blocked, destroy session and redirect to landing page

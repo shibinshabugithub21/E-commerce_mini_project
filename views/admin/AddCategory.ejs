@@ -16,7 +16,6 @@
     height: 100vh;
 }
 
-/* Sidebar Navigation */
 .side-nav {
     background-color: black;
     color: white;
@@ -69,7 +68,6 @@ button:hover {
 <body>
 <div class="main">
   <div class="side-nav">
-    <!-- <img src="/Public/img/bg.png" width="100px",height="150px"> -->
     <ul>
         <li><a href="/admin/home">Dashboard</a></li>
         <li><a href="/admin/user">User</a></li>
@@ -77,8 +75,6 @@ button:hover {
         <li><a href="/admin/product">Product</a></li>
         <li><a href="/admin/order">Order</a></li>
         <li><a href="/admin/logout">logout</a></li>
-
-        <!-- Add more navigation items as needed -->
     </ul>
 </div>
 
@@ -86,91 +82,65 @@ button:hover {
   <div class="row justify-content-center">
     <div class="col-md-7">
       <h2 class="mb-4">ADD New Category</h2>
-      <form  onsubmit="submitForm(event)">
-      <!-- <form  action="/admin/AddCategory" method="post"> -->
+      <form id="categoryForm">
         <div id="error"></div>
         <div class="form-group">
-          <label for="Category">categoryname:</label>
+          <label for="Category">Category Name:</label>
           <input type="text" class="form-control" id="Category" name="category" placeholder="New Category">
         </div>
         <button type="submit" class="btn btn-primary">Add Category</button>
       </form>
-      <% if (status) { %>
-        <div class="" id="error" style="color:red"><%= mes %></div>
-    <% } %>
-    
     </div>
   </div>
 </div>
 </div>
 
 <script>
-  let categoryname = document.getElementById("Category");
-           
-  if ( window.history.replaceState ) {
-window.history.replaceState( null, null, window.location.href );
-}
+document.getElementById('categoryForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
 
-  let errorId  = document.getElementById("error");
-  
-  function showError(message) {
-    const errorDiv = document.createElement("div");
-    errorDiv.textContent = message;
-    errorDiv.classList.add("error-message");
-    errorId.appendChild(errorDiv);
+    let categoryname = document.getElementById("Category").value.trim();
+    let errorId = document.getElementById("error");
 
-    setTimeout(() => {
-        errorId.removeChild(errorDiv);
-    }, 5000);
-}
+    // Function to show error message
+    function showError(message) {
+        const errorDiv = document.createElement("div");
+        errorDiv.textContent = message;
+        errorDiv.classList.add("error-message");
+        errorId.appendChild(errorDiv);
 
+        setTimeout(() => {
+            errorId.removeChild(errorDiv);
+        }, 5000);
+    }
 
-  async function submitForm(e){
-      e.preventDefault();
+    // Check if category name is empty
+    if (!categoryname) {
+        showError("Category name is required");
+        return;
+    }
 
-const data = {
-category: categoryname.value, // changed now  for checking 
+    // Submit the form
+    const data = {
+        category: categoryname
+    };
 
-};
+    const response = await fetch("/admin/AddCategory", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
 
-
-const response = await fetch("/admin/AddCategory", {
-method: "POST",
-headers: {
-  "Content-Type": "application/json",
-},
-body: JSON.stringify(data),
+    if (response.ok) {
+        const responseData = await response.json();
+        window.location.href = "/admin/category";
+    } else {
+        const errorMessage = await response.json();
+        showError(errorMessage.mes);
+    }
 });
-console.log(data)
-
-if (response.ok) {
-console.log("ok")
-const responseData = await response.json();
-console.log("Response Data:", responseData);
-
-window.location.href = "/admin/category";
-} else {
-console.log("error")
-const errorMessage = await response.json();
-console.log(errorMessage)
-showError(errorMessage.mes)
-
-if(errorMessage.mes === "category already exists"){
-  alert("Category already exists")
-}
-// Server-side code handling existing category
-else {
-    console.log("Item already exists");
-    res.status(400).json({ mes: "Category already exists" });
-}
-
-
-}
-
-  }
-
-
-
 </script>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>

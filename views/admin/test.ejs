@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/assets/logo.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Allura&family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.4/cropper.min.css'>
+    <!-- <link rel="stylesheet" href="/css/cart.css"> -->
+   
+    <style>
+        body{
+    position: relative;
+ }
+
+/* user side image previewer */
+
+#imagePreview img{
+    height: 300px;
+    max-width: 300px;
+}
+
+#cropper110Modal{
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(53, 52, 52, 0.532);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+
+#cropper110Modal img {
+	max-width: 100%;
+}
+
+.cropper110-page {
+	margin: 1em auto;
+	max-width: 768px;
+	height: 100%;
+}
+
+.cropper110-box {
+	padding: 0.5em;
+	width: calc(100%/2 - 1em);
+    max-height: 60vh;
+}
+
+
+
+.cropper110-crop , .cropper110-close {
+    padding: .5rem 1rem;
+    background-color: rgb(0,0,0);
+    color: #fff;
+    font-weight: bold;
+}
+
+.cropper110-close{
+    background-color: red;
+}
+
+
+      #imagePreviewContainer {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+    
+      .img-preview {
+        max-width: 100px; /* Adjust the max-width as needed */
+        max-height: 100px; /* Adjust the max-height as needed */
+        border: 1px solid #ddd; /* Add a border for better visibility */
+        margin-bottom: 10px;
+      }
+     
+    .img-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .remove-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: transparent;
+        color: #fff; /* Set the color of the 'X' symbol */
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
+    }
+
+    .remove-btn:hover {
+        color: #ff0000; /* Change the color on hover if desired */
+    }
+    </style>
+
+   
+</head>
+<body>
+    <!-- <div class="d-flex justify-content-end ">
+        <div class="float-end">
+           
+            <img src="/static/assets/g-times-high-resolution-logo-transparent.png" style="width: 70px; height: 65px;" class="mx-2 img-fluid">
+        </div>
+    </div> -->
+    <a href="/homepage" class="d-inline-flex link-body-emphasis text-decoration-none fs-2 fst-italic fst-bold fw-bolder" style="font-family: Allura, cursive;
+    font-weight: 500;"> G Times
+    </a>
+
+    <div class="d-flex justify-content-center" style="margin-top: 10px;">
+        <h1>ADD PRODUCTS</h1>
+    </div>
+
+   <form action="/addproducts" method="POST" enctype="multipart/form-data">
+    <div class="container d-flex justify-content-center" style="margin-top: 30px;">
+    <div class="row justify-content-center">
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="floatingInput" name="modelname" required>
+            <label for="floatingInput">Model Name</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="floatingPassword" name="brand" required> 
+            <label for="floatingInput">Brand</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="floatingPassword" name="description" required>
+            <label for="floatingInput">Description</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="number" class="form-control" id="floatingPassword" min="1" max="5" name="rating" required>
+            <label for="floatingInput">Rating</label>
+          </div>
+          
+          <div class="form-floating  mb-3">
+            <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="colour" required>
+              <option value="" selected disabled>Select</option>
+              <option value="Black">Black</option>
+              <option value="Blue">Blue</option>
+              <option value="White">White</option>
+              <option value="Brown">Brown</option>
+              <option value="Gold">Gold</option>
+              <option value="Silver">Silver</option>
+            </select>
+            <label for="floatingSelect">Choose the colour</label>
+          </div>
+          <div class="form-floating mb-3">
+            <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="dialshape" required>
+              <option value="" selected disabled>Select</option>
+              <option value="Round">Round</option>
+              <option value="Square">Square</option>
+              <option value="Rectangle">Rectangle</option>
+            </select>
+            <label for="floatingSelect">Choose the Dial shape</label>
+          </div>
+          <div class="form-floating mb-3">
+            <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="strapmaterial" required>
+              <option value="" selected disabled>Select</option>
+              <option value="Leather">Leather</option>
+              <option value="Stainless Steel">Stainless Steel</option>
+              <option value="Silicone">Silicone</option>
+              <option value="Rubber">Rubber</option>
+              <option value="Ceramic">Ceramic</option>
+            </select>
+            <label for="floatingSelect">Choose the Strap material</label>
+          </div>
+
+            
+                <label for="fileUploader"></label>
+                <input type="file" name="image" id="fileUploader" data-image-preview="#imagePreview" accept=".jpg,.png,.jpeg" multiple>
+                <div id="imagePreview"></div>
+
+
+                <!--Cropper model-->
+                <div id="cropper110Modal">
+                  <div id="imageCropBox">
+                      <div style="text-align: end;">
+                          <button class="cropper110-close">close</button>
+                      </div>
+                      <section class="cropper110-page">
+                          <div class="cropper110-box">
+                              <div class="cropper110-cropping-box"></div>
+                          </div>
+          
+                          <div>
+                              <button class="cropper110-crop mx-3">Crop</button>
+                          </div>
+                      </section>
+                  </div>
+              </div>
+              <!--cropper-->
+
+               <div class="form-floating mb-3">
+            <input type="number" class="form-control" id="floatingPassword" name="price" min="1" required>
+            <label for="floatingInput">Price</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="number" class="form-control" id="floatingPassword" name="stock" min="1" required>
+            <label for="floatingInput">Stock Available</label>
+          </div>
+
+                <button type="submit" class="btn btn-primary" style="width: min-content;">Submit</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="switch d-flex justify-content-center"><a href="/adminlog">Back to home</a></div>
+
+    <!-- Script -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js'></script>
+    <!-- <script src="/Public/javascript/crop.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+   
+<script>
+    let fileInputs = document.querySelectorAll('[data-image-preview]')
+
+
+let croppingBox = document.querySelector('.cropper110-cropping-box'),
+    crop = document.querySelector('.cropper110-crop'),
+    cropper = '',
+    currentInput = null,
+    imgNames = null,
+    imgSrc = null;
+
+fileInputs.forEach(fileInput => {
+    fileInput.addEventListener('change', () => {
+        let previewDiv = document.querySelector(fileInput.dataset.imagePreview)
+        previewDiv.innerHTML = ""
+        for (let each of fileInput.files) {
+            let imgSrc = URL.createObjectURL(each)
+            let img = document.createElement('img')
+            img.src = imgSrc
+            img.dataset.fileName = each.name
+            img.dataset.input = fileInput.id
+            img.addEventListener('click', cropImage)
+
+            previewDiv.append(img)
+
+        }
+    })
+})
+
+
+function cropImage(e) {
+    
+    document.getElementById('cropper110Modal').style.display = 'flex'
+
+    let img = document.createElement('img');
+    img.id = 'image';
+    img.src = e.target.src;
+    croppingBox.innerHTML = '';
+    croppingBox.appendChild(img);
+    cropper = new Cropper(img);
+
+    imgNames = e.target.dataset.fileName
+    currentInput = e.target.dataset.input
+
+}
+
+//crop and save on click
+crop.addEventListener('click', e => {
+    e.preventDefault();
+    // get result to data uri
+
+    let imgSrc = cropper.getCroppedCanvas({
+        width: 300 // input value
+    }).toDataURL();
+
+    if (imgSrc && imgNames !== null) {
+        let fileUploader = document.getElementById(currentInput)
+        fetch(imgSrc)
+            .then(res => res.blob())
+            .then(blob => {
+                let file = new File([blob], `${imgNames}-${Date.now()}.png`, { type: "image/jpeg" })
+
+                const dt = new DataTransfer()
+                for (let each of fileUploader.files) {
+                    if (each.name !== imgNames) {
+                        dt.items.add(each)
+                    } else {
+                        dt.items.add(file)
+                    }
+                }
+
+
+                fileUploader.files = dt.files
+
+
+                let previewDiv = document.querySelector(fileUploader.dataset.imagePreview)
+                previewDiv.innerHTML = ""
+                let res = ""
+
+                for (let each of fileUploader.files) {
+                    let src = URL.createObjectURL(each)
+                    res += `<img src="${src}" data-file-name="${each.name}" data-input="${fileUploader.id}" onclick="cropImage(event)" class="previewImages">`
+                }
+
+                previewDiv.innerHTML = res
+
+
+            })
+    }
+
+    document.querySelector('.cropper110-close').click()
+});
+
+document.querySelector('.cropper110-close')
+    .addEventListener('click', () => {
+        document.getElementById('cropper110Modal').style.display = 'none'
+    })
+
+  // Array to store images temporarily
+  let tempImages = [];
+
+  document.getElementById('imageInput').addEventListener('change', function (e) {
+    // Clear existing images
+    document.getElementById('imagePreviewContainer').innerHTML = "";
+
+    // Loop through selected files and display image preview
+    for (let i = 0; i < e.target.files.length; i++) {
+        let file = e.target.files[i];
+
+        // Check if the file is an image
+        if (file && file.type.startsWith('image/')) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                let imgContainer = document.createElement('div');
+                imgContainer.classList.add('img-container');
+
+                let imgElement = document.createElement('img');
+                imgElement.classList.add('img-preview');
+                imgElement.src = e.target.result;
+
+                // Add image to temporary storage
+                tempImages.push({ file, container: imgContainer });
+
+                // Create remove button
+                let removeBtn = document.createElement('button');
+                removeBtn.classList.add('remove-btn');
+                removeBtn.innerHTML = 'X';
+
+                // Add click event to remove image
+                removeBtn.addEventListener('click', function () {
+                    imgContainer.remove(); // Remove the image container
+
+                    // Remove image from temporary storage
+                    let index = tempImages.findIndex(item => item.file === file);
+                    if (index !== -1) {
+                        tempImages.splice(index, 1);
+                    }
+                });
+
+                // Append the remove button to the image container
+                imgContainer.appendChild(removeBtn);
+
+                // Append the image to the container
+                imgContainer.appendChild(imgElement);
+
+                // Append the image container to the preview container
+                document.getElementById('imagePreviewContainer').appendChild(imgContainer);
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            // Handle non-image file (display an alert, ignore, etc.)
+            alert('Please select only image files (JPEG, PNG, etc.).');
+            // Clear the file input
+            this.value = null;
+        }
+    }
+});
+
+
+</script>
+</body>
+</html>

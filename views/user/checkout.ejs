@@ -430,14 +430,16 @@
     color: #333;
   }
 
-   
+   #addbtn{
+    width: 170px;
+   }
     </style>
 
 <div class="row">
   <div class="col-75">
       <div class="container">
           <select id="existing-address">
-              <option value="">Select an existing address</option>
+              <option id="address" value="">Select an existing address</option>
               <% user.profile.address.forEach(function(address) { %>
                   <option value="<%= address._id %>"><%=address.name %> - <%= address.houseName %> - <%= address.city %>, <%= address.postalCode %>,<%=address.phone %></option>
               <% }); %>
@@ -460,36 +462,65 @@
                   </div>
               </div>
           </form>
-          <a href="/addAddress"><button> Add New Address</button></a>
+          <a href="/addressadding"><button id="addbtn" class="btn btn-success"> Add New Address</button></a>
         </div>
       </div>
       <div class="col-25">
         <div class="container">
-          
-          <h4>Cart <span class="price" style="color:black"><i class="fa fa-shopping-cart"><%=cartCount%></i> </span></h4>
-          <!-- <h4>Cart <span class="price" style="color:black"><i class="fa fa-shopping-cart"></i> <b>4</b></span></h4> -->
-          <% result.forEach(element => {%>
-            <p><a href="#"><%=element.name%></a> <span class="price">₹<%= element.price %></span></p>
-             
-            <% }); %>
-          <hr>
-          <div class="col-50">
-            <h3>Payment</h3>
-            <div style="display: block;">
-              <input type="checkbox" id="cashOnDelivery" name="cashondelivery"> Cash on Delivery
-            </div>
-            <!-- <label>
-                <input type="checkbox" id="paypal" name="paypal"> Paypal
-            </label> -->
-        </div>
-        
-        
-            <hr>
-          <p>Total <span class="price" style="color:black"><b>₹<%= total %></b></span></p>
-          <button class="btn" onclick="checkoutChecking()" >buynow</button>
+           <!-- Space for the coupon -->
+<div style="margin-bottom: 20px;"> <!-- Adjust margin as needed -->
+  <!-- Coupon dropdown -->
+  <!-- Coupon dropdown -->
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="couponDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
+      Select Coupon
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="couponDropdownButton" id="couponDropdownMenu">
+      <!-- Coupon options will be dynamically populated here -->
+      <% coupons.forEach(coupon => { %>
+          <li onclick="couponVal('<%=coupon._id%>','<%=coupon.couponValue%>','<%= total%>')"><a class="dropdown-item" href="#" data-coupon-id="<%= coupon._id %>"><%= coupon.couponName %></a></li>
+      <% }); %>
+  </ul>
+</div>
+
+<!-- Field to display selected coupon -->
+<div id="selectedCoupon" style="display: none;">
+  <label for="selectedCouponField">Selected Coupon:</label>
+  <input type="text" id="selectedCouponField" class="form-control" readonly>
+</div>
+
+</div>
+
+            <!-- End of space for the coupon -->
     
+            <h4>Cart <span class="price" style="color:black"><i class="fa fa-shopping-cart"><%=cartCount%></i> </span></h4>
+            <% result.forEach(element => {%>
+                <p><a href="#"><%=element.name%></a> <span class="price">₹<%= element.price %></span></p>
+            <% }); %>
+            <hr>
+            <div class="col-50">
+                <h3>Payment</h3>
+                <div style="display: block;">
+                    <input type="radio" id="cashOnDelivery" name="paymentMethod" value="cashondelivery"> Cash on Delivery
+                </div>
+                <div style="display: block;">
+                  <input type="radio" id="wallet" name="paymentMethod" value="wallet"> Wallet Pay
+              </div>
+                <div style="display: block;">
+                    <input type="radio" id="razorpay" name="paymentMethod" value="razorpay"> Razorpay
+                </div>
+            </div>
+            <hr>
+            <!-- Buttons section -->
+            <div style="margin-top: 20px;"> <!-- Adjust margin as needed -->
+                <button class="btn" onclick="checkoutChecking()">Buy Now</button>
+            </div>
+            <!-- End of buttons section -->
+            <hr>
+            <p>Total <span class="price" id="totalAmount" style="color:black"><b>₹<%= total %></b></span></p>
         </div>
-      </div>
+    </div>
+    
     </div>
    
 
@@ -642,12 +673,14 @@
 
 
   <script>
+    let userAddress;
     document.getElementById('existing-address').addEventListener('change', function() {
     var selectedIndex = this.selectedIndex;
     if (selectedIndex !== 0) {
         var Address = JSON.parse('<%- JSON.stringify(user.profile.address) %>');
         var selectedAddress = Address[selectedIndex - 1]; // Adjust index to match array index
         console.log(selectedAddress);
+        userAddress = selectedAddress;
         document.getElementById('adr').value = selectedAddress.houseName;
         document.getElementById('city').value = selectedAddress.city;
         document.getElementById('pincode').value = selectedAddress.postalCode;
@@ -662,35 +695,40 @@
         document.getElementById('inputPhone').value = "";
     }
 });
-
-</script>
-
-
-
  
-<script>
+
   const email = document.getElementById("email");
   const addressid = this.value;
 
  async function checkoutChecking(){
     console.log("checkout")
+console.log(userAddress)
+const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+    if (!selectedPaymentMethod) {
+        alert('Please select a payment method.');
+        return;
+    }
+
+    const paymentMethod = selectedPaymentMethod.value;
+    console.log(paymentMethod);
+const dataa = {
+  
+  emailAddress:email.value,
+      method:paymentMethod,
+      addressid : userAddress
+}
+
+
+    if (paymentMethod === "cashondelivery") {
+      
     try {
       const response = await fetch("/CheckOut",{method:"post",
     headers:{
       "Content-Type":"application/json"
     },
-    body: JSON.stringify({
-      emailAddress:email.value,
-      method:"COD",
-      addressid : addressid
-
-    })
+    body: JSON.stringify(dataa)
   })
-  // if (response.ok){
-  //   // alert("ok it s fine")
-  //   const result = await response.json()
-  //   alert(result.data)
-  // }
+  
   if (response.ok) {
     const result = await response.json();
     // Use SweetAlert to display a success message
@@ -710,7 +748,157 @@
     } catch (error) {
       
     }
-  }
+  } else if(paymentMethod === "razorpay"){
+    initializeRazorpay(dataa)      
+
+ }
+ else if(paymentMethod === "wallet"){
+  try {
+
+      const response = await fetch("/CheckOut",{method:"post",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify(dataa)
+  })
+  
+  if (response.ok) {
+    const result = await response.json();
+    // Use SweetAlert to display a success message
+    Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: result.data
+    }).then((result) => {
+        // Redirect to /success
+        if (result.isConfirmed || result.isDismissed) {
+            window.location.href = '/success';
+        }
+    });
+}
+
+
+    } catch (error) {
+      
+    }    
+
+ }
+ else {
+
+    }
+}
+
+
+
+function initializeRazorpay(dataa) {
+    fetch('/create', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount: 2000, currency: 'INR' }), // Adjust amount and currency as needed
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        const options = {
+            key: 'rzp_test_yeIbQTeZebXZS2', // Replace with your Razorpay key
+            amount: data.amount,
+            currency: 'INR',
+            name: 'iStore',
+            description: 'Test Transaction',
+            image: 'https://example.com/your_logo',
+            order_id: data.orderId,
+            handler: function (response) {
+                console.log('Payment successful! Payment ID:', response.razorpay_payment_id);
+                try {
+                    fetch("/CheckOut", {
+                        method: "post",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(dataa)
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error('Network response was not ok.');
+                    })
+                    .then(result => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: result.data
+                        }).then((result) => {
+                            if (result.isConfirmed || result.isDismissed) {
+                                window.location.href = '/success';
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error during checkout:', error);
+                    });
+                } catch (error) {
+                    console.error('Error during checkout:', error);
+                }
+            },
+            prefill: {
+                name: 'Shibin',
+                email: 'Shibin@example.com',
+                contact: '9000090000'
+            },
+            notes: {
+                address: 'Razorpay Corporate Office'
+            },
+            theme: {
+                color: '#3399cc'
+            }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
+ // Fetch coupons data from the server
+fetch("/admin/coupoun")
+    .then(response => response.json())
+    .then(data => {
+        // Populate the dropdown with available coupons
+        const couponDropdown = document.getElementById("couponDropdownMenu");
+        data.forEach(coupon => {
+            const option = document.createElement("li");
+            option.innerHTML = `<a class="dropdown-item" href="#" data-id="${coupon._id}">${coupon.name}</a>`;
+            couponDropdown.appendChild(option);
+        });
+    })
+    .catch(error => console.error("Error fetching coupons:", error));
+
+// Function to handle coupon selection
+document.querySelectorAll("#couponDropdownMenu .dropdown-item").forEach(item => {
+    item.addEventListener("click", function(event) {
+        event.preventDefault();
+        const selectedCouponName = event.target.innerHTML;
+        const selectedCouponField = document.getElementById("selectedCouponField");
+        selectedCouponField.value = selectedCouponName;
+        // Show the selected coupon field
+        document.getElementById("selectedCoupon").style.display = "block";
+    });
+});
+
+function couponVal(id,value,total){
+  console.log(id,value,total)
+  const totalPrice = document.getElementById("totalAmount");
+  totalPrice.innerHTML = total-value || total;
+}
+
 </script>
+<script src="https://checkout.razorpay.com/v1/razorpay.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>
   </html>

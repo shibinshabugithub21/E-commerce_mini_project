@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Banner</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar Navigation */
+        .side-nav {
+            background-color:black;
+            color:white;
+            padding: 15px;
+            text-align: left;
+            width: 200px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            height: calc(100vh - 80px); /* Adjusted height to fit below top navigation bar */
+        }
+
+        .side-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .side-nav a {
+            text-decoration: none;
+            color: #fff;
+            display: block;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 3px;
+            border-radius: 20px;
+            transition:  0.33s ease-in-out;  
+            font-weight: 500; 
+        }
+
+        .side-nav a:hover{
+            color: black;
+            background-color: white;
+            border-radius: 20px;
+        }
+
+        /* Main Content Area */
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto; /* Added overflow-y to allow scrolling if content overflows */
+        }
+
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-group input[type="file"] {
+            padding: 8px;
+        }
+
+        .btn-container {
+            text-align: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            width: 100%;
+            height: 80px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            background-color: rgb(246, 246, 246);
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        @media screen and (max-width: 768px) {
+            .side-nav {
+                display: none; /* Hide sidebar on smaller screens */
+            }
+            .content {
+                padding-left: 20px; /* Add padding to content to compensate for hidden sidebar */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <!-- Add top navigation content here if needed -->
+        <h1>Banner Management</h1>
+    </div>
+
+    <div class="main-content">
+        <!-- Sidebar Navigation -->
+        <div class="side-nav">
+            <ul>
+                <li><a href="/admin/home">Dashboard</a></li>
+                <li><a href="/admin/user">User</a></li>
+                <li><a href="/admin/category">Category</a></li>
+                <li><a href="/admin/product">Product</a></li>
+                <li><a href="/admin/order">order</a></li>
+                <li><a href="/admin/coupoun">coupoun</a></li>
+                <li><a href="/admin/logout">logout</a></li>
+                <!-- Add more navigation items as needed -->
+            </ul>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="content">
+            <div class="form-container">
+                <form action="/admin/addbanner" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="bannerName">Banner Name</label>
+                        <input type="text" id="bannerName" name="bannername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bannerImage">Banner Image</label>
+                        <input type="file" id="bannerImage" name="bannerImage" accept="image/*" required>
+                    </div>
+                    <div class="btn-container">
+                        <button type="submit" class="btn btn-primary">Add Banner</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

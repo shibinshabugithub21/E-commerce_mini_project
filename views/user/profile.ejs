@@ -76,6 +76,8 @@
         <a class="nav-link" href="/managePassword" >Manage Password</a>
         <a class="nav-link" href="/manageAddress" >Manage Addres</a>
         <a class="nav-link" href="/order">Order</a>
+        <a class="nav-link" href="/wallet">Wallet</a>
+
     </nav>
     <hr class="mt-0 mb-4">
     <div class="row">
@@ -100,7 +102,7 @@
                     <form action="/updateprofile" method="POST" >
                         <div class="mb-3">
                             <label class="small mb-1" for="firstname">Fullname</label>
-                            <input class="form-control" name="name" id="firstname" type="text" value="<%= userData.name %>"
+                            <input class="form-control" name="name" id="firstname" type="text" value="<%= userData.profile.address?.name%>"
                                 required>
                             <div id="firstnameValidation" class="invalid-feedback"></div>
                         </div>
@@ -108,21 +110,21 @@
                             <div class="col-md-6">
                                 <label class="small mb-1" for="Address">House Name</label>
                                 <input class="form-control" name="houseName" id="Address" type="text"
-                                    value="<%= userData.profile.address[0]?.houseName%>"
+                                    value="<%= userData.profile.address?.houseName%>"
                                     required>
                                 <div id="addressValidation" class="invalid-feedback"></div>
                             </div>
                             <div class="col-md-6">
                                 <label class="small mb-1" for="Pincode">Pincode</label>
                                 <input class="form-control" name="postalCode" id="pincode" type="text"
-                                    value="<%= userData.profile.address[0]?.postalCode%>"
+                                    value="<%= userData.profile.address?.postalCode%>"
                                     required>
                                 <div id="pincodeValidation" class="invalid-feedback"></div>
                             </div>
                             <div class="col-md-6">
                                 <label class="small mb-1" for="inputLocation">City</label>
                                 <input class="form-control" name="city" id="inputLocation" type="text"
-                                    value="<%= userData.profile.address[0]?.city%>"
+                                    value="<%= userData.profile.address?.city%>"
                                     required>
                                 <div id="cityValidation" class="invalid-feedback"></div>
                             </div>
@@ -136,7 +138,7 @@
                         <div class="row gx-3 mb-3">
                             <div class="col-md-6">
                                 <label class="small mb-1" for="inputPhone">Phone number</label>
-                                <input class="form-control" name="phone" id="inputPhone" type="tel"
+                                <input class="form-control" name="phone" id="inputPhone" type="number"
                                     value="<%= userData.phone %>" required>
                                 <div id="phoneValidation" class="invalid-feedback"></div>
                             </div>

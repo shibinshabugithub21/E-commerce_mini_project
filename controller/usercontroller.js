@@ -1,27 +1,70 @@
 const { render } = require('ejs');
 const { sendEmail } = require('../middleware/nodeMailer');
-const collectionModel = require('../models/mongodb');
+const collectionModel = require('../models/userdb');
 
-const collection =require('../models/mongodb');
+const collection =require('../models/userdb');
 const collectionOtp = require('../models/otp');
 const collectionProduct = require("../models/product"); 
 const collectionOrder = require('../models/order');
+const bcrypt = require("bcrypt");
+const { product } = require('./admincontroller');
+const Razorpay = require('razorpay');
+const collectionCoupoun = require('../models/coupoun');
+const collectionBanner = require("../models/bannerdb")
+
+const razorpay = new Razorpay({
+    key_id:process.env.keyId,
+    key_secret:process.env.keyName
+  });
 
 
 
-const landing= async(req,res)=>{
+// const landing= async(req,res)=>{
     
-    const product = await collectionProduct.find({isDelete:true})
-    if(req.session.user){
-        console.log('landing page ',req.session.user);
-        res.redirect("/home")
+//     const product = await collectionProduct.find({isDelete:true})
+//     if(req.session.user){
+//         console.log('landing page ',req.session.user);
+//         res.redirect("/home")
+//     }
+//     else{
+//     //  sendEmail("12345")
+//     res.render("user/landing",{product})
+//     }
+//     // res.render('user/landing.ejs')
+// }
+
+const landing = async (req, res) => {
+    try {
+        const searchQuery = req.query.search || '';
+        let product;
+
+        if (searchQuery) {
+            // Perform search if there's a search query
+            product = await collectionProduct.find({
+                $and: [
+                    { isDelete: true },
+                    { $or: [
+                        { Productname: { $regex: searchQuery, $options: 'i' } },
+                        { Category: { $regex: searchQuery, $options: 'i' } }
+                    ]}
+                ]
+            });
+        } else {
+            // Otherwise, retrieve all products with isDelete:true
+            product = await collectionProduct.find({ isDelete: true });
+        }
+
+        if (req.session.user) {
+            console.log('landing page ', req.session.user);
+            res.redirect("/home");
+        } else {
+            res.render("user/landing", { product, searchQuery });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
-    else{
-    //  sendEmail("12345")
-    res.render("user/landing",{product})
-    }
-    // res.render('user/landing.ejs')
-}
+};
 
 
  const login= (req, res) => {
@@ -41,7 +84,9 @@ const loginpost = async(req,res)=>{
     try {
         const check = await collectionModel.findOne({email:req.body.email}) 
             console.log('checkid', check);
-        if(check.password === req.body.password){//auth for login
+        
+        const data =  await bcrypt.compare(req.body.password,check.password)
+        if(data){//auth for login
 
             req.session.user = check.email//session creation
             req.session.userid=check._id
@@ -72,7 +117,7 @@ const signup= (req, res) => {
         res.render('user/signup.ejs');
     }
 
-};
+}; 
 
     const signuppost =async (req,res) =>{
         // console.log(req.body,"here int he sign out");
@@ -86,6 +131,17 @@ const signup= (req, res) => {
             phone:req.body.phone
         }
     
+        const newdata = await bcrypt.hash(data.password,10)
+
+        const datahash ={
+            name : req.body.name,
+            email : req.body.email,
+            password :newdata,
+            repassword :req.body.repassword,
+            phone:req.body.phone
+        }
+
+        console.log(newdata)
         console.log("sign")
 
 
@@ -101,7 +157,7 @@ const signup= (req, res) => {
 
         }
         else{
-            await collectionModel.insertMany([data]);
+            await collectionModel.insertMany([datahash]);
             // data["otpNum"] = randome
             req.session.otpGerner = data;
             console.log(data)
@@ -185,9 +241,10 @@ const otppost = async (req, res) => {
         const result = await collectionOtp.findOne({ number: isNumber });
 
         if (result) {
+            console.log(req.session.otpGerner)
             req.session.user = req.session.otpGerner.email;
             delete req.session.otpGerner;
-            return res.redirect("/login");
+            return res.redirect("/home");
         } else {
             return res.status(400).render('user/otp', { error: 'Invalid OTP. Please try again.' });
         }
@@ -216,9 +273,10 @@ const resendOtp = async(req,res)=>{
            });
    
            await newUser.save();
-   
-           res.render('user/otp', { user: req.session.user, entrie });
-       } catch (error) {
+           console.log(req.session.otpGerner.email)
+           sendEmail(randomOTP,req.session.otpGerner.email)
+           res.render('user/otp', { error: null, user: req.session.userid, entrie: 0 });
+        } catch (error) {
            console.log("Error generating OTP:", error);
            res.status(500).send("OTP error");
        }
@@ -294,33 +352,34 @@ const details = async (req, res) => {
     res.render('user/details',{product});
 };
 
-const home =async (req,res)=>{
+const home = async (req, res) => {
     try {
-        const username = req.session.userid
-        const product = await collectionProduct.find({isDelete:true})
-        console.log(username,"here in the home");
-    // res.render("user/home",{product})
-       // console.log("here in the ")
-       const user = await collectionModel.findOne({_id: username})
-       console.log(user)
-       if(user){
-        console.log("hwee");
+        const username = req.session.userid;
+        const searchQuery = req.query.search || '';
+        const categoryQuery = req.query.category || '';
 
-           res.render("user/home", {product,user:req.session.useremail})
-       }
-    else{
-           res.redirect("/login");
-       } 
+        let productQuery = { isDelete: true };
+
+        
+        const banner = await collectionBanner.find({ status: 'active' });
+        // Fetch products based on the constructed query
+        const product = await collectionProduct.find(productQuery);
+        
+        product.Productname = { $regex: searchQuery, $options: 'i' };
+        product.Category = { $regex: searchQuery, $options: 'i' };
+        
+        const user = await collectionModel.findOne({ _id: username });
+        if (user) {
+            res.render("user/home", { product, user: req.session.useremail, searchQuery, categoryQuery,banner });
+        } else {
+            res.redirect("/login");
+        }
     } catch (error) {
-       console.log("error in the home",error.message)
+        console.log("Error in the home route:", error.message);
+        res.status(500).send('Internal Server Error');
     }
-   // if(req.session.user){
-   //     res.render("user/home", {user:req.session.user})
-   // }
-   // else{
-   //     res.render("user/login")
-   // }
-}
+};
+
 
   
     //cart details
@@ -439,12 +498,13 @@ const home =async (req,res)=>{
     
             // Recalculate grantTotal and total
             userDetails.cart.grantTotal = userDetails.cart.items.reduce((accu, element) => accu + element.totalprice, 0);
-            userDetails.total = userDetails.cart.items.reduce((accu, element) => accu + (element.quantity * element.Price), 0);
+            // userDetails.total = userDetails.cart.items.reduce((accu, element) => accu + (element.quantity * element.Price), 0);
+            const totalAmount = userDetails.cart.grantTotal;
     
             // Save the changes to the user details
             await userDetails.save();
     
-            res.json({ grantTotal: userDetails.cart.grantTotal, total: userDetails.total });
+            res.json({ grantTotal: userDetails.cart.grantTotal, totalAmount });
         } catch (error) {
             console.error('Error from the cartQuantityUpdate:', error);
             res.status(500).json({ error: 'Internal server error' });
@@ -482,16 +542,64 @@ const home =async (req,res)=>{
     
     
    // checkout 
-   const checkoutpage = async (req, res) => {
+//    const checkoutpage = async (req, res) => {
+//     try {
+//         // Retrieve user's email from session
+//         const userId = req.session.userid;
+        
+//         // Fetch user details from the database
+//         const userDetails = await collectionModel.findOne({ _id:userId});
+
+//         // Extract necessary information from user details
+//         const user= userDetails._id;
+//         const cartItems = userDetails.cart.items;
+//         const cartCount = cartItems.length;
+
+//         // Extract product IDs from cart items
+//         const cartProductIds = cartItems.map(item => item.productname);
+
+//         // Fetch product details for items in the cart
+//         const cartProducts = await collectionProduct.find({ _id: { $in: cartProductIds } });
+
+//         // Calculate total price of all items in the cart
+//         // const totalPrice = cartItems.reduce((accu, element) => accu + (element.quantity * element.price), 0);
+
+//         let result = [];
+
+//         for (let values of cartItems){
+//             for(let product of cartProducts){
+
+//                 if (String(values.productname).trim() === String(product._id).trim()) {
+
+//                     result.push({
+//                         name:product.Productname,
+//                         price:product.Price
+//                     })
+//                 }
+//             }
+//         }
+//         console.log(result)
+//         // Render the checkout page with retrieved data
+//         res.render('user/checkout', { user: userDetails,result,total:userDetails.cart.grantTotal,cartCount });
+
+//     } catch (error) {
+//         console.log(error);
+//         const message = error.message;
+//         res.render('404-error', { error, message });
+//     }
+// };
+
+// checkout 
+const checkoutpage = async (req, res) => {
     try {
         // Retrieve user's email from session
         const userId = req.session.userid;
         
         // Fetch user details from the database
-        const userDetails = await collectionModel.findOne({ _id:userId});
+        const userDetails = await collectionModel.findOne({ _id: userId });
 
         // Extract necessary information from user details
-        const user= userDetails._id;
+        const user = userDetails._id;
         const cartItems = userDetails.cart.items;
         const cartCount = cartItems.length;
 
@@ -502,25 +610,26 @@ const home =async (req,res)=>{
         const cartProducts = await collectionProduct.find({ _id: { $in: cartProductIds } });
 
         // Calculate total price of all items in the cart
-        // const totalPrice = cartItems.reduce((accu, element) => accu + (element.quantity * element.price), 0);
+        let totalPrice = 0;
+        const result = [];
 
-        let result = [];
-
-        for (let values of cartItems){
-            for(let product of cartProducts){
-
+        for (let values of cartItems) {
+            for (let product of cartProducts) {
                 if (String(values.productname).trim() === String(product._id).trim()) {
-
                     result.push({
-                        name:product.Productname,
-                        price:product.Price
-                    })
+                        name: product.Productname,
+                        price: product.Price
+                    });
+                    totalPrice += product.Price;
                 }
             }
         }
-        console.log(result)
+
+        // Fetch available coupons from the database
+        const coupons = await collectionCoupoun.find({});
+
         // Render the checkout page with retrieved data
-        res.render('user/checkout', { user: userDetails,result,total:userDetails.cart.grantTotal,cartCount });
+        res.render('user/checkout', { user: userDetails, result, total: userDetails.cart.grantTotal, cartCount, coupons });
 
     } catch (error) {
         console.log(error);
@@ -530,43 +639,113 @@ const home =async (req,res)=>{
 };
 
 
+const coupoun = async (req, res) => {
+    const { code } = req.params;
+    const userId = req.session.user;
+
+    try {
+        let cart = await collectionModel.findOne({ user: userId });
+
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found" });
+        }
+
+        const coupon = await collectionCoupoun.findOne({ code });
+
+        if (!coupon) {
+            return res.status(404).json({ message: "Coupon not found" });
+        }
+
+        if (cart.couponused.discount_amount !== 0) {
+            return res.status(400).json({ message: "Coupon already applied" });
+        }
+
+        const couponAmount = (cart.totalPrice * coupon.discount) / 100;
+
+        // Calculate the new total price after applying the coupon discount
+        const newTotalPrice = cart.totalPrice - couponAmount;
+
+        // Update the cart with the coupon details and new total price
+        cart.totalPrice = newTotalPrice;
+        cart.couponused = {
+            couponid: coupon._id,
+            discount_amount: couponAmount,
+        };
+
+        // Save the updated cart
+        await cart.save();
+
+        res.json({ message: "Coupon applied successfully", cart });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+
+
+
 const orderSuccess = async (req,res)=>{
+
+
     console.log(req.body)
     const currentDate = new Date();
 
-    const data = req.body
+    const dataa = req.body
     const id = req.session.userid;
     const foundUser = await collectionModel.findOne({ _id:id });
-    // console.log(foundUser);
+    
+
     const cartItems = foundUser.cart.items;
     console.log(cartItems);
+    console.log("addres",dataa);
     const cartProductIds = cartItems.map(item => item.productname);
     const cartProducts = await collectionProduct.find({ _id: { $in: cartProductIds }});
     console.log(cartProducts)
 
     const userId = foundUser._id;
-    const addressId = data.selectedAddress;
-    const method = data.method;
+    const addressId = dataa.selectedAddress;
+    const method = dataa.method;
     const amount = foundUser.cart?.grantTotal;
     console.log(('hey man this your ordered amount'));
     console.log(amount)
-    // Data collecting for db Storing
-    const productData = cartProducts.map(product => ({
-        p_name: product.Productname,
-        realPrice: product.Price,
-        price: amount,
-        description: product.Description,
-        image: product.Image,
-        category: product.Category,
-        quantity: product.quantity
-    }));
-    console.log(productData)
+
+    if(method === "wallet"){
+        if (foundUser.walletbalance < amount) {
+            return res.status(400).json({ error: 'Insufficient wallet balance.' });
+        }
+        
+        foundUser.walletbalance = foundUser.walletbalance - amount;
+        console.log(foundUser.walletbalance)
+        foundUser.wallethistory.push({
+            process:"purchase",
+            amount: amount
+        })
+    }
+   
+    const productData = cartProducts.map(product => {
+        const cartItem = cartItems.find(item =>item.productname.toString() === product._id.toString());
+
+        return {
+            p_name: product.Productname,
+            realPrice: product.Price,
+            price: amount,
+            description: product.Description,
+            image: product.Image,
+            category: product.Category,
+            quantity:cartItem.quantity
+        }
+    });
+    
+
+    
+    // console.log(productData)
 
     const deliveryDate = new Date();
     deliveryDate.setDate(currentDate.getDate() + 5);
     const newOrder = new collectionOrder({
         userId: userId,
-        address: addressId,
+        address: req.body.addressid,
         products: productData,
         payment: {
             method: method,
@@ -581,14 +760,14 @@ const orderSuccess = async (req,res)=>{
 
 
     console.log(method)
-    if (method === "COD") {
+  
         console.log("hai")
 
         await newOrder.save();
         for (let values of cartItems) {
             for (let products of cartProducts) {
-                if (new String(values.productId).trim() == new String(products._id).trim()) {
-                    products.quantity = products.quantity - values.quantity;
+                if (new String(values.productname).trim() == new String(products._id).trim()) {
+                    products.Stock = products.Stock - values.quantity;
                     
                     await products.save()
                 }
@@ -601,8 +780,196 @@ const orderSuccess = async (req,res)=>{
         res.status(200).json({data:"Ordered Successfully"})
         // res.redirect('/success')
 
-    }  else {
-        res.status(400).send("individual payment")
+}
+
+// const walletSuccess = async (req,res)=>{
+
+
+//     console.log(req.body)
+//     const currentDate = new Date();
+
+//     const dataa = req.body
+//     const id = req.session.userid;
+//     const foundUser = await collectionModel.findOne({ _id:id });
+
+//     if(walletbalance==amount){
+
+//     }
+    
+
+//     const cartItems = foundUser.cart.items;
+//     console.log(cartItems);
+//     console.log("addres",dataa);
+//     const cartProductIds = cartItems.map(item => item.productname);
+//     const cartProducts = await collectionProduct.find({ _id: { $in: cartProductIds }});
+//     console.log(cartProducts)
+
+//     const userId = foundUser._id;
+//     const addressId = dataa.selectedAddress;
+//     const method = dataa.method;
+//     const amount = foundUser.cart?.grantTotal;
+//     console.log(('hey man this your ordered amount'));
+//     console.log(amount)
+   
+//     const productData = cartProducts.map(product => {
+//         const cartItem = cartItems.find(item =>item.productname.toString() === product._id.toString());
+
+//         return {
+//             p_name: product.Productname,
+//             realPrice: product.Price,
+//             price: amount,
+//             description: product.Description,
+//             image: product.Image,
+//             category: product.Category,
+//             quantity:cartItem.quantity
+//         }
+//     });
+//     // console.log(productData)
+
+//     const deliveryDate = new Date();
+//     deliveryDate.setDate(currentDate.getDate() + 5);
+//     const newOrder = new collectionOrder({
+//         userId: userId,
+//         address: req.body.addressid,
+//         products: productData,
+//         payment: {
+//             method: method,
+//             amount: amount
+//         },
+//         status: "Processing",
+//         proCartDetail: cartProducts,
+//         cartProduct: cartItems,
+//         createdAt: currentDate,
+//         expectedDelivery: deliveryDate
+//     });
+
+
+//     console.log(method)
+  
+//         console.log("hai")
+
+//         await newOrder.save();
+//         for (let values of cartItems) {
+//             for (let products of cartProducts) {
+//                 if (new String(values.productname).trim() == new String(products._id).trim()) {
+//                     products.Stock = products.Stock - values.quantity;
+                    
+//                     await products.save()
+//                 }
+//             }
+//         }
+//         foundUser.cart.items = [];
+//         foundUser.grantTotal = 0;
+//         foundUser.total = 0;
+//         await foundUser.save();
+//         res.status(200).json({data:"Ordered Successfully"})
+// }
+const walletSuccess = async (req, res) => {
+    console.log(req.body);
+    const currentDate = new Date();
+    const dataa = req.body;
+    const id = req.session.userid;
+    
+    try {
+        const foundUser = await collectionModel.findOne({ _id: id });
+        const walletBalance = foundUser.walletbalance; // Assuming walletBalance is the property name
+        
+        // Calculate the total amount of the order
+        const orderTotal = foundUser.cart?.grantTotal || 0;
+        
+        // Check if the wallet balance is sufficient
+        if (walletBalance < orderTotal) {
+            return res.status(400).json({ error: 'Insufficient wallet balance.' });
+        }
+        
+        foundUser.walletbalance = foundUser.walletbalance - orderTotal;
+        console.log(foundUser.walletbalance)
+        foundUser.wallethistory.push({
+            process:"purchase",
+            amount: orderTotal
+        })
+
+        // Proceed with order processing
+        const cartItems = foundUser.cart.items;
+        const cartProductIds = cartItems.map(item => item.productname);
+        const cartProducts = await collectionProduct.find({ _id: { $in: cartProductIds }});
+        const userId = foundUser._id;
+        const addressId = dataa.selectedAddress;
+        const method = dataa.method;
+        const amount = orderTotal;
+
+      
+        const productData = cartProducts.map(product => {
+            const cartItem = cartItems.find(item => item.productname.toString() === product._id.toString());
+            
+            return {
+                p_name: product.Productname,
+                realPrice: product.Price,
+                price: amount,
+                description: product.Description,
+                image: product.Image,
+                category: product.Category,
+                quantity: cartItem.quantity
+            };
+        });
+        
+        const deliveryDate = new Date();
+        deliveryDate.setDate(currentDate.getDate() + 5);
+        
+        const newOrder = new collectionOrder({
+            userId: userId,
+            address: req.body.addressid,
+            products: productData,
+            payment: {
+                method: method,
+                amount: amount
+            },
+            status: "Processing",
+            proCartDetail: cartProducts,
+            cartProduct: cartItems,
+            createdAt: currentDate,
+            expectedDelivery: deliveryDate
+        });
+        
+        await newOrder.save();
+        
+        for (let values of cartItems) {
+            for (let products of cartProducts) {
+                if (String(values.productname).trim() === String(products._id).trim()) {
+                    products.Stock -= values.quantity;
+                    await products.save();
+                }
+            }
+        }
+        
+        foundUser.cart.items = [];
+        foundUser.grantTotal = 0;
+        foundUser.total = 0;
+        await foundUser.save();
+        
+        res.status(200).json({ data: "Ordered Successfully" });
+    } catch (error) {
+        console.error('Error processing order:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+
+const razor=async(req,res)=>{
+    const {amount,currency}=req.body
+
+    const options={
+        amount,currency
+    };
+console.log(options);
+    try{
+        const order = await razorpay.orders.create(options);
+        res.json({orderId:order.id});
+    }
+    catch(error){
+    console.error('error creating order');
+        res.status(500).send('Internal servr error')
     }
 
 }
@@ -612,36 +979,36 @@ const addressAdding=(req,res)=>{
 }
 
 const addressAddingpost = async (req, res) => {
-    console.log('hey i am address adding function ');
+    const { name, houseName, city, phone, postalCode} = req.body;
+    const userId = req.session.user; // Assuming you have a session userId
+    console.log(userId);
     try {
+        // Assuming you have a model for your collection
+        const user = await collectionModel.findOne({ email : userId});
 
-        const email = req.session.user;
-        const { firstname,address, city, phone, postalCode } = req.body;
-console.log(email);
-        const userData = await collectionModel.findOne({ email: email });
-
-        if (!userData) {
-            return console.log("User not found")
-        }
-
+        // Create a new address object
         const newAddress = {
-            name: firstname,
-            houseName: address,
+            name: name,
+            houseName: houseName,
             city: city,
             phone: phone,
             postalCode: postalCode,
-            
+            emailid: userId 
         };
+        console.log(user);
+        // Push the new address object into the addresses array
+        user.profile.address.push(newAddress);
 
-        userData.profile.address.push({newAddress});
-        await userData.save();
-        res.render('user/checkout', { user: userDetails });
+        // Save the updated user document
+        await user.save();
+
+        // res.status(200).send("Address added successfully");
+        // res.render('user/manageAddress',{ user});
+        res.redirect("/CheckOutPage")
+
     } catch (error) {
-        console.log(error);
-        res.status(500).send("Internal server error");
-        const message = error.message
-        res.render('404-error', { error, message })
-
+        console.error("Error adding address:", error);
+        res.status(500).send("Internal Server Error");
     }
 };
 
@@ -653,15 +1020,18 @@ const profile = async(req,res)=>{
     try {
         if(req.session.user){
         console.log('i am profile')
-        const userDetails = await collectionModel.findOne({ email: req.session.user });
-        let cart = userDetails.cart.items;
-        let cartCount = cart.length;
-        const name = userDetails.profile.address;
+        console.log(req.session.user)
+        console.log(req.session.userid)
+        const userData = await collectionModel.findOne({ _id: req.session.userid});
+        // let cart = userDetails.cart.items;
+        // let cartCount = cart.length;
+        console.log(userData);
+        const name = userData.profile.address;
 
         const user = true
-        const FoundUser = req.session.user;
-        const userData = await collectionModel.findOne({ email: FoundUser });
-        res.render('user/profile', { user,userData, cartCount ,name});
+        // const FoundUser = req.session.user;
+        // const userData = await collectionModel.findOne({ email: FoundUser });
+        res.render('user/profile', { user,userData,name});
         }else{
             res.redirect('/')
         }
@@ -679,10 +1049,13 @@ const updateprofile = async (req, res) => {
         let cart = userData.cart.items;
         let cartCount = cart.length;
         const { name, houseName, emailid, phone, postalCode, city } = req.body; // Updated field names
+        console.log(req.body)
+        console.log(typeof phone);
+
 
         // If the user doesn't have any address, insert new details
         if (!userData.profile.address || userData.profile.address.length === 0) {
-            userData.profile.address.push({
+            userData.profile.address.push({ 
                 name:name,
                 houseName: houseName,
                 postalCode: postalCode,
@@ -691,13 +1064,6 @@ const updateprofile = async (req, res) => {
                 phone:phone,
         
             });
-        } else {
-            userData.profile.address.name = name; // Updated field name
-            userData.profile.address.emailid = emailid;
-            userData.phone.profile.phone = phone;
-            userData.profile.address[0].houseName = houseName;
-            userData.profile.address[0].postalCode = postalCode;
-            userData.profile.address[0].city = city;
         }
 
         userData.name = name;
@@ -707,9 +1073,8 @@ const updateprofile = async (req, res) => {
         await userData.save();
 
         req.session.email = userData.email;
-        req.session.user = userData.name;
         
-        return res.render('user/profile', { user: true, userData, cartCount, success: "Successfully Updated" });
+        return res.redirect('/profile');
     } catch (error) {
         console.log(error.message);
         return res.status(500).render('404-error', { error: error.message });
@@ -718,6 +1083,7 @@ const updateprofile = async (req, res) => {
 
 const manageAddress= async(req,res)=>{
     const email = req.session.user;
+
         const { firstname,address, city, phone, postalCode } = req.body;
 console.log(email +"email");
         const userData = await collectionModel.findOne({ email: email });
@@ -754,6 +1120,8 @@ const addAddresspost = async (req, res) => {
     try {
         // Assuming you have a model for your collection
         const user = await collectionModel.findOne({ email : userId});
+
+        const phone =parseInt(phone)
 
         // Create a new address object
         const newAddress = {
@@ -892,7 +1260,8 @@ const changePassword = async (req, res) => {
         if (newPassword !== confirmPassword) {
             return res.status(400).json({ error: 'New password and confirm password do not match' });
         }
-        user.password = newPassword;
+        const newpass = await bcrypt.hash(newPassword,10)
+        user.password = newpass;
         await user.save();
     } catch (error) {
         console.error('Error updating password:', error);
@@ -919,13 +1288,12 @@ const order=async(req,res)=>{
         // Fetch orders from the database, you'll need to replace this with your actual logic
         const orders = await collectionOrder.find({ userId: req.session.userid });
         // Render the "user/order" view and pass the orders data
-        console.log(orders[0].products,"here")
+        // console.log(orders[0].product,"here")
         let listItems = [];
         for(let order of orders){
-            console.log("1");
             listItems.push(order.products)
         }
-        console.log(orders);
+        // console.log(orders);
         res.render('user/order', { orders,listItems });
     } catch (error) {
         console.error('Error fetching orders:', error);
@@ -933,14 +1301,202 @@ const order=async(req,res)=>{
     }
     
 }
+const cancelOrder = async (req, res) => {
+    
+    const {orderId,productId} =  req.params
+    // console.log("here");
+    // console.log(orderId);
+    // console.log(productId);
+    try {
+        // Find the order in the database
+        const user=await collectionModel.findOne({_id:req.session.userid})
+        // const wallet=user.wallethistory
+        console.log("look at yoou",req.session.userid);
+        // const walletbal = user.walletbalance
+        const order = await collectionOrder.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ message:"Order not found"});
+        }
+        console.log("order",order);
+        // const itemcancel= order.products.find(items => items._id.toString()===itemId)
+        const productToCancel = order.products.find(products => products.p_id.toString() === productId);
+        console.log(order.payment,"PATTTT");
+        console.log(order.payment.amount,"fffffff");
+
+        if(order.payment.method !="cashondelivery"){
+            await collectionModel.updateOne({_id:req.session.userid},{$inc:{walletbalance:order.payment.amount}})
+
+            user.wallethistory.push({
+                process:order.payment.method,
+                amount:productToCancel.quantity * productToCancel.realPrice,
+            })
+           
+            await user.save()
+        }
+
+        if (!productToCancel) {
+            // console.log("here is out here")
+            return res.status(404).json({ message: "Product not found in the order" });
+        }
+        // Update the order status to "Cancelled"
+        
+        // itemcancel.status = "Cancelled";
+        productToCancel.status = "Cancelled";
+
+        await order.save();
+
+        res.status(200).json({ message: "Order cancelled successfully", order });
+    } catch (error) {
+        console.error('Error cancelling order:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
 
 
+
+// const orderReturn = async (req, res) => {
+//     try {
+//         const {orderId,productId,reason} = req.body;
+        
+        
+//         const productData = await collectionOrder.findById(orderId);
+//         productData.products.map(item =>{
+//             console.log(item.p_id)
+//             if(item.p_id === productId){
+//                 item.status = "Return Request",
+//                 item.reason = reason
+//             }
+//         })
+//         await productData.save()
+//         console.log(req.body)
+
+        
+//     } catch (error) {
+//         console.log(error);
+//         // Handle errors appropriately, such as sending an error response
+//         res.status(500).send('Internal Server Error');
+//     }
+// };
+
+const orderReturn= async (req, res, next) => {
+    try {
+        const {orderId, productId, reason} = req.body;
+
+        const productData = await collectionOrder.findById(orderId);
+        productData.products.forEach(item => {
+            if (item.p_id === productId) {
+                item.status = "Return Request";
+                item.reason = reason;
+            }
+        });
+        await productData.save();
+        res.json({success: true, message: 'Product returned successfully.'});
+    } catch (error) {
+        next(error); // Pass the error to the error handling middleware
+    }
+};
+
+// wallet
+const wallet = async (req, res) => {
+    try {
+        // Fetch user wallet details including wallethistory
+        console.log("session user" ,req.session.userid)
+        const user = await collectionModel.findById(req.session.userid);
+        console.log('vipin user' , user)
+        res.render("user/wallet", { wallethistory: user.wallethistory , walletbalance:user.walletbalance});
+    } catch (error) {
+        console.error('Error fetching wallet details:', error);
+        // Handle error appropriately
+        res.status(500).send('Internal server error');
+    }
+}
+
+
+
+//whish list 
+const whishlistload = async (req, res) => {
+    try {
+        if (req.session.user) {
+            const userEmail = req.session.user;
+            const userDetails = await collectionModel.findOne({ email: userEmail });
+            const name =  userDetails.name
+            const productData = userDetails.wishlist;
+            const cart = userDetails.cart.items;
+            const cartCount = cart.length;
+            const productId = productData.map(items => items.productId);
+            const productDetails = await collectionProduct.find({ _id: { $in: productId } });
+            const price = productDetails.originalprice - (productDetails.originalprice * productDetails.productOffer) / 100
+
+            res.render('user/wishlist', { price, productDetails, cartCount,name })
+        } else {
+            res.redirect('/login')
+        }
+    } catch (error) {
+        console.log(error)
+        const message = error.message
+        res.render('404-error', { error, message })
+
+    }
+}
+
+const addingWhishList = async (req, res) => {
+    console.log('hey i am the add wishlist');
+    try {
+        const productId = req.params.id;
+        const userEmail = req.session.user;
+        const userDetails = await collectionModel.findOne({ email: userEmail });
+        const productExist = userDetails.wishlist.map(items => items.productId.toString() === productId);
+
+
+        if (productExist.includes(true)) {
+            return res.json("Already Exist");
+        } else {
+            const WhishList = {
+                productId: productId
+            }
+            userDetails.wishlist.push(WhishList);
+            await userDetails.save();
+            return res.json('server got this....');
+        }
+    } catch (error) {
+        console.log(error);
+        const message = error.message
+        res.render('404-error', { error, message })
+
+    }
+}
+
+const WhishProductDelete = async (req, res) => {
+    console.log('hello i am the wishlist delete');
+    try {
+        const productId = req.params.id;
+        const userEmail = req.session.user;
+        await collectionModel.findOneAndUpdate(
+            { email: userEmail },
+            { $pull: { wishlist: { productId: productId } } }
+        );
+        res.redirect("/wishlist");
+    } catch (error) {
+        console.log("whish deleting Error" + error)
+        const message = error.message
+        res.render('404-error', { error, message })
+
+    }
+}
 
 // success
 const success=(req,res)=>{
     res.render("user/succes")
 }
 
+
+
+
 module.exports={
-    login,loginpost,signuppost,home,logout,signup,otp,otppost,resendOtp,forget,products,details,landing,mac,airpod,watch,loadcart,cartDelete,Addcart,cartQuantityUpdate,checkoutpage,addressAdding,addressAddingpost,profile,updateprofile,addAddress,addAddresspost,editAddress,editAddresspost, deleteAddress,managePassword,changePassword,manageAddress,orderSuccess,order,success
+    login,loginpost,signuppost,home,logout,signup,otp,otppost,resendOtp,forget,
+    products,details,landing,mac,airpod,watch,loadcart,cartDelete,Addcart,cartQuantityUpdate,
+    checkoutpage,addressAdding,addressAddingpost,whishlistload,addingWhishList,WhishProductDelete,
+    profile,updateprofile,addAddress,addAddresspost,editAddress,editAddresspost, deleteAddress,
+    managePassword,changePassword,manageAddress,orderSuccess,walletSuccess,razor,order,cancelOrder,orderReturn,
+    coupoun,success,wallet
 }

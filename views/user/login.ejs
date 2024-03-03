@@ -65,6 +65,8 @@
           <div class="form-group">
               <input type="password"  id="password" class="form-control" name="password" placeholder="password" required>
           </div>
+          <div id="error"></div>
+
           <a href="/forget">Forget Password</a>
           <br>
           
@@ -78,12 +80,13 @@
    <script>
       let emailUser = document.getElementById("email");
       let passwordUser = document.getElementById("password");
-               
+      let errorId = document.getElementById("error");
+       
       if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
   }
   
-      let errorId  = document.getElementById("error");
+      let error  = document.getElementById("error");
       
       function showError(message) {
 // Create a new div element

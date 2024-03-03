@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Banner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome CDN -->
+    <!-- Include pdfmake library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden; /* Remove horizontal scrolling */
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar Navigation */
+        .side-nav {
+            background-color: black;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            width: 200px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            height: calc(100vh - 80px); /* Adjusted height to fit below top navigation bar */
+        }
+
+        .side-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .side-nav a {
+            text-decoration: none;
+            color: #fff;
+            display: block;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 3px;
+            border-radius: 20px;
+            transition: 0.33s ease-in-out;
+            font-weight: 500;
+        }
+
+        .side-nav a:hover {
+            color: black;
+            background-color: white;
+            border-radius: 20px;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            width: 100%;
+            height: 80px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            background-color: rgb(246, 246, 246);
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .btn-container {
+            text-align: right;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-pdf,
+        .btn-excel {
+            margin:40px;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-pdf:hover,
+        .btn-excel:hover {
+            background-color: #f2f2f2;
+        }
+
+        /* Table Styles */
+        table {
+            width: 110%; /* Adjusted width */
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: black;
+            color: white;
+            width: 230px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        @media screen and (max-width: 768px) {
+            .side-nav {
+                display: none; /* Hide sidebar on smaller screens */
+            }
+
+            .content {
+                padding-left: 20px; /* Add padding to content to compensate for hidden sidebar */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div>
+            <!-- Add top navigation content here if needed -->
+            <h1>Sales Report</h1>
+        </div>
+        
+    </div>
+
+    <div class="main-content">
+        <!-- Sidebar Navigation -->
+        <div class="side-nav">
+            <ul>
+                <li><a href="/admin/home">Dashboard</a></li>
+                <li><a href="/admin/user">User</a></li>
+                <li><a href="/admin/category">Category</a></li>
+                <li><a href="/admin/product">Product</a></li>
+                <li><a href="/admin/order">order</a></li>
+                <li><a href="/admin/coupoun">coupoun</a></li>
+                <li><a href="/admin/logout">logout</a></li>
+                <!-- Add more navigation items as needed -->
+            </ul>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="content">
+            <div class="btn-container">
+                <!-- <button class="btn-pdf" onclick=" downloadPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button> -->
+                <a href="/admin/pdf"><button class="btn-pdf"><i class="fas fa-file-pdf"></i> Download PDF</button></a>
+               <a href="/admin/excel"><button class="btn-excel" ><i class="fas fa-file-excel"></i> Download Excel</button></a> 
+                
+                
+                <form id="dateFilterForm">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate" name="startDate">
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate" name="endDate">
+                    <button type="submit" class="btn-filter"><i class="fas fa-filter"></i> Filter</button>
+                </form>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Product Name</th>
+                        <th>Date</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% salesReport.forEach(function(report) { %>
+                    <tr>
+                        <td><%= report._id %></td>
+                        <td><%= report.p_name %></td>
+                        <td><%= report.createdAt.toLocaleString() %></td>
+                        <td><%= report.quantity %></td>
+                        <td><%= report.price %></td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+
+
+
+    <!-- <script>
+        // Define a global variable to store the sales report data
+    
+        // async function downloadPDF() {
+        //     try {
+        //         const response = await fetch('/admin/dwnpdf', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //             },
+        //             body: JSON.stringify(salesReport),
+        //         });
+    
+        //         if (!response.ok) {
+        //             throw new Error(`HTTP error! Status: ${response.status}`);
+        //         }
+    
+        //         // Trigger download by parsing the response as blob
+        //         const blob = await response.blob();
+        //         const url = window.URL.createObjectURL(blob);
+        //         const link = document.createElement('a');
+        //         link.href = url;
+        //         link.download = 'sales_report.pdf';
+        //         document.body.appendChild(link);
+        //         link.click();
+        //         document.body.removeChild(link);
+        //         window.URL.revokeObjectURL(url);
+        //     } catch (error) {
+        //         console.error('Error:', error);
+        //     }
+        // }
+    
+        async function downloadExcel() {
+            try {
+                const response = await fetch('/admin/dwnexcel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(salesReport),
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+    
+                // Trigger download by parsing the response as blob
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'sales_report.xlsx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script> -->
+    
+</body>
+</html>

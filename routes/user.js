@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = express('mongoose')
 const usercontroller = require('../controller/usercontroller');
-const collectionModel = require('../models/mongodb');
+const collectionModel = require('../models/userdb');
 const {isUser,checkSessionAndBlocked} = require('../middleware/userside');
 
 
@@ -54,13 +54,15 @@ router.get('/watch',usercontroller.watch);
 router.post('/cart/:id',usercontroller.Addcart)
 router.get('/cart',usercontroller.loadcart)
 router.post('/cartupdate/:id',usercontroller.cartQuantityUpdate);
-router.post('/cartDelete/:id',usercontroller.cartDelete);
+router.delete('/cartDelete/:id',usercontroller.cartDelete);
 
 // // checkout page
 router.get('/CheckOutPage',usercontroller.checkoutpage)
 router.get("/AddressUpdate",usercontroller.addressAdding)
 router.post('/AddressUpdate',usercontroller.addressAddingpost)
 router.post('/CheckOut',usercontroller.orderSuccess)
+router.post('/create',usercontroller.razor)
+
 
 
 // profile
@@ -80,8 +82,18 @@ router.get("/deleteAddress/:id", usercontroller.deleteAddress);
 
 // oreder
 router.get("/order",usercontroller.order)
-// router.post("/order",usercontroller.orderpost)
+router.get('/addressadding',usercontroller.addressAdding)
+router.post('/addAddrresscheckout', usercontroller.addressAddingpost);
+router.post('/cancelOrder/:orderId/:productId', usercontroller.cancelOrder);
+router.post('/returnProduct',usercontroller.orderReturn);
 
+// wishlsit
+router.get('/wishlist',usercontroller.whishlistload);
+router.post('/wishlist/:id',usercontroller.addingWhishList)
+router.get('/wishlistdelete/:id',usercontroller.WhishProductDelete)
+
+// wallet
+router.get('/wallet',usercontroller.wallet)
 
 // produt details
 router.get('/details/:id',usercontroller.details)

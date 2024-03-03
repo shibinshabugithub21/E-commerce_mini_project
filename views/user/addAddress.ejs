@@ -64,6 +64,9 @@ color:#69707a;
     background-color: #f1e0e3;
     border-color: #f1e0e3;
 }
+#newbtn{
+    margin-bottom: 30px;
+}
 </style>
 <div class="container-xl px-4 mt-4">
     <!-- Account page navigation-->
@@ -82,35 +85,113 @@ color:#69707a;
                 <div class="container">
 
                     <h2>Add New Address</h2>
-                    <form action="/addAddress" method="POST">
+                    <form action="/addAddress" method="POST" id="addAddressForm" onsubmit="return validateForm()">
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <input type="text" class="form-control" id="name" name="name">
+                            <!-- Display error message for name field -->
+                            <span id="nameError" style="color: #b92b27;" ></span>
                         </div>
                         <div class="mb-3">
                             <label for="houseName" class="form-label">House Name</label>
-                            <input type="text" class="form-control" id="houseName" name="houseName" required>
+                            <input type="text" class="form-control" id="houseName" name="houseName" >
+                            <!-- Display error message for houseName field -->
+                            <span id="housenameError" style="color: #b92b27;" ></span>
                         </div>
                         <div class="mb-3">
                             <label for="city" class="form-label">City</label>
-                            <input type="text" class="form-control" id="city" name="city" required>
+                            <input type="text" class="form-control" id="city" name="city" >
+                            <!-- Display error message for city field -->
+                            <span id="cityError" style="color: #b92b27;" ></span>
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" required>
+                            <input type="text" class="form-control" id="phone" name="phone"  pattern="[0-9]{10}">
+                            <!-- Display error message for phone field -->
+                            <span id="phoneError" style="color: #b92b27;" ></span>
                         </div>
                         <div class="mb-3">
                             <label for="postalCode" class="form-label">Postal Code</label>
-                            <input type="text" class="form-control" id="postalCode" name="postalCode" required>
+                            <input type="text" class="form-control" id="postalCode" name="postalCode" >
+                            <!-- Display error message for postalCode field -->
+                            <span id="postalCodeError" style="color: #b92b27;" ></span>
                         </div>
-                        <button type="submit" class="btn btn-primary">Add Address</button>
+                        <button type="submit" class="btn btn-success" id="newbtn">Add Address</button>
                     </form>
-
                 </div>
             </div>
+        </div>
+    </div>
 </div>
-</div>
-</div>
+
+
+
+
+<script>
+
+    const name = document.getElementById('name');
+    const  houseName = document.getElementById('houseName');
+    const city= document.getElementById('city');
+    const phone= document.getElementById('phone');
+    const postalcode = document.getElementById('postalCode');
+    const addAddressForm =document.getElementById('addAddressForm');
+    const nameerror = document.getElementById('nameError');
+    const housenameError= document.getElementById('housenameError');
+    const cityError = document.getElementById('cityError');
+    const phoneError = document.getElementById('phoneError');
+    const postalCodeError= document.getElementById('postalCodeError');
+     
+
+    addAddressForm.addEventListener('submit', (e) => {
+    let isValid = true;
+
+    // Validate Name field
+    if (name.value.trim() === '') {
+        nameerror.textContent = 'Name is required';
+        isValid = false;
+    } else {
+        nameerror.textContent = '';
+    }
+
+    // Validate House Name field
+    if (houseName.value.trim() === '') {
+        housenameError.textContent = 'House Name is required';
+        isValid = false;
+    } else {
+        housenameError.textContent = '';
+    }
+
+    // Validate City field
+    if (city.value.trim() === '') {
+        cityError.textContent = 'City is required';
+        isValid = false;
+    } else {
+        cityError.textContent = '';
+    }
+
+    // Validate Phone field
+    if (phone.value.trim() === '' || !phone.checkValidity()) {
+        phoneError.textContent = 'Invalid phone number';
+        isValid = false;
+    } else {
+        phoneError.textContent = '';
+    }
+
+    // Validate Postal Code field
+    if (postalcode.value.trim() === '') {
+        postalCodeError.textContent = 'Postal Code is required';
+        isValid = false;
+    } else {
+        postalCodeError.textContent = '';
+    }
+
+    if (!isValid) {
+        e.preventDefault(); // Prevent form submission if validation fails
+    }
+});
+
+
+</script>
 
 
 <%-include("footer")%>

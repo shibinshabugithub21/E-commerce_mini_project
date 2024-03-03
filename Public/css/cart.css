@@ -1,0 +1,54 @@
+body{
+    position: relative;
+}
+
+/* user side image previewer */
+
+#imagePreview img{
+    height: 50px;
+    max-width: 80px;
+}
+
+#cropper110Modal{
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(53, 52, 52, 0.532);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+
+#cropper110Modal img {
+	max-width: 100%;
+}
+
+.cropper110-page {
+	margin: 1em auto;
+	max-width: 768px;
+	height: 100%;
+}
+
+.cropper110-box {
+	padding: 0.5em;
+	width: calc(100%/2 - 1em);
+    max-height: 60vh;
+}
+
+
+
+.cropper110-crop , .cropper110-close {
+    padding: .5rem 1rem;
+    background-color: rgb(0,0,0);
+    color: #fff;
+    font-weight: bold;
+}
+
+.cropper110-close{
+    background-color: red;
+}
+
+
+
+

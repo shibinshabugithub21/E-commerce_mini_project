@@ -62,6 +62,8 @@
                           <input name="num4" type="number" />
                           <input name="num5" type="number" />
                       </div>
+
+
   
                       <button type="submit" class="btn btn-primary mb-3" >
                           Verify
@@ -71,15 +73,17 @@
                     <% if (error) { %>
                         <!-- Display the error message -->
                         <div class="alert alert-danger" role="alert">
-                            <%= error %>
                         </div>
                     <% } %>
                     
 
-                   <!-- Example of a button triggering OTP resend -->
                     <div>
-                         <a id="resendOtpBtn" href="#">Resend OTP</a>
+                        Time left: <span id="timer">60</span> seconds
                     </div>
+                    <div id="resendButtonContainer" style="display: none;">
+                        <button id="resendOtpBtn" onclick="resendOtp()">Resend OTP</button>
+                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -106,7 +110,59 @@ document.getElementById('resendOtpBtn').addEventListener('click', function() {
         console.error('Error resending OTP:', error);
     });
 });
+const timerElement = document.getElementById('timer');
+    const resendButtonContainer = document.getElementById('resendButtonContainer');
 
+    // Function to start the timer
+    function startTimer(duration, display) {
+        let timer = duration;
+        const countdown = setInterval(function () {
+            const minutes = Math.floor(timer / 60);
+            let seconds = timer % 60;
+
+            // Add leading zero if seconds is less than 10
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+
+            display.textContent = minutes + ' : ' + seconds;
+            timer--;
+
+            if (timer < 0) {
+                clearInterval(countdown);
+                // Show the resend button
+                resendButtonContainer.style.display = 'block';
+                display.textContent = '00 : 00';
+            }
+        }, 1000);
+    }
+
+    // Start the timer when the page loads
+    window.onload = function () {
+        const countdownDuration = 60; // 60 seconds
+        startTimer(countdownDuration, timerElement);
+    };
+
+    // Function to handle resend OTP
+    function resendOtp() {
+        // Hide the resend button
+        resendButtonContainer.style.display = 'none';
+        // Restart the timer
+        startTimer(60, timerElement);
+        // Make an AJAX request to resend OTP
+        fetch('/resendotp', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            // Handle response, maybe show a success message to the user
+            console.log('Resend OTP request successful');
+        })
+        .catch(error => {
+            // Handle error, maybe show an error message to the user
+            console.error('Error resending OTP:', error);
+        });
+    }
 
 </script>
 

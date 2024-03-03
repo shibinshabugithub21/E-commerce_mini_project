@@ -1,29 +1,47 @@
 const mongoose = require("mongoose");
-const collectionModel = require("./mongodb");
-
+const collectionModel = require("./userdb");
+const {v4:uuidv4}=require("uuid")
 // Define the order schema
 const schema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: collectionModel // Reference to the User collection
     },
-    address: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: collectionModel // Reference to the Address collection
-    },
-    status: {
-        type: String,
-        default: "Processing"
-    },
-    orderCancleRequest: {
-        type: Boolean,
-        default: false
-    },
-    orderReturnRequest: {
-        type: Boolean,
-        default: false
-    },
+    address: [{
+        name: {
+            type: String,
+            required: true
+        },
+        houseName: {
+            type: String,
+            required: true
+        },
+        city: {
+            type: String,
+            required: true
+        },
+        phone: {
+            type: String,
+            required: true
+        },
+        postalCode: {
+            type: String,
+            required: true
+        }
+    }],
     products: [{
+        orderCancleRequest: {
+            type: Boolean,
+            default: false
+        },
+        orderReturnRequest: {
+            type: Boolean,
+            default: false
+        },
+        p_id:{
+            type:String,
+            default:uuidv4
+        },
         p_name: {
             type: String,
             required: true 
@@ -53,6 +71,14 @@ const schema = new mongoose.Schema({
             type: Number,
             required: false
         },
+        status:{
+            type:String,
+            enum:['Processing', 'Cancelled','Delivered',"Shipped","Return Request","Return"],
+            default:"Processing"
+        },
+        reason:{
+            type:String
+        }
     }],
     payment: {
         method: {

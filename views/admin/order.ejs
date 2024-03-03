@@ -1,280 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            overflow-x: hidden; /* Remove horizontal scrolling */
+        }
+
+        /* Sidebar Navigation */
+        .side-nav {
+            background-color: black;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            width: 200px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+        }
+
+        .side-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .side-nav a {
+            text-decoration: none;
+            color: #fff;
+            text-align: center;
+            display: block;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 3px;
+            transition: 0.33s ease-in-out;
+        }
+
+        .side-nav a:hover {
+            color: black;
+            background-color: white;
+            border-radius: 20px;
+        }
+
+        /* Main Content Area */
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-x: hidden; /* Hide horizontal overflow */
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            width: 100%;
+            height: 50px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            background-color: rgb(255, 255, 255);
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin-left: 212px;
+        }
+
+        /* Table Styling */
+        table {
+            border-collapse: collapse;
+            margin: 20px auto;
+             margin-left: 210px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: black;
+            color: white;
+        }
+
+        
+        /* Pagination Styling */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 10px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .pagination button.active {
+            background-color: black;
+            color: white;
+        }
+
+        .block-btn-notBlock {
+            background-color: green;
+            color: white;
+        }
+
+        .block-btn-Block {
+            background-color: red;
+            color: white;
+        }
+
+        /* Responsive Styles */
+        @media only screen and (max-width: 600px) {
+            .side-nav {
+                display: none;
+            }
+
+            .top-nav {
+                padding: 10px;
+            }
+
+            .content {
+                padding: 10px;
+                margin-left: 0;
+            }
+
+            .add-product-btn {
+                margin-left: 10px;
+            }
+        }
+
+        .headline u {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div class="side-nav">
+        <!-- <img src="/Public/img/bg.png" width="100px",height="150px"> -->
+        <ul>
+            <li><a href="/admin/home">Dashboard</a></li>
+            <li><a href="/admin/user">User</a></li>
+            <li><a href="/admin/category">Category</a></li>
             <li><a href="/admin/product">Product</a></li>
-            <!DOCTYPE html>
-            <html lang="en">
-            
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 0;
-                        padding: 0;
-                        display: flex;
-                        min-height: 100vh;
-                        background-color: #f4f4f4;
-                        /* overflow-x: hidden; */
-                    }
-            
-                    /* Sidebar Navigation */
-                    .side-nav {
-                        background-color:black;
-                        color:white;
-                        padding: 15px;
-                        text-align: left;
-                        width: 200px;
-                        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-                        height: 1000px;
-                    
-                    }
-            
-                    .side-nav ul {
-                        list-style: none;
-                        padding: 0;
-                        margin: 0;
-                        position: absolute;
-                        left: 45px;
-                        top: 120px;
-            
-                    }
-            
-            
-                    .side-nav a {
-                        text-decoration: none;
-                        color: #fff;
-                        text-align: center;
-                        display: block;
-                        padding: 10px;
-                        margin-top: 40px;
-                        border-radius: 3px;
-                        border-radius: 20px;
-                        transition:  0.33s ease-in-out;  
-                        font-weight: 500; 
-                        
-                        
-                        /* transition: background-color 0.3s; */
-                    }
-            
-                    .side-nav a:hover{
-                        color: black;
-                        background-color: white;
-                        border-radius: 20px;
-                    }
-                    /* Main Content Area */
-                    .content {
-                        flex: 1;
-                        overflow-x: hidden;
-                    }
-            
-                    /* Top Navigation */
-                    .top-nav {
-                        width: 100%;
-                        height: 50px;
-                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-                        background-color: rgb(255, 255, 255);
-                        padding: 15px;
-                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-                        /* z-index: 1; Ensure top-nav is above sidebar */
-                    
-                    }
-            
-                    /* Table Styling */
-                    table {
-                        border-collapse: collapse;
-                        width: 80%;
-                        margin: 20px auto; /* Center the table on the page */
-                    }
-            
-                    th, td {
-                        border: 1px solid #ddd;
-                        padding: 8px;
-                        text-align: left;
-                    }
-            
-                    th {
-                        background-color: #FF6347;
-                        color: white;
-                    }
-            
-                    /* Action Button Styling */
-                    .action-btn {
-                        padding: 8px;
-                        margin-bottom: 5px; /* Added margin to separate buttons */
-                        border: none;
-                        border-radius: 3px;
-                        cursor: pointer;
-                    }
-            
-                    .update-btn {
-                        background-color: #4CAF50;
-                        color: white;
-                    }
-            
-                    .remove-btn {
-                        background-color: red;
-                        color: white;
-                    }
-            
-                    /* Add New Product Button Styling */
-                    .add-product-btn {
-                        margin: 20px auto;
-                        margin-left: 110px;
-                        padding: 10px;
-                        background-color: #3498db;
-                        color: white;
-                        border: none;
-                        border-radius: 3px;
-                        cursor: pointer;
-                        display: block;
-                    }
-            
-                    /* Pagination Styling */
-                    .pagination {
-                        display: flex;
-                        justify-content: center;
-                        margin-top: 20px;
-                    }
-            
-                    .pagination button {
-                        padding: 10px;
-                        margin: 0 5px;
-                        border: none;
-                        border-radius: 3px;
-                        cursor: pointer;
-                    }
-            
-                    .pagination button.active {
-                        background-color: black;
-                        color: white;
-                    }
-            
-                    .block-btn-notBlock {
-                        background-color:green;
-                        color: white;
-                    }
-                    .block-btn-Block {
-                        background-color: red;
-                        color: white;
-                    }
-            
-            
-                    /* Responsive Styles */
-                    @media only screen and (max-width: 600px) {
-                        .side-nav {
-                            display: none;
-                        }
-            
-                        .top-nav {
-                            padding: 10px;
-                        }
-            
-                        .content {
-                            padding: 10px;
-                        }
-            
-                        .add-product-btn {
-                            margin-left: 10px;
-                        }
-                    }
-            
-                    .headline u{
-                        text-decoration:none;
-                    }
-                </style>
-            </head>
-            
-            <body>
-            
-                <!-- Sidebar Navigation -->
-                <div class="side-nav">
-                    <!-- <img src="/Public/img/bg.png" width="100px",height="150px"> -->
-                    <ul>
-                        <li><a href="/admin/home">Dashboard</a></li>
-                        <li><a href="/admin/user">User</a></li>
-                        <li><a href="/admin/category">Category</a></li>
-                        <li><a href="/admin/product">Product</a></li>
-                        <li><a href="/admin/logout">logout</a></li>
-            
-                        <!-- Add more navigation items as needed -->
-                    </ul>
-                </div>
-            
-                <!-- Main Content Area -->
-                <div class="content">
-                    <!-- Top Navigation -->
-                    <div class="top-nav">
-                        <!-- Add top navigation content here if needed -->
-                        <h1 class="headline"><u>Product Management</u></h1>
-                    </div>
-            
-                    <!-- Add New Product Button -->
-                   <a href="/admin/addproduct"><button class="add-product-btn">Add New Product</button></a>
-            
-                    <!-- Product List Table -->
-                    <table border="1">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Product Name</th>
-                                <th>Category</th>
-                                <th>Stock</th>
-                                <th>Price</th>
-                                <th>Rating</th>
-                                <th>Description</th>
-                                <th>Images</th>
-                                <th>Block</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        
-                            <% product.forEach((element,index) => { %>
+            <li><a href="/admin/order">Order</a></li>
+            <li><a href="/admin/logout">Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <!-- Add top navigation content here if needed -->
+            <h1 class="headline"><u>Order Management</u></h1>
+        </div>
+
+        <!-- form handling -->
+        <form>            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Product Name</th>
+                        <th>Order ID</th>
+                        <th>User Name</th>
+                        <th>Shipping Address</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Payment</th>
+                        <th>Order Status</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% ordersWithDataSorted.forEach(order => { %>
+                        <% order.cartProduct.forEach(cartItem => { %>
+                            <% if (order.products.some(product => product._id.$oid === cartItem.productname.$oid)) { %>
+                                <% const product = order.products.find(product => product._id.$oid === cartItem.productname.$oid); %>
                                 <tr>
-                                    
-                                    <td><%=index +1%></td>
-                                    <td><%= element.Productname%></td>
-                                    <td><%= element.Category%></td>
-                                    <td><%= element.Stock%></td>
-                                    <td><%= element.Price%></td>
-                                    <td><%= element.Rating%></td>
-                                    <td><%= element.Description %></td>
+                                    <td><img src="/productImages/<%= product.image[0] %>" style="width:70px" height="70px"></td>
+                                    <td><%= product.p_name %></td>
+                                    <td><%= order._id %></td>
+                                    <td><%= order.address[0].name %></td>
                                     <td>
-                                        <img style="width: 50px; height: 55px" src="/productImages/<%= element.Image[0] %>"/>
-                                                        </td>
-                                                        <td>
-                                                            <!-- Form for blocking -->
-                                        <% if (element.isDelete === false) { %>
-                                            <form action="/admin/isdelete/<%= element._id%>" method="post">
-                                                <button class="action-btn block-btn-Block">Block</button>
-                                            </form>
-                                        <% } else { %>
-                                            <!-- Form for unblocking -->
-                                            <form action="/admin/notdelete/<%= element._id%>" method="post">
-                                                <button class="action-btn block-btn-notBlock">Unblock</button>
-                                            </form>
-                                        <% } %>
-                                        
-                                     </td>
-                                    <td>
-                                   <a href="/admin/editproduct/<%= element._id%>"><button class="action-btn update-btn">Update</button></a>
-                                    <a href="/admin/deleteproduct/<%=element._id %>"><button class="action-btn remove-btn">Remove</button></a>
+                                        <%= order.address[0].houseName %>,
+                                        <%= order.address[0].city %>,
+                                        <%= order.address[0].phone %>,
+                                        <%= order.address[0].postalCode %>
                                     </td>
+                                    <td><%= cartItem.quantity %></td>
+                                    <td>₹<%= order.payment.amount %></td>
+                                    <td><%= order.payment.method %></td>
+                                    <td>
+                                        <select name="itemStatus" id="<%= product._id %>" data-item-id="<%= product._id %>" data-order-id="<%= order._id %>" <%= order.status === 'cancelled' ? 'disabled' : '' %> style="<%= order.status === 'cancelled' ? 'font-weight: bold; color: black;' : '' %>" onchange="status('<%= order._id %>','<%= product._id %>')">
+                                            <option value="Pending" <%= product.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                            <option value="Shipped" <%= product.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                            <option value="Delivered" <%= product.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                            <option value="Cancelled" <%= product.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                            <option value="Return Request" <%= product.status === 'Return Request' ? 'selected' : '' %>>Return Request</option>
+                                            <option value="Return" <%= product.status === 'Return' ? 'selected' : '' %>>Return</option>
+                                        </select>
+                                    </td>
+                                    <td><%= order.createdAt.toISOString().slice(0, 19).replace("T", " ") %></td>
                                 </tr>
-                          <% })%>
-                            <!-- Add more rows as needed -->
-                        </tbody>
-                    </table>
-                    <!-- Pagination -->
-                    <!-- <div class="pagination">
-                        <button>Previous</button>
-                        <button class="active">1</button>
-                        <button>2</button>
-                        <button>3</button>
-                        <button>Next</button>
-                    </div> -->
-                </div>
-            
-            </body>
-            
-            </html>
-            
+                            <% } %>
+                        <% }); %>
+                    <% }); %>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <script>
+     // Express Route for updating order status
+        // JavaScript
+        async function status(orderId, productId) {
+    const newStatus = document.getElementById(productId).value;
+
+    // Send HTTP request to update order status
+    await fetch(`/admin/order/${orderId}/${productId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to update order status');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Update UI with the new order status
+        console.log('Order status updated successfully:', data);
+        // Implement UI update logic here if needed
+    })
+    .catch(error => {
+        console.error('Error updating order status:', error.message);
+        // Handle error
+    });
+};
+
+
+    </script>
+
+</body>
+
+</html>

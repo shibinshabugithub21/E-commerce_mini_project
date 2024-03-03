@@ -1,73 +1,228 @@
 <%- include("header") %>
 <style>
-    body{
-background:#eee;
-}
-.panel-order .row {
-	border-bottom: 1px solid #ccc;
-}
-.panel-order .row:last-child {
-	border: 0px;
-}
-.panel-order .row .col-md-1  {
-	text-align: center;
-	padding-top: 15px;
-}
-.panel-order .row .col-md-1 img {
-	width: 50px;
-	max-height: 50px;
-}
-.panel-order .row .row {
-	border-bottom: 0;
-}
-.panel-order .row .col-md-11 {
-	border-left: 1px solid #ccc;
-}
-.panel-order .row .row .col-md-12 {
-	padding-top: 7px;
-	padding-bottom: 7px; 
-}
-.panel-order .row .row .col-md-12:last-child {
-	font-size: 11px; 
-	color: #555;  
-	background: #efefef;
-}
-.panel-order .btn-group {
-	margin: 0px;
-	padding: 0px;
-}
-.panel-order .panel-body {
-	padding-top: 0px;
-	padding-bottom: 0px;
-}
-.panel-order .panel-deading {
-	margin-bottom: 0;
-}                    
-</style>
+    body {
+        background: #eee;
+    }
 
-<div class="container">
-    <h1>Order Details</h1>
-    <% if (orders.length > 0) { %>
-        <% orders.forEach(order => { %>
-            <div>
-                <p><u><strong>OrderID:<%= order._id %></strong></u></p>
-                <p>Order_Status: <%= order.status %></p>                
-                    <div class="product-item">
-                        <img style="width: 50px; height: 55px" src="/productImages/<%= order.products[0].image[0]  %>"/>
-                        <p><strong>Name: <%= order.products[0].p_name %></strong></p><br>
-                        <p><strong>Price:<%= order.products[0].price %></strong> </p>
-                        <!-- Add cancel order button here -->
-                        <button class="btn btn-outline-danger" data-order-id="<%= order._id %>" data-product-id="<%= order.products._id %>">Cancel Order</button>
-                        <hr>
+    .container {
+        margin-top: 20px;
+    }
+
+    .order {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 20px;
+        margin-left: 20px;
+
+        background-color: #fff;
+    }
+
+    .order .product-details {
+        flex: 1;
+        padding-right: 20px;
+        margin-left: 20px;
+    }
+
+    .order .product-image {
+        flex-shrink: 0;
+        width: 200px;
+        height: 200px;
+    }
+
+    .order .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .order .product-details h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    .order .product-details p {
+        margin: 0;
+    }
+
+    .order .cancel-btn {
+        margin-top: auto;
+        margin-left: 450px;
+    }
+
+    .status {
+        text-align: center;
+        font-weight: 100%;
+    }
+    .pname{
+        background-color: #fff;
+        font-weight: border ;
+    }
+</style>
+<div class="container-xl px-4 mt-4">
+    <!-- Account page navigation-->
+    <nav class="nav nav-borders">
+        <a class="nav-link active ms-0" href="/profile">Profile</a>
+        <a class="nav-link" href="/managePassword">Manage Password</a>
+        <a class="nav-link" href="/manageAddress">Manage Address</a>
+        <a class="nav-link" href="/orderdetails">Order</a>
+    </nav>
+    <hr class="mt-0 mb-4">
+
+    <div class="container">
+        <h1>Order Details</h1>
+        <% if (orders.length > 0) { %>
+            <% orders.reverse().forEach(order => { %>
+                <% order.products.forEach(product => { %>
+                    <div class="order" id="order-<%= order._id %>">
+                        <div class="product-details">
+                            <p class="orderid"><u><strong>OrderID: <%= product.p_id %></strong></u></p>
+                            <p class="status">Order Status: <%= product.status %></p>
+                            <h3 class="pname"><%= product.p_name %></h3>
+                            <p><strong></strong>₹<%= product.price %></p>
+                            <% if (product.status === "Shipped" || product.status === "Processing") { %>
+                                <button class="btn btn-outline-danger cancel-btn" onclick="productcancel('<%= order._id %>','<%= product.p_id %>')" >Cancel Order</button>
+                            <% } else if (product.status === "Delivered") { %>
+                                <button class="btn btn-outline-success cancel-btn" onclick="returnProduct('<%= order._id %>','<%= product.p_id %>')">Return Product</button>
+                                <% } %>
+                        </div>
+                        <div class="product-image">
+                            <img src="/productImages/<%= product.image[0] %>" alt="<%= product.p_name %>">
+                        </div>
                     </div>
-                
-            </div>
-        <% }); %>
-    <% } else { %>
-        <p>No orders found.</p>
-    <% } %>
+                <% }); %>
+            <% }); %>
+        <% } else { %>
+            <p>No orders found.</p>
+        <% } %>
+    </div>
 </div>
-<!-- < -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    // Define the returnProduct function
+    function returnProduct(orderId, productId) {
+        console.log(orderId,productId,"hello");
+        // Show SweetAlert2 input dialog
+        Swal.fire({
+            title: 'Enter Reason for Return',
+            input: 'text',
+            inputPlaceholder: 'Enter reason...',
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'You need to enter a reason!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Data to be sent in the request body
+                const data = {
+                    orderId: orderId,
+                    productId: productId,
+                    reason: result.value // Reason entered by the user
+                };
+
+                // Send a POST request to return the product
+                fetch(`/returnProduct/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    // Check if the response status is in the 200-299 range
+                    if (!response.ok) {
+                        // If response status is not in the success range, throw an error
+                        throw new Error('Failed to return product');
+                    }
+                    // Parse the response as JSON
+                    return response.json();
+                })
+                .then(data => {
+                    // Product returned successfully
+                    console.log('Product returned successfully:', data);
+                    // Show success message
+                    Swal.fire('Product Returned!', 'Your product has been returned.', 'success');
+                    // Reload the page to reflect the updated order status
+                    window.location.reload();
+                })
+                .catch(error => {
+                    // Log and display error message
+                    console.error('Error returning product:', error);
+                    Swal.fire('Error', 'Failed to return product.', 'error');
+                });
+            }
+        });
+    }
+
+
+
+    // Define the productcancel function
+    function productcancel(orderId, productId) {
+        // Show SweetAlert2 confirmation dialog
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Are you sure you want to cancel this order?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Data to be sent in the request body
+                const data = {
+                    orderId: orderId,
+                    productId: productId
+                };
+
+                // Send a POST request to cancel the order
+                fetch(`/cancelOrder/${orderId}/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    // Check if the response status is in the 200-299 range
+                    if (!response.ok) {
+                        // If response status is not in the success range, throw an error
+                        throw new Error('Failed to cancel order');
+                    }
+                    // Parse the response as JSON
+                    return response.json();
+                })
+                .then(data => {
+                    // Order successfully cancelled
+                    console.log('Order cancelled successfully:', data);
+                    // Show success message
+                    Swal.fire('Cancelled!', 'Your order has been cancelled.', 'success');
+                    // Reload the page to reflect the updated order status
+                    window.location.reload();
+                })
+                .catch(error => {
+                    // Log and display error message
+                    console.error('Error cancelling order:', error);
+                    Swal.fire('Error', 'Failed to cancel order.', 'error');
+                });
+            }
+        });
+    }
+
+   
+</script>
+
 
 
 <%- include("footer") %>

@@ -13,7 +13,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <script src="https://kit.fontawesome.com/d66066a26b.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/css/style.css">
@@ -36,7 +36,7 @@
 
                 </div>
                 <div class="col-md-5 my-auto">
-                    <form role="search">
+                    <form action="/home" method="GET">
                         <div class="input-group">
                             <input type="search" placeholder="Search your product" class="form-control" >
                             <button class="search-btn" type="submit" style="background-color: white; height:45px">
@@ -54,7 +54,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="/wishlist">
                                 <i class="fa fa-heart"></i> Wishlist
                             </a>
                         </li>
@@ -65,7 +65,7 @@
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/profile"><i class="fa fa-user"></i> Profile</a></li>
                             <li><a class="dropdown-item" href="/order"><i class="fa fa-list"></i> My Orders</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fa fa-heart"></i> My Wishlist</a></li>
+                            <li><a class="dropdown-item" href="/wishlist"><i class="fa fa-heart"></i> My Wishlist</a></li>
                             <li><a class="dropdown-item" href="/cart"><i class="fa fa-shopping-cart"></i> My Cart</a></li>
                             <li><a class="dropdown-item" href="/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
                             </ul>
