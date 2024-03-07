@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const mongoose = express('mongoose')
 const usercontroller = require('../controller/usercontroller');
+const orderController = require("../controller/orderController");
+const profileController = require("../controller/userProfileController")
 const collectionModel = require('../models/userdb');
 const {isUser,checkSessionAndBlocked} = require('../middleware/userside');
 
@@ -19,10 +21,10 @@ router.get('/logout',usercontroller.logout)
 router.get('/signup',usercontroller.signup);
 router.post('/signup',usercontroller.signuppost);
 
-router.get('/forget',usercontroller.forget);
-// router.post('/numberValidation',usercontroller.numberValidation)
-// router.post('/newPassword',userController.newPassword)
-// router.post('/resetPassword',userController.resetPassword)
+router.get('/emailforget',usercontroller.forget);
+router.post("/emailforget",usercontroller.forgetpost)
+router.get("/forgetPassword/:token",usercontroller.forgetPassword);
+router.post('/resetPassword/:email',usercontroller.resetPassword)
 
 router.get('/otp',usercontroller.otp)
 router.post('/otppost',usercontroller.otppost)
@@ -37,10 +39,7 @@ router.get('/home',checkSessionAndBlocked,usercontroller.home);
 // router.get('/profile',usercontroller.profile)
 
 
-// test
-router.get("/test",(req,res)=>{
-    res.render("user/test")
-})
+
 
 
 // products routes(here product means the iphone )
@@ -66,26 +65,26 @@ router.post('/create',usercontroller.razor)
 
 
 // profile
-router.get('/profile',usercontroller.profile)
-router.post("/updateprofile",usercontroller.updateprofile)
+router.get('/profile',profileController.profile)
+router.post("/updateprofile",profileController.updateprofile)
 // profile password
-router.get("/managePassword",usercontroller.managePassword)
-router.post("/changePassword", usercontroller.changePassword);
+router.get("/managePassword",profileController.managePassword)
+router.post("/changePassword", profileController.changePassword);
 // profile address
-router.get('/manageaddress',usercontroller.manageAddress)
-router.get("/addAddress",usercontroller.addAddress)
-router.post('/addAddress', usercontroller.addAddresspost);
-router.get ("/editaddress/:id",usercontroller.editAddress)
-router.post("/editaddress/:id", usercontroller.editAddresspost);
+router.get('/manageaddress',profileController.manageAddress)
+router.get("/addAddress",profileController.addAddress)
+router.post('/addAddress', profileController.addAddresspost);
+router.get ("/editaddress/:id",profileController.editAddress)
+router.post("/editaddress/:id", profileController.editAddresspost);
 // Define the route for deleting an address
-router.get("/deleteAddress/:id", usercontroller.deleteAddress);
+router.get("/deleteAddress/:id", profileController.deleteAddress);
 
 // oreder
-router.get("/order",usercontroller.order)
+router.get("/order",orderController.order)
 router.get('/addressadding',usercontroller.addressAdding)
 router.post('/addAddrresscheckout', usercontroller.addressAddingpost);
-router.post('/cancelOrder/:orderId/:productId', usercontroller.cancelOrder);
-router.post('/returnProduct',usercontroller.orderReturn);
+router.post('/cancelOrder/:orderId/:productId', orderController.cancelOrder);
+router.post('/returnProduct',orderController.orderReturn);
 
 // wishlsit
 router.get('/wishlist',usercontroller.whishlistload);

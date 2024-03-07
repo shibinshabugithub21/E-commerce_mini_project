@@ -15,6 +15,7 @@ adminrouter.use(isAdmin);
 adminrouter.use(authMiddleware)
 
 adminrouter.get('/home', admincontroller.home);
+adminrouter.post("/graph",admincontroller.graph)
 
 // user starts
 adminrouter.get('/user', admincontroller.user);
@@ -64,7 +65,7 @@ adminrouter.post("/blockbanner/:id", admincontroller.BlockBanner);
 adminrouter.get('/sale',admincontroller.sales)
 adminrouter.get('/pdf',admincontroller.generatePDF)
 
-adminrouter.get('/excel', admincontroller.downloadExcel);
+adminrouter.post('/excel', admincontroller.downloadExcel);
 
 
 

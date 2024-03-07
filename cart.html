@@ -1,198 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Banner</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome CDN -->
+    <title>Forget Password OTP</title>
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            background-color:white;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden; /* Remove horizontal scrolling */
-        }
-
-        .main-content {
-            display: flex;
-            flex: 1;
-        }
-
-        /* Sidebar Navigation */
-        .side-nav {
-            background-color: black;
-            color: white;
-            padding: 15px;
-            text-align: left;
-            width: 200px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            height: calc(100vh - 80px); /* Adjusted height to fit below top navigation bar */
-        }
-
-        .side-nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .side-nav a {
-            text-decoration: none;
-            color: #fff;
-            display: block;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 3px;
-            border-radius: 20px;
-            transition: 0.33s ease-in-out;
-            font-weight: 500;
-        }
-
-        .side-nav a:hover {
-            color: black;
-            background-color: white;
-            border-radius: 20px;
-        }
-
-        /* Top Navigation */
-        .top-nav {
-            width: 100%;
-            height: 80px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            background-color: rgb(246, 246, 246);
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
+            height: 100vh;
         }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-
-        .btn-container {
+        .container {
             text-align: center;
         }
-
-        .btn {
-            padding: 10px 20px;
+        .otp-field {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .otp-field input[type="number"] {
+            width: 40px;
+            height: 40px;
+            margin: 0 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 30px;
             border: none;
             border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-        }
-
-        .btn-pdf,
-        .btn-excel {
-            margin-left: 10px;
-            padding: 8px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-pdf:hover,
-        .btn-excel:hover {
-            background-color: #f2f2f2;
-        }
-
-        /* Table Styles */
-        table {
-            width: 90%; /* Adjusted width */
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        @media screen and (max-width: 768px) {
-            .side-nav {
-                display: none; /* Hide sidebar on smaller screens */
-            }
-
-            .content {
-                padding-left: 20px; /* Add padding to content to compensate for hidden sidebar */
-            }
         }
     </style>
 </head>
-
 <body>
-    <!-- Top Navigation -->
-    <div class="top-nav">
-        <div>
-            <!-- Add top navigation content here if needed -->
-            <h1>Banner Management</h1>
-        </div>
-        <div class="btn-container">
-            <button class="btn-pdf"><i class="fas fa-file-pdf"></i> Download PDF</button>
-            <button class="btn-excel"><i class="fas fa-file-excel"></i> Download Excel</button>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <!-- Sidebar Navigation -->
-        <div class="side-nav">
-            <ul>
-                <li><a href="/admin/home">Dashboard</a></li>
-                <li><a href="/admin/user">User</a></li>
-                <li><a href="/admin/category">Category</a></li>
-                <li><a href="/admin/product">Product</a></li>
-                <li><a href="/admin/order">order</a></li>
-                <li><a href="/admin/coupoun">coupoun</a></li>
-                <li><a href="/admin/logout">logout</a></li>
-                <!-- Add more navigation items as needed -->
-            </ul>
-        </div>
-
-        <!-- Main Content Area -->
-        <div class="content">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product ID</th>
-                        <th>Product Name</th>
-                        <th>Date</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Sample Row (Replace with dynamically generated rows from server-side or database) -->
-                    <tr>
-                        <td>123</td>
-                        <td>Product A</td>
-                        <td>2024-02-29</td>
-                        <td>5</td>
-                        <td>$50.00</td>
-                    </tr>
-                    <!-- End of Sample Row -->
-                </tbody>
-            </table>
-        </div>
+    <div class="container">
+        <h2>Verify</h2>
+        <p>Your code was sent to you via email</p>
+        <form action="/otppost" method="post">
+            <div class="otp-field">
+                <input name="num1" type="number"/>
+                <input name="num2" type="number"/>
+                <input name="num3" type="number"/>
+                <input name="num4" type="number"/>
+                <input name="num5" type="number"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Verify</button>
+        </form>
     </div>
 </body>
-
 </html>

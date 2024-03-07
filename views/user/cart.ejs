@@ -17,7 +17,29 @@
   height: 30px;
   padding-bottom: 10px;
 }
+/* Center the image */
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+  }
+  #empty-cart-btn {
+  display: block;
+  margin: 0 auto; /* Centers the button horizontally */
+  width: 200px; /* Set the width of the button */
+  height: 30px; /* Set the height of the button */
+  font-size: 15px;
+  border: none;
+  border-radius: 20px;
+}
 </style>
+
+<% if (cartItems.length == 0) { %>
+  <img src="/img/empty-cart.png" >
+  <button id="empty-cart-btn" class="btn btn-success btn-lg btn-block" onclick="window.location.href='/home'">Go Back to Home</button>
+
+  <% } else{ %>
 
 <section class="h-100 ">
   <div class="container py-5">
@@ -109,6 +131,7 @@
     </div>
   </div>
 </section>
+<% } %>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>

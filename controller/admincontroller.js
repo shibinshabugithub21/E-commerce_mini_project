@@ -4,10 +4,12 @@ const collectionProduct = require('../models/product');
 const { products } = require('./usercontroller');
 const collectionOrder = require('../models/order');
 const collectionCoupoun = require('../models/coupoun');
-const collectionBanner=require("../models/bannerdb")
+const BannerDB=require("../models/bannerdb")
 const { render } = require('ejs');
 const PDFDocument = require('pdfkit');
 const excelJS = require('exceljs');
+
+
 const fs = require('fs');
 
 
@@ -69,9 +71,25 @@ const logout = (req, res) => {
 // }
 //
 
-const home = (req, res) => {
+const home = async (req, res) => {
     if (req.session.admin) {
-        res.render("admin/home");
+        // let data = {};
+        const orderData = await collectionOrder.find();
+        const user = await collectionModel.find().count();
+        const product = await collectionProduct.find().count();
+        let totalAmount = 0 ;
+        orderData.forEach(item =>{
+            totalAmount +=  Number(item.payment.amount)
+        })
+        const order = await collectionOrder.find().count()
+        data = {
+            totalAmount,
+            user,
+            product,
+            order
+        }
+        
+        res.render("admin/home",{data});
     } else {
         res.redirect('/admin/login');
     }
@@ -237,7 +255,6 @@ const deletecategory = async (req, res) => {
 const product = async (req, res) => {
     try {
         
-
         // Fetch products from the database
         const productList = await collectionProduct.find({});
         
@@ -251,19 +268,60 @@ const product = async (req, res) => {
 
 const addproduct = (req, res) => {
     // Check if the user is authenticated
+    
+    const errorMessage = req.flash('error');
     if (!req.session.admin) {
         return res.redirect('/admin/login');
     }
 
-    res.render('admin/addproduct');
+    res.render('admin/addproduct',{errorMessage:errorMessage});
 };
 
 
 
 const addproductpost = async (req, res) => {
     try {
+        
         const files = req.files;
-        console.log(files);
+        console.log(files ,">>file");
+        
+
+        const Productname = req.body.productName 
+        const Category = req.body.category;
+        const Stock = parseInt(req.body.stock); 
+        const Rating = parseFloat(req.body.rating); 
+        const Price = parseFloat(req.body.price);
+        const Description = req.body.description;
+
+        
+            if (!Productname || !Productname.trim()) {
+                req.flash('error', 'Product Name is required');
+               return  res.redirect("/admin/addproduct")
+            }
+
+            if (/\s/.test(Productname) || /[^\w\s]/.test(Productname)) {
+                
+               req.flash('error', 'Product Name cannot contain whitespace or special characters');
+               return  res.redirect("/admin/addproduct")
+
+            }
+
+            if (Stock < 1 || Price < 1  ) {
+
+                req.flash('error', 'Value cannot be negative');
+                return  res.redirect("/admin/addproduct");
+
+            }
+
+            if ( Rating > 5 || Rating < 1) {
+
+                
+                req.flash('error', 'Rating Shuld be between 1 and 5 ');
+                return  res.redirect("/admin/addproduct");
+
+
+            }
+        
 
         const data = {
             Productname: req.body.productName,  // Use the correct case
@@ -274,6 +332,7 @@ const addproductpost = async (req, res) => {
             Description: req.body.description,
             Image: files.map(file => file.filename)
         };
+        // if(data.Productname)
 
         // Use the correct case for the Mongoose model
         const newProduct = await collectionProduct.insertMany([data]);
@@ -285,9 +344,10 @@ const addproductpost = async (req, res) => {
         // res.status(201).json({ mes: "success" });
     } catch (error) {
         console.error("Error during adding:", error);
-        res.status(500).send("Internall server error");
-    }
-};
+        res.status(500).send("Internal server error");
+      }
+    };
+
 
 const editproduct = async(req,res)=>{
 
@@ -455,9 +515,9 @@ const orderput = async (req, res) => {
         const status = req.body.status;
         const { itemId, orderId } = req.params;
 
-        console.log(orderId);
-        console.log(status);
-        console.log(itemId);
+        // console.log(orderId,">> here");
+        // console.log(status);
+        // console.log(itemId);
 
         // Find the order by ID
         const order = await collectionOrder.findById(orderId);
@@ -467,17 +527,31 @@ const orderput = async (req, res) => {
         
         // Find the item within the order
         const item = order.products.find(item => item._id.toString() === itemId.toString());
-        console.log(item)
+        let product = await collectionProduct.findById(item.p_id);
+
+        product.Stock += item.quantity;
+        const user = await collectionModel.findById(order.userId);
+
+
+        user.walletbalance = item.realPrice * item.quantity + user.walletbalance;
+        user.wallethistory.push({
+            process:"return from the admin",
+            amount:item.realPrice * item.quantity,
+        })
         if (!item) {
             return res.status(404).json({ error: "Item not found in the order" });
         }
-        console.log(item)
+
 
         // Update the status of the item
         item.status = status;
+        
+        console.log(user.walletbalance)
 
         // Save the order with updated status
         await order.save();
+        await user.save()
+        await product.save()
 
         res.json(status);
     } catch (error) {
@@ -521,11 +595,11 @@ const couponCreation = async (req, res) => {
         });
 
         // Save the coupon details to the database
-        // await couponDetails.save();
+        await couponDetails.save();
 
         // Send a success response
         res.status(201).json({ message: "Coupon created successfully" });
-        res.redirect("/admin/coupoun");
+        // res.redirect("/admin/coupoun");
     } catch (error) {
         // Handle errors
         console.error('Error creating coupon:', error);
@@ -578,7 +652,7 @@ const BannerList = async(req,res)=>{
         
 
         // Fetch products from the database
-        const BannerList = await collectionBanner.find({});
+        const BannerList = await BannerDB.find({});
         
         // Render the product page with the fetched products
         res.render('admin/banner', { Banner: BannerList });
@@ -602,7 +676,7 @@ const AddBannerPost = async (req, res) => {
         const imageUrl = imageFiles.map(file => file.path);
 
         // Create a new banner object
-        const newBanner = new collectionBanner({
+        const newBanner = new BannerDB({
             bannername,
              imageUrl, // Array of image filenames
             status: 'active' // Default status
@@ -626,7 +700,7 @@ const DeleteBanner = async (req, res) => {
         console.log("hrryt",bannerId);
 
         // Delete the banner from the database based on the provided bannerId
-        await collectionBanner.findByIdAndDelete(bannerId);
+        await BannerDB.findByIdAndDelete(bannerId);
 
         // Redirect back to the admin page or any other appropriate route
         res.redirect('/admin/banner');
@@ -639,7 +713,7 @@ const DeleteBanner = async (req, res) => {
 const BlockBanner = async (req, res) => {
     try {
         const bannerId = req.params.id;
-        const banner = await collectionBanner.findById(bannerId);
+        const banner = await BannerDB.findById(bannerId);
 
         // Toggle the status of the banner
         banner.status = banner.status === 'active' ? 'blocked' : 'active';
@@ -783,11 +857,10 @@ const generatePDF = async (req, res) => {
     }
 };
 
-
 const downloadExcel = async (req, res) => {
     try {
-        const salesReport = req.body;
-        console.log(salesReport);
+       let salesReport = req.session.salesReport;
+
         // Check if data is present and is an array
         if (!Array.isArray(salesReport) || salesReport.length === 0) {
             throw new Error('Data is empty or not an array');
@@ -799,22 +872,16 @@ const downloadExcel = async (req, res) => {
 
         // Define column headers and widths
         worksheet.columns = [
-            { header: 'Product ID', key: 'productId', width: 15 },
-            { header: 'Product Name', key: 'productName', width: 20 },
-            { header: 'Date', key: 'date', width: 15 },
-            { header: 'Total Quantity', key: 'totalQuantity', width: 15 },
-            { header: 'Total Price', key: 'totalSales', width: 15 },
+            { header: 'Product ID', key: '_id', width: 15 },
+            { header: 'Product Name', key: 'p_name', width: 20 },
+            { header: 'Date', key: 'createdAt', width: 15 },
+            { header: 'Quantity', key: 'quantity', width: 15 },
+            { header: 'Price', key: 'price', width: 15 },
         ];
 
         // Add rows to the worksheet
         salesReport.forEach((item) => {
-            worksheet.addRow({
-                productId: item._id || '', // Adjust if necessary
-                productName: item.p_name || '', // Adjust if necessary
-                date: item.createdAt || '', // Adjust if necessary
-                totalQuantity: item.quantity || 0, // Default to 0 if not provided
-                totalSales: item.price || 0, // Default to 0 if not provided
-            });
+            worksheet.addRow(item);
         });
 
         // Set response headers
@@ -827,14 +894,53 @@ const downloadExcel = async (req, res) => {
         // End the response
         res.end();
     } catch (error) {
-        console.error('Error generating Excel:', error.message); // Log error message
-        res.status(500).send('Internal Server Error: ' + error.message); // Send error message as response
+        console.error('Error generating Excel:', error.message);
+        res.status(500).send('Internal Server Error: ' + error.message);
     }
 };
 
 
+const graph = async (req,res)=>{
+    try {
+        data = await collectionOrder.aggregate([
+            {
+              $match: {
+                //status: { $in: ["Delivered", "Returned", "Cancelled","Processing"] },
+                // Add your matching conditions here
+                createdAt: {
+                  $gte: new Date(2022, 0, 1),
+                  $lt: new Date(2024 + 1, 0, 1)
+                }
+              }
+            },
+            {
+                $unwind: "$products"
+            },
+            {
+              $group: {
+                _id: "$products.status", // Group by status
+                count: { $sum: 1 } // Count occurrences of each status
+              }
+            },
+            {
+              $project: {
+                _id: 0, // Exclude _id field
+                label: "$_id", // Create a 'label' field with status value
+                value: "$count" // Create a 'value' field with count value
+              }
+            }
+          ]);
+          
+        console.log("allOrder>>",data);
+
+        res.json(data);
+    } catch (error) {
+        
+    }
+}
+
 module.exports = {
     login,loginpost,logout,home,
     user,category,product,addcategory,addcategorypost,editcategory,update,deletecategory,isBlocked,notBlocked,addproduct,addproductpost,editproduct,editproductpost,deleteproduct,isdelete,notdelete,order,orderput,coupounsList,couponsAdding,couponCreation
-    ,coupounDelete,deletImage,BannerList,AddBanner,AddBannerPost,DeleteBanner,BlockBanner,sales,generatePDF,downloadExcel
+    ,coupounDelete,deletImage,BannerList,AddBanner,AddBannerPost,DeleteBanner,BlockBanner,sales,generatePDF,downloadExcel,graph
 };

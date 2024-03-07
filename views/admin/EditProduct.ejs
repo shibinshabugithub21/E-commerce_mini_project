@@ -147,22 +147,22 @@
   </div>
   <form action="/admin/editproduct/<%= element._id%>" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
     <label for="productName">Product Name:</label>
-    <input type="text" id="productName" name="productName" value="<%=element.Productname%>" required>
+    <input type="text" id="productName" name="productName" value="<%=element.Productname%>">
 
     <label for="category">Category:</label>
-    <input type="text" id="category" name="category" value="<%=element.Category%>" required>
+    <input type="text" id="category"  name="category" value="<%=element.Category%>">
 
     <label for="stock">Stock:</label>
-    <input type="number" id="stock" name="stock" value="<%=element.Stock%>" required>
+    <input type="number" id="stock" min="0" name="stock" value="<%=element.Stock%>">
 
     <label for="price">Price:</label>
-    <input type="number" id="price" name="price" value="<%=element.Price%>" required>
+    <input type="number" id="price" name="price" value="<%=element.Price%>" >
 
     <label for="rating">Rating:</label>
-    <input type="number" id="rating" name="rating" value="<%=element.Rating%>" required>
+    <input type="number" id="rating" name="rating" value="<%=element.Rating%>" >
 
     <label for="description">Description:</label>
-    <textarea id="description" name="description" rows="4" required><%=element.Description %></textarea>
+    <textarea id="description" name="description" rows="4" ><%=element.Description %></textarea>
 
     <label for="productImage">Product Image:</label>
     <input type="file" id="image" name="image" accept="image/*" multiple onchange="previewImages(event)">

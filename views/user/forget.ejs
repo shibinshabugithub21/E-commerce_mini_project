@@ -50,15 +50,15 @@
 
     <div class="container reset-container">
         <h2 class="text-center mb-4">Reset Password</h2>
-        <form onsubmit="return validateForm()">
+        <form action="/resetPassword/<%=email%>" method="post" onsubmit="return validateForm()">
             <div class="form-group">
                 <label for="password">New Password</label>
-                <input type="password" class="form-control" id="password" placeholder="Enter new password">
+                <input name="newPassword" type="password" class="form-control" id="password" placeholder="Enter new password">
                 <span id="passwordError" class="error-message"></span>
             </div>
             <div class="form-group">
                 <label for="repassword">Confirm New Password</label>
-                <input type="password" class="form-control" id="repassword" placeholder="Confirm new password">
+                <input name="confirmPassword" type="password" class="form-control" id="repassword" placeholder="Confirm new password">
                 <span id="repasswordError" class="error-message"></span>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Reset Password</button>
@@ -94,7 +94,7 @@
             document.getElementById("successMessage").innerHTML = "Password reset successfully!";
 
             // Prevent form submission (remove for actual implementation)
-            return false;
+            return true;
         }
         </script>
 

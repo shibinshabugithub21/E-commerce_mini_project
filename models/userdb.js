@@ -40,10 +40,10 @@ const schema = new mongoose.Schema({
                 type: Number,
                 required: true
             },
-            emailid: {
-                type: String,
-                required: true
-            }
+            // emailid: {
+            //     type: String,
+            //     required: true
+            // }
         }]
     },
     cart: {

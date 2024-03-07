@@ -18,7 +18,7 @@ const schema = new mongoose.Schema({
         require:true
      },
      maxValue:{
-        type:Number,
+        type:String,
         require:true
      },
      blocked: { type: Boolean, default: false } 

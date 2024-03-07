@@ -4,11 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Banner</title>
+    <title>SALESer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome CDN -->
+    <!-- DataTable HEADER-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+
     <!-- Include pdfmake library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+    
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -164,6 +169,8 @@
                 <li><a href="/admin/product">Product</a></li>
                 <li><a href="/admin/order">order</a></li>
                 <li><a href="/admin/coupoun">coupoun</a></li>
+                <li><a href="/admin/Banner">Banner</a></li>
+                <li><a href="/admin/sale">Sales</a></li>
                 <li><a href="/admin/logout">logout</a></li>
                 <!-- Add more navigation items as needed -->
             </ul>
@@ -174,7 +181,12 @@
             <div class="btn-container">
                 <!-- <button class="btn-pdf" onclick=" downloadPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button> -->
                 <a href="/admin/pdf"><button class="btn-pdf"><i class="fas fa-file-pdf"></i> Download PDF</button></a>
-               <a href="/admin/excel"><button class="btn-excel" ><i class="fas fa-file-excel"></i> Download Excel</button></a> 
+               <!-- <a href="/admin/excel"><button class="btn-excel" ><i class="fas fa-file-excel"></i> Download Excel</button></a>  -->
+               <button class="btn-excel" onclick="downloadExcel()">
+                <i class="fas fa-file-excel"></i> Download Excel
+            </button>
+            
+
                 
                 
                 <form id="dateFilterForm">
@@ -185,7 +197,7 @@
                     <button type="submit" class="btn-filter"><i class="fas fa-filter"></i> Filter</button>
                 </form>
             </div>
-            <table>
+            <table id="example" class="table table-striped" style="width:100%">
                 <thead>
                     <tr>
                         <th>Product ID</th>
@@ -215,48 +227,30 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
 
+ <!-- DATATABLE  SCRIPT-->
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="https://cdn.datatables.net/v/bs5/dt-1.13.8/datatables.min.js"></script>  
+<script>
+   new DataTable('#example');
+   
+  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js" integrity="sha512-UnrKxsCMN9hFk7M56t4I4ckB4N/2HHi0w/7+B/1JsXIX3DmyBcsGpT3/BsuZMZf+6mAr0vP81syWtfynHJ69JA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 
-    <!-- <script>
-        // Define a global variable to store the sales report data
-    
-        // async function downloadPDF() {
-        //     try {
-        //         const response = await fetch('/admin/dwnpdf', {
-        //             method: 'POST',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //             },
-        //             body: JSON.stringify(salesReport),
-        //         });
-    
-        //         if (!response.ok) {
-        //             throw new Error(`HTTP error! Status: ${response.status}`);
-        //         }
-    
-        //         // Trigger download by parsing the response as blob
-        //         const blob = await response.blob();
-        //         const url = window.URL.createObjectURL(blob);
-        //         const link = document.createElement('a');
-        //         link.href = url;
-        //         link.download = 'sales_report.pdf';
-        //         document.body.appendChild(link);
-        //         link.click();
-        //         document.body.removeChild(link);
-        //         window.URL.revokeObjectURL(url);
-        //     } catch (error) {
-        //         console.error('Error:', error);
-        //     }
-        // }
-    
+    <script>
         async function downloadExcel() {
             try {
-                const response = await fetch('/admin/dwnexcel', {
+               
+    
+                const response = await fetch('/admin/excel', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(salesReport),
                 });
     
                 if (!response.ok) {
@@ -277,7 +271,9 @@
                 console.error('Error:', error);
             }
         }
-    </script> -->
+    </script>
+    
+
     
 </body>
 </html>

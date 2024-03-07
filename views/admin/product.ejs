@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- DataTable HEADER-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -192,9 +197,11 @@
             <li><a href="/admin/user">User</a></li>
             <li><a href="/admin/category">Category</a></li>
             <li><a href="/admin/product">Product</a></li>
-            <li><a href="/admin/order">Order</a></li>
+            <li><a href="/admin/order">order</a></li>
+            <li><a href="/admin/coupoun">coupoun</a></li>
+            <li><a href="/admin/Banner">Banner</a></li>
+            <li><a href="/admin/sale">Sales</a></li>
             <li><a href="/admin/logout">logout</a></li>
-
             <!-- Add more navigation items as needed -->
         </ul>
     </div>
@@ -211,7 +218,7 @@
        <a href="/admin/addproduct"><button class="add-product-btn" style="text-decoration: none;">Add New Product</button></a>
 
         <!-- Product List Table -->
-        <table border="1">
+        <table id="example" class="table table-striped" style="width:100%">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -239,8 +246,7 @@
                         <td><%= element.Rating%></td>
                         <td><%= element.Description %></td>
                         <td>
-                            <img style="width: 50px; height: 55px" src="/productImages/<%= element.Image[0] %>"/>
-                                            </td>
+                            <img style="width: 50px; height: 55px" src="/productImages/<%= element.Image[0] %>"/>                                            </td>
                                             <td>
                                                 <!-- Form for blocking -->
                             <% if (element.isDelete === false) { %>
@@ -264,14 +270,16 @@
                 <!-- Add more rows as needed -->
             </tbody>
         </table>
-        <!-- Pagination -->
-        <!-- <div class="pagination">
-            <button>Previous</button>
-            <button class="active">1</button>
-            <button>2</button>
-            <button>3</button>
-            <button>Next</button>
-        </div> -->
+        <!-- DATATABLE  SCRIPT-->
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="https://cdn.datatables.net/v/bs5/dt-1.13.8/datatables.min.js"></script>  
+<script>
+   new DataTable('#example');
+</script>
     </div>
 
 </body>

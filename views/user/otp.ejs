@@ -73,6 +73,7 @@
                     <% if (error) { %>
                         <!-- Display the error message -->
                         <div class="alert alert-danger" role="alert">
+                            <%= error %>
                         </div>
                     <% } %>
                     
@@ -81,7 +82,7 @@
                         Time left: <span id="timer">60</span> seconds
                     </div>
                     <div id="resendButtonContainer" style="display: none;">
-                        <button id="resendOtpBtn" onclick="resendOtp()">Resend OTP</button>
+                        <button id="resendOtpBtn" class="btn btn-link">Resend OTP</button>
                     </div>
                     
                 </div>
@@ -137,32 +138,40 @@ const timerElement = document.getElementById('timer');
 
     // Start the timer when the page loads
     window.onload = function () {
-        const countdownDuration = 60; // 60 seconds
+        const countdownDuration = 10; // 60 seconds
+        console.log(countdownDuration,"countdown");
         startTimer(countdownDuration, timerElement);
     };
 
     // Function to handle resend OTP
-    function resendOtp() {
-        // Hide the resend button
-        resendButtonContainer.style.display = 'none';
-        // Restart the timer
-        startTimer(60, timerElement);
-        // Make an AJAX request to resend OTP
-        fetch('/resendotp', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            // Handle response, maybe show a success message to the user
-            console.log('Resend OTP request successful');
-        })
-        .catch(error => {
-            // Handle error, maybe show an error message to the user
-            console.error('Error resending OTP:', error);
-        });
-    }
+
+
+    
+    // Check if the Resend OTP button exists in the DOM
+    // const resendOtpBtn = document.getElementById('resendOtpBtn');
+    // if (resendOtpBtn) {
+    //     resendOtpBtn.addEventListener('click', function() {
+    //         // Hide the resend button
+    //         resendButtonContainer.style.display = 'none';
+    //         // Restart the timer
+    //         startTimer(60, timerElement);
+    //         // Make an AJAX request to resend OTP
+    //         fetch('/resendotp', {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         })
+    //         .then(response => {
+    //             // Handle response, maybe show a success message to the user
+    //             console.log('Resend OTP request successful');
+    //         })
+    //         .catch(error => {
+    //             // Handle error, maybe show an error message to the user
+    //             console.error('Error resending OTP:', error);
+    //         });
+    //     });
+    // }
 
 </script>
 

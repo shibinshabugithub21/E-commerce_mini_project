@@ -477,7 +477,7 @@
   </button>
   <ul class="dropdown-menu" aria-labelledby="couponDropdownButton" id="couponDropdownMenu">
       <!-- Coupon options will be dynamically populated here -->
-      <% coupons.forEach(coupon => { %>
+      <% validCoupons.forEach(coupon => { %>
           <li onclick="couponVal('<%=coupon._id%>','<%=coupon.couponValue%>','<%= total%>')"><a class="dropdown-item" href="#" data-coupon-id="<%= coupon._id %>"><%= coupon.couponName %></a></li>
       <% }); %>
   </ul>
@@ -789,14 +789,17 @@ const dataa = {
 }
 
 
+var amount = JSON.parse('<%- JSON.stringify(total) %>')*100;
+
 
 function initializeRazorpay(dataa) {
+  console.log(typeof(amount));
     fetch('/create', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ amount: 2000, currency: 'INR' }), // Adjust amount and currency as needed
+        body: JSON.stringify({ amount: amount, currency: 'INR' }), // Adjust amount and currency as needed
     })
     .then(response => response.json())
     .then(data => {

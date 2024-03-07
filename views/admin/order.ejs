@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- DataTable HEADER-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -157,8 +162,12 @@
             <li><a href="/admin/user">User</a></li>
             <li><a href="/admin/category">Category</a></li>
             <li><a href="/admin/product">Product</a></li>
-            <li><a href="/admin/order">Order</a></li>
-            <li><a href="/admin/logout">Logout</a></li>
+            <li><a href="/admin/order">order</a></li>
+            <li><a href="/admin/coupoun">coupoun</a></li>
+            <li><a href="/admin/Banner">Banner</a></li>
+            <li><a href="/admin/sale">Sales</a></li>
+            <li><a href="/admin/logout">logout</a></li>
+            <!-- Add more navigation items as needed -->
         </ul>
     </div>
 
@@ -172,7 +181,8 @@
 
         <!-- form handling -->
         <form>            
-            <table>
+            <table id="example" class="table table-striped" style="width:70%">
+
                 <thead>
                     <tr>
                         <th>Product</th>
@@ -196,12 +206,12 @@
                                     <td><img src="/productImages/<%= product.image[0] %>" style="width:70px" height="70px"></td>
                                     <td><%= product.p_name %></td>
                                     <td><%= order._id %></td>
-                                    <td><%= order.address[0].name %></td>
+                                    <td><%= order.address[0]?.name %></td>
                                     <td>
-                                        <%= order.address[0].houseName %>,
-                                        <%= order.address[0].city %>,
-                                        <%= order.address[0].phone %>,
-                                        <%= order.address[0].postalCode %>
+                                        <%= order.address[0]?.houseName %>,
+                                        <%= order.address[0]?.city %>,
+                                        <%= order.address[0]?.phone %>,
+                                        <%= order.address[0]?.postalCode %>
                                     </td>
                                     <td><%= cartItem.quantity %></td>
                                     <td>₹<%= order.payment.amount %></td>
@@ -225,6 +235,17 @@
             </table>
         </form>
     </div>
+     <!-- DATATABLE  SCRIPT-->
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="https://cdn.datatables.net/v/bs5/dt-1.13.8/datatables.min.js"></script>  
+<script>
+   new DataTable('#example');
+   
+  </script>
 
     <script>
      // Express Route for updating order status

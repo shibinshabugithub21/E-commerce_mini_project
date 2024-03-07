@@ -10,6 +10,6 @@ const schema = new mongoose.Schema({
         default: 'active'
     }});
 
-const collectionBanner = mongoose.model('Banner', schema);
+const BannerDB = mongoose.model('Banner', schema);
 
-module.exports = collectionBanner;
+module.exports = BannerDB;
