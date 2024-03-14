@@ -21,45 +21,43 @@
         }
 
         /* Sidebar Navigation */
+        /* Sidebar Navigation */
         .side-nav {
-            background-color:black;
-            color:white;
+            background-color: black;
+            color: white;
             padding: 15px;
             text-align: left;
             width: 200px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            height: 800px;
-        
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .side-nav ul {
             list-style: none;
             padding: 0;
             margin: 0;
-            position: absolute;
-            left: 45px;
-            top: 120px;
-
         }
-
 
         .side-nav a {
             text-decoration: none;
             color: #fff;
-            text-align: center;
             display: block;
             padding: 10px;
-            margin-top: 40px;
+            margin-top: 10px;
             border-radius: 3px;
             border-radius: 20px;
-            transition:  0.33s ease-in-out;  
-            font-weight: 500; 
-            
-            
-            /* transition: background-color 0.3s; */
+            transition: 0.33s ease-in-out;
+            font-weight: 500;
         }
 
-        .side-nav a:hover{
+        .side-nav a:hover {
             color: black;
             background-color: white;
             border-radius: 20px;
@@ -69,6 +67,7 @@
         .content {
             /* text-align: center; */
             flex: auto;
+            margin-left: 200px;
         }
 
         /* Top Navigation */
@@ -174,6 +173,16 @@
                 margin: 10px auto;
             }
         }
+        .block-btn.blocked {
+    background-color:black;
+    color: white;
+}
+.block-btn.unblocked {
+    background-color:white;
+    color:black;
+}
+
+
     </style>
 </head>
 
@@ -227,7 +236,11 @@
                     <td class="btnn ">
                    <a href="/admin/editcatgory/<%=category._id%>"><button class="action-btn update-btn"  >Update</button></a>
                       <a href="/admin/delete/<%=category.id%>"> <button class="action-btn remove-btn">Remove</button></a>  
-
+                      <% if (category.isBlocked) { %>
+                        <a href="/admin/unblock/<%=category._id%>"><button class="action-btn block-btn blocked">Unblock</button></a>
+                    <% } else { %>
+                        <a href="/admin/block/<%=category._id%>"><button class="action-btn block-btn unblocked">Block</button></a>
+                    <% } %>
                     </td>
                 </tr>
             <% }) %>

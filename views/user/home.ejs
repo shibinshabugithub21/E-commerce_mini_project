@@ -178,7 +178,12 @@
     color: #bb3535; /* Red color when clicked */
 }
 
-
+.inWishlist{
+    color: #FF0000
+}
+.notInWishlist{
+    color: #FF000030
+}
 
     </style>
 
@@ -189,7 +194,7 @@
         <div class="card">
             <!-- Wishlist icon -->
             <a href="#" class="wishlist-icon" id="wishlist-icon-<%= index %>" data-product-id="<%= element.id %>">
-                <i id="heartIcon" class="fa-solid fa-heart fa-lg"style="cursor: pointer; color: red;"></i>
+                <i  id="heartIcon wishlist<%=element._d %>" class="fa-solid fa-heart fa-lg <%= wishlist.find( (x) => x.productId.toString() == element._id.toString()) ?  "inWishlist" : "notInWishlist"  %>" style="cursor: pointer"></i>
             </a>
             <!-- Product image -->
             <a href="/details/<%= element.id %>">
@@ -198,7 +203,7 @@
                         <!-- Product details -->
             <div class="card-content">
                 <h5 class="card-title"><%= element.Productname %></h5>
-                <p class="card-text">₹<%= element.Price %></p>
+                <span class="offer-price">₹<%= element.OriginalPrice %></span>
             </div>
         </div>
         <% }); %>
@@ -220,12 +225,12 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function(event) {
             event.preventDefault(); // Prevent default anchor behavior
             const productId = button.dataset.productId;
-            addProductToWishlist(productId);
+            addProductToWishlist(productId, event.target);
         });
     });
 });
 
-function addProductToWishlist(productId) {
+function addProductToWishlist(productId, target) {
     fetch(`/wishlist/${productId}`, {
         method: 'POST',
         headers: {
@@ -235,6 +240,8 @@ function addProductToWishlist(productId) {
     .then(response => {
         if (response.ok) {
             console.log('Product added to wishlist');
+            target.classList.add("inWishlist")
+            target.classList.remove("notInWishlist")
         } else {
             console.error('Failed to add product to wishlist');
         }
@@ -245,5 +252,5 @@ function addProductToWishlist(productId) {
 }
 </script>
 
-
 <%-include('footer')-%>
+

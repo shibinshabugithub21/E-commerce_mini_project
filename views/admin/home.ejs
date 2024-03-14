@@ -37,6 +37,10 @@
             position: fixed;
             top: 0;
             left: 0;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .side-nav ul {
@@ -152,7 +156,7 @@
         <!-- Total Product Numbers -->
         <div class="overview-item total-product-numbers">
             <h3>Total Product Numbers</h3>
-            <p>₹<%= data.product %></p>
+            <p><%= data.product %></p>
         </div>
 
           <!-- Chart -->

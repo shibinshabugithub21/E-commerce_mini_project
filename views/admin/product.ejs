@@ -22,44 +22,41 @@
 
         /* Sidebar Navigation */
         .side-nav {
-            background-color:black;
-            color:white;
+            background-color: black;
+            color: white;
             padding: 15px;
             text-align: left;
             width: 200px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            height: 1000px;
-        
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .side-nav ul {
             list-style: none;
             padding: 0;
             margin: 0;
-            position: absolute;
-            left: 45px;
-            top: 120px;
-
         }
-
 
         .side-nav a {
             text-decoration: none;
             color: #fff;
-            text-align: center;
             display: block;
             padding: 10px;
-            margin-top: 40px;
+            margin-top: 10px;
             border-radius: 3px;
             border-radius: 20px;
-            transition:  0.33s ease-in-out;  
-            font-weight: 500; 
-            
-            
-            /* transition: background-color 0.3s; */
+            transition: 0.33s ease-in-out;
+            font-weight: 500;
         }
 
-        .side-nav a:hover{
+        .side-nav a:hover {
             color: black;
             background-color: white;
             border-radius: 20px;
@@ -68,6 +65,7 @@
         .content {
             flex: 1;
             overflow-x: hidden;
+            margin-left: 200px;
         }
 
         /* Top Navigation */
@@ -225,7 +223,9 @@
                     <th>Product Name</th>
                     <th>Category</th>
                     <th>Stock</th>
-                    <th>Price</th>
+                    <th> Price</th> <!-- New column for discounted price -->
+                    <th>Offer </th> <!-- New column for offer -->
+                    <th>Discounted Price</th>
                     <th>Rating</th>
                     <th>Description</th>
                     <th>Images</th>
@@ -242,7 +242,9 @@
                         <td><%= element.Productname%></td>
                         <td><%= element.Category%></td>
                         <td><%= element.Stock%></td>
-                        <td><%= element.Price%></td>
+                        <td><%= element.Price %></td>
+                        <td><%= element.OfferPercentage %></td> <!-- Display the offer percentage -->
+                        <td><%= element.OriginalPrice %></td> <!-- Display the discounted price -->
                         <td><%= element.Rating%></td>
                         <td><%= element.Description %></td>
                         <td>

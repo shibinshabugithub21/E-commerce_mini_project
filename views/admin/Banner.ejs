@@ -22,14 +22,22 @@
         }
 
         /* Sidebar Navigation */
+        /* Sidebar Navigation */
         .side-nav {
-            background-color:black;
-            color:white;
+            background-color: black;
+            color: white;
             padding: 15px;
             text-align: left;
             width: 200px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            height: calc(100vh - 80px); /* Adjusted height to fit below top navigation bar */
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .side-nav ul {
@@ -46,11 +54,11 @@
             margin-top: 10px;
             border-radius: 3px;
             border-radius: 20px;
-            transition:  0.33s ease-in-out;  
-            font-weight: 500; 
+            transition: 0.33s ease-in-out;
+            font-weight: 500;
         }
 
-        .side-nav a:hover{
+        .side-nav a:hover {
             color: black;
             background-color: white;
             border-radius: 20px;
@@ -61,6 +69,7 @@
             flex: 1;
             padding: 20px;
             overflow-y: auto; /* Added overflow-y to allow scrolling if content overflows */
+            margin-left: 200px;
         }
 
         .banner-container {
@@ -141,7 +150,7 @@
 
         /* Top Navigation */
         .top-nav {
-            width: 100%;
+            /* width: 100%; */
             height: 80px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             background-color: rgb(246, 246, 246);

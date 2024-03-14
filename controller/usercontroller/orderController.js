@@ -1,30 +1,27 @@
-const collectionModel = require('../models/userdb');
-const collectionCat=require('../models/category');
-const collectionProduct = require('../models/product');
+const collectionModel = require('../../models/userdb');
+const collectionCat=require('../../models/category');
+const collectionProduct = require('../../models/product');
 const { products } = require('./usercontroller');
-const collectionOrder = require('../models/order');
-const collectionCoupoun = require('../models/coupoun');
-const collectionBanner=require("../models/bannerdb")
+const collectionOrder = require('../../models/order');
+const collectionCoupoun = require('../../models/coupoun');
+const collectionBanner=require("../../models/bannerdb")
 const { render } = require('ejs');
 const PDFDocument = require('pdfkit');
 const excelJS = require('exceljs');
 
 const fs = require('fs');
-const { product } = require('./admincontroller');
+const { product } = require('../admincontroller/admincontroller');
 
 // order
 const order=async(req,res)=>{
     try {
-        // Fetch orders from the database, you'll need to replace this with your actual logic
         const orders = await collectionOrder.find({ userId: req.session.userid });
-        // Render the "user/order" view and pass the orders data
-        // console.log(orders[0].product,"here")
+        const category =await collectionCat.find({isBlocked:false})
         let listItems = [];
         for(let order of orders){
             listItems.push(order.products)
         }
-        // console.log(orders);
-        res.render('user/order', { orders,listItems });
+        res.render('user/order', { orders,listItems,category});
     } catch (error) {
         console.error('Error fetching orders:', error);
         res.status(500).send('Internal Server Error');
@@ -34,26 +31,17 @@ const order=async(req,res)=>{
 const cancelOrder = async (req, res) => {
     
     const {orderId,productId} =  req.params
-    // console.log("here");
-    // console.log(orderId);
-    // console.log(productId);
+    
     try {
-        // Find the order in the database
         const user=await collectionModel.findOne({_id:req.session.userid})
-        // const wallet=user.wallethistory
-        console.log("look at yoou",req.session.userid);
-        // const walletbal = user.walletbalance
         const order = await collectionOrder.findById(orderId);
         if (!order) {
             return res.status(404).json({ message:"Order not found"});
         }
-        console.log(order)
-        console.log(productId);
-        // console.log("order",order);
-        // const itemcancel= order.products.find(items => items._id.toString()===itemId)
+        
+       
         const productToCancel = order.products.find(products => products.p_id.toString() === productId);
-        // console.log(order.payment,"PATTTT");
-        // console.log(order.payment.amount,"fffffff");
+     
 
         let product = await collectionProduct.findById(productId)
 
@@ -73,12 +61,9 @@ const cancelOrder = async (req, res) => {
         }
 
         if (!productToCancel) {
-            // console.log("here is out here")
             return res.status(404).json({ message: "Product not found in the order" });
         }
-        // Update the order status to "Cancelled"
         
-        // itemcancel.status = "Cancelled";
         productToCancel.status = "Cancelled";
 
         await order.save();
@@ -159,7 +144,7 @@ const orderReturn= async (req, res, next) => {
         await productData.save();
         res.json({success: true, message: 'Product returned successfully.'});
     } catch (error) {
-        next(error); // Pass the error to the error handling middleware
+        next(error); 
     }
 };
 

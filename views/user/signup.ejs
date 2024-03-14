@@ -53,37 +53,37 @@
     <form id="signupForm" action="/signup" method="post">
         <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" class="form-control" id="username" name="name" placeholder="Enter username" required>
+            <input type="text" class="form-control" id="username" name="name" placeholder="Enter username">
             <div id="errorUsername" class="error-message"></div>
         </div>
         <div class="form-group">
             <label for="email">Email address</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
             <div id="errorEmail" class="error-message"></div>
         </div>
         <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
             <div id="errorPassword" class="error-message"></div>
         </div>
         <!-- Uncomment this section if you want to confirm the password -->
         <div class="form-group">
             <label for="confirmPassword">confirm Password</label>
-            <input type="password" class="form-control" id="confirmPassword" name="repassword" placeholder="Confirm password" required>
+            <input type="password" class="form-control" id="confirmPassword" name="repassword" placeholder="Confirm password">
             <div id="errorConfirmPassword" class="error-message"></div>
         </div>
            
        
         <div class="form-group">
             <label for="phone">Phone</label>
-            <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter phone number" required>
+            <input type="tel" class="form-control" id="phone" min="1" name="phone" placeholder="Enter phone number">
             <div id="errorPhone" class="error-message"></div>
         </div>
         <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
     </form>
 </div>
 
-<script>
+<!-- <script>
     document.addEventListener('DOMContentLoaded', function () {
         var form = document.getElementById('signupForm');
         form.addEventListener('submit', function (event) {
@@ -138,10 +138,74 @@
 
         });
     });
+</script> -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('signupForm');
+        form.addEventListener('submit', function (event) {
+            var username = form.querySelector('#username').value.trim();
+            var email = form.querySelector('#email').value.trim();
+            var password = form.querySelector('#password').value.trim();
+            var confirmPassword = form.querySelector('#confirmPassword').value.trim();
+            var phone = form.querySelector('#phone').value.trim();
+
+            var errorUsername = document.getElementById('errorUsername');
+            var errorEmail = document.getElementById('errorEmail');
+            var errorPassword = document.getElementById('errorPassword');
+            var errorConfirmPassword = document.getElementById('errorConfirmPassword');
+            var errorPhone = document.getElementById('errorPhone');
+            var validationMessage = document.getElementById('validationMessage');
+
+            errorUsername.innerHTML = '';
+            errorEmail.innerHTML = '';
+            errorPassword.innerHTML = '';
+            errorConfirmPassword.innerHTML = '';
+            errorPhone.innerHTML = '';
+            validationMessage.innerHTML = '';
+
+            if (username === '' || email === '' || password === '' || confirmPassword === '' || phone === '') {
+                validationMessage.innerHTML = 'Please fill in all fields.';
+                event.preventDefault();
+                return;
+            }
+
+            if (/\s/.test(username) || /\s/.test(password)) {
+                validationMessage.innerHTML = 'Username and password should not contain whitespace.';
+                event.preventDefault();
+                return;
+            }
+
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorEmail.innerHTML = 'Enter a valid email address.';
+                event.preventDefault();
+                return;
+            }
+
+            if (password.length < 8) {
+                errorPassword.innerHTML = 'Password must be at least 8 characters long.';
+                event.preventDefault();
+                return;
+            }
+
+            var passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+            if (!passwordRegex.test(password)) {
+                errorPassword.innerHTML = 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.';
+                event.preventDefault();
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorConfirmPassword.innerHTML = 'Passwords do not match.';
+                event.preventDefault();
+                return;
+            }
+
+            form.submit();
+        });
+    });
 </script>
-
-
-
 
     <%-include("footer")-%>
 

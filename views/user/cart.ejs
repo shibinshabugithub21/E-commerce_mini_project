@@ -31,7 +31,24 @@ img {
   height: 30px; /* Set the height of the button */
   font-size: 15px;
   border: none;
-  border-radius: 20px;
+  border-radius: 20px; 
+}
+@media (max-width: 768px) {
+    .cart-summary {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000; /* Ensure it's above other content */
+        background-color: white; /* Optional: Add a background color */
+        border-top: 1px solid #ddd; /* Optional: Add a border */
+    }
+
+    .cart-summary .card {
+        border: none; /* Remove card border */
+        border-radius: 0; /* Remove card border radius */
+        border-bottom: 1px solid #ddd; /* Optional: Add a border between items */
+    }
 }
 </style>
 

@@ -1,10 +1,11 @@
-const collectionModel = require('../models/userdb');
-const collectionCat=require('../models/category');
-const collectionProduct = require('../models/product');
+const collectionModel = require('../../models/userdb');
+const collectionCat=require('../../models/category');
+const collectionProduct = require('../../models/product');
 const { products } = require('./usercontroller');
-const collectionOrder = require('../models/order');
-const collectionCoupoun = require('../models/coupoun');
-const collectionBanner=require("../models/bannerdb")
+const collectionOrder = require('../../models/order');
+const collectionCoupoun = require('../../models/coupoun');
+const collectionBanner=require("../../models/bannerdb")
+const bcrypt = require("bcrypt");
 const { render } = require('ejs');
 const PDFDocument = require('pdfkit');
 const excelJS = require('exceljs');
@@ -18,18 +19,15 @@ const profile = async(req,res)=>{
     try {
         if(req.session.user){
         console.log('i am profile')
-        console.log(req.session.user)
-        console.log(req.session.userid)
+        // console.log(req.session.user)
+        // console.log(req.session.userid)
+        const category =await collectionCat.find({isBlocked:false})
         const userData = await collectionModel.findOne({ _id: req.session.userid});
-        // let cart = userDetails.cart.items;
-        // let cartCount = cart.length;
-        console.log(userData);
         const name = userData.profile.address;
 
         const user = true
-        // const FoundUser = req.session.user;
-        // const userData = await collectionModel.findOne({ email: FoundUser });
-        res.render('user/profile', { user,userData,name});
+       
+        res.render('user/profile', { user,userData,name,category});
         }else{
             res.redirect('/')
         }
@@ -51,7 +49,6 @@ const updateprofile = async (req, res) => {
         console.log(typeof phone);
 
 
-        // If the user doesn't have any address, insert new details
         if (!userData.profile.address || userData.profile.address.length === 0) {
             userData.profile.address.push({ 
                 name:name,
@@ -85,8 +82,9 @@ const manageAddress= async(req,res)=>{
         const { firstname,address, city, phone, postalCode } = req.body;
 console.log(email +"email");
         const userData = await collectionModel.findOne({ email: email });
+        const category =await collectionCat.find({isBlocked:false})
     console.log(userData+"userData")
-    res.render('user/addressManage.ejs',{userData})
+    res.render('user/addressManage.ejs',{userData,category})
 }
 
 
@@ -94,6 +92,8 @@ const addAddress = async(req,res)=>{
     try {
         if(req.session.user){
         console.log('i am profile')
+        const category =await collectionCat.find({isBlocked:false})
+
         const userDetails = await collectionModel.findOne({ email: req.session.user });
         let cart = userDetails.cart.items;
         let cartCount = cart.length;
@@ -102,7 +102,7 @@ const addAddress = async(req,res)=>{
         const user = true
         const FoundUser = req.session.user;
         const userData = await collectionModel.findOne({ email: FoundUser });
-        res.render('user/addAddress', { user,userData, cartCount ,name});
+        res.render('user/addAddress', { user,userData, cartCount,category ,name});
         }else{
             res.redirect('/')
         }
@@ -113,9 +113,8 @@ const addAddress = async(req,res)=>{
 
 const addAddresspost = async (req, res) => {
     const { name, houseName, city, phone, postalCode} = req.body;
-    const userId = req.session.user; // Assuming you have a session userId
+    const userId = req.session.user; 
     try {
-        // Assuming you have a model for your collection
         const user = await collectionModel.findOne({ email : userId});
 
         const phone1 = parseInt(phone); 
@@ -131,7 +130,6 @@ const addAddresspost = async (req, res) => {
             phone:  phone1
         };
 
-        // Push the new address object into the addresses array
         user.profile.address.push(newAddress);
 
         // Save the updated user document
@@ -150,15 +148,15 @@ const editAddress = async (req, res) => {
     try {
         const email = req.session.user;
         const addressId = req.params.id; // Extract the address ID from request parameters
+        const category =await collectionCat.find({isBlocked:false})
         const userData = await collectionModel.findOne({ email: email });
         
-        // Find the address based on the address ID
         const address = userData.profile.address.find(addr => addr._id.toString() === addressId);
         if (!address) {
             return res.status(404).render('error', { message: "Address not found" });
         }
         
-        res.render("user/editAddress", { userData, address }); // Pass the address to the template
+        res.render("user/editAddress", { userData, address,category}); // Pass the address to the template
     } catch (error) {
         console.error("Error fetching user data:", error);
         return res.status(500).render('error', { message: "Error fetching user data" });
@@ -234,8 +232,9 @@ const deleteAddress = async (req, res) => {
 };
 
 // passwword
-const managePassword = (req, res) => {
-    res.render('user/passwordManage.ejs');
+const managePassword = async (req, res) => {
+    const category =await collectionCat.find({isBlocked:false})
+    res.render('user/passwordManage.ejs',{category});
 }
 
 const changePassword = async (req, res) => {
@@ -248,14 +247,13 @@ const changePassword = async (req, res) => {
         const user = await collectionModel.findById(userId);
         console.log(user);
 
-        // Verify current password
-        if (user.password !== currentPassword) {
-            // return res.status(400).json({ error: ' current password' });
-        }
+        // // Verify current password
+        // if (user.password !== currentPassword) {
+        // }
 
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({ error: 'New password and confirm password do not match' });
-        }
+        // if (newPassword !== confirmPassword) {
+        //     return res.status(400).json({ error: 'New password and confirm password do not match' });
+        // }
         const newpass = await bcrypt.hash(newPassword,10)
         user.password = newpass;
         await user.save();

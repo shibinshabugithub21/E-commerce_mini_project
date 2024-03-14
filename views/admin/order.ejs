@@ -28,11 +28,14 @@
             text-align: left;
             width: 200px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            height: 100%;
+            height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
-            bottom: 0;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .side-nav ul {
@@ -44,12 +47,13 @@
         .side-nav a {
             text-decoration: none;
             color: #fff;
-            text-align: center;
             display: block;
             padding: 10px;
-            margin-top: 20px;
+            margin-top: 10px;
             border-radius: 3px;
+            border-radius: 20px;
             transition: 0.33s ease-in-out;
+            font-weight: 500;
         }
 
         .side-nav a:hover {
@@ -62,6 +66,7 @@
         .content {
             flex: 1;
             padding: 20px;
+            margin-left: 200px;
             overflow-x: hidden; /* Hide horizontal overflow */
         }
 

@@ -127,6 +127,9 @@
                 width: 80%;
             }
         }
+        .error {
+        color: red;
+    }
     </style>
 </head>
 
@@ -153,71 +156,130 @@
         </div>
 
         <!-- Add New Coupon Form -->
-        <form >
-            <label for="couponCode">Coupon Code:</label>
-            <input type="text" id="couponCode" name="couponCode" required>
-
-            <label for="discountType">Discount Amount:</label>
-            <!-- <select id="discountType" name="discountType" required> -->
-                <!-- <option value="Fixed">Fixed</option> -->
-                <!-- <option value="Percentage">Percentage</option> -->
-                <input type="text" id="discountType" name="discountType" required>
-            <!-- </select> -->
-
-            <label for="discountAmount">Usage Limit:</label>
-            <input type="text" id="number" name="discountAmount" required>
-
-            <label for="expiryDate">Expiry Date:</label>
-            <input type="date" id="expiryDate" name="expiryDate" required>
-
+            <form id="couponForm">
+                <label for="couponCode">Coupon Code:</label>
+                <input type="text" id="couponCode" name="couponCode">
+                <div id="couponCodeError" class="error"></div>
             
+                <label for="discountType">Discount Amount:</label>
+                <input type="text" id="discountType" name="discountType">
+                <div id="discountTypeError" class="error"></div>
+            
+                <label for="discountAmount">Usage Limit:</label>
+                <input type="text" id="discountAmount" name="discountAmount">
+                <div id="discountAmountError" class="error"></div>
+            
+                <label for="expiryDate">Expiry Date:</label>
+                <input type="date" id="expiryDate" name="expiryDate">
+                <div id="expiryDateError" class="error"></div>
+            
+                <!-- <button type="button" onclick="validateForm()">Click to Add Coupon</button> -->
+                <button type="button" onclick="validateAndAddCoupon()">Click to Add Coupon</button>
 
-            <button type="button" onclick="addCoupon(event)">Click to Add Coupon</button>
-
-        </form>
+            </form>
     </div>
 </body>
 
 <script>
-    const form = document.querySelector('form');
+    function validateAndAddCoupon() {
+        if (validateForm()) {
+            addCoupon();
+        }
+    }
 
-    async function addCoupon(event) {
-    // event.preventDefault();
+    function validateForm() {
+        clearErrors(); // Clear previous errors
 
-    const formData = new FormData(form);
-    const data = {};
-    formData.forEach((value, key) => {
-        data[key] = value;
-    });
-    console.log('Coupon data:', data);
+        const couponCode = document.getElementById('couponCode');
+        const discountType = document.getElementById('discountType');
+        const discountAmount = document.getElementById('discountAmount');
+        const expiryDate = document.getElementById('expiryDate');
 
-    try {
-        const response =  await fetch('/admin/addcoupon', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+        // Regular expressions for validation
+        const codeRegex = /^[a-zA-Z0-9]+$/;
+        const amountRegex = /^\d+(\.\d{1,2})?$/;
 
-        const responseData =  response.json();
-        if (!response.ok) {
-            console.log("inside not ok")
-            // Handle non-ok response
-            throw new Error('Failed to add coupon: ' + response.statusText);
+        let isValid = true;
+
+        // Validate Coupon Code
+        if (!couponCode.value.match(codeRegex)) {
+            showError('couponCodeError', 'Coupon code can only contain letters and numbers.');
+            isValid = false;
+        }
+  // Validate Discount Type
+  if (!discountType.value.match(amountRegex)) {
+        showError('discountTypeError', 'Please enter a positive number for discount amount....');
+        isValid = false;
+    } else if (parseFloat(discountType.value) < 0) {
+        alert('Please enter a positive number for discount amount.');
+        isValid = false;
+    }
+
+    // Validate Discount Amount
+    if (!discountAmount.value.match(amountRegex)) {
+        showError('discountAmountError', 'Please enter a positive number for usage limit....');
+        isValid = false;
+    } else if (parseFloat(discountAmount.value) < 0) {
+        alert('Please enter a positive number for usage limit.');
+        isValid = false;
+    }
+
+        // Validate Expiry Date
+        if (expiryDate.value === '') {
+            showError('expiryDateError', 'Expiry date is required.');
+            isValid = false;
         }
 
-        console.log('Coupon added successfully:', responseData);
-        window.location.href = "/admin/coupoun";
-        // Optionally redirect or perform additional actions after successful coupon addition
-    } catch (error) {
-        console.error('Error adding coupon:', error.message);
-        // Handle error, display message to user, etc.
+        return isValid;
     }
-}
 
-    // Attach the addCoupon function to the form submission event
-    // form.addEventListener('submit', addCoupon);
+    // Function to show error message
+    function showError(id, message) {
+        const errorDiv = document.getElementById(id);
+        errorDiv.textContent = message;
+    }
+
+    // Function to clear all error messages
+    function clearErrors() {
+        const errors = document.querySelectorAll('.error');
+        errors.forEach(error => {
+            error.textContent = '';
+        });
+    }
+
+    async function addCoupon() {
+        const form = document.getElementById('couponForm');
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+        console.log('Coupon data:', data);
+
+        try {
+            const response = await fetch('/admin/addcoupon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const responseData = await response.json();
+            if (!response.ok) {
+                console.log("inside not ok")
+                // Handle non-ok response
+                throw new Error('Failed to add coupon: ' + response.statusText);
+            }
+
+            console.log('Coupon added successfully:', responseData);
+            window.location.href = "/admin/coupoun";
+            // Optionally redirect or perform additional actions after successful coupon addition
+        } catch (error) {
+            console.error('Error adding coupon:', error.message);
+            // Handle error, display message to user, etc.
+        }
+    }
 </script>
 
 </html>

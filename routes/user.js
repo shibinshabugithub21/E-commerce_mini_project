@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = express('mongoose')
-const usercontroller = require('../controller/usercontroller');
-const orderController = require("../controller/orderController");
-const profileController = require("../controller/userProfileController")
+const authcontroller = require("../controller/usercontroller/userauth")
+const usercontroller = require('../controller/usercontroller/usercontroller');
+const orderController = require("../controller/usercontroller/orderController");
+const profileController = require("../controller/usercontroller/userProfileController")
+const wishlistController =  require("../controller/usercontroller/userwishlist")
+const cartcontroller = require("../controller/usercontroller/usercartcontroller")
+const detailscontroller = require("../controller/usercontroller/userproductdetails")
 const collectionModel = require('../models/userdb');
 const {isUser,checkSessionAndBlocked} = require('../middleware/userside');
 
@@ -11,49 +15,46 @@ const {isUser,checkSessionAndBlocked} = require('../middleware/userside');
 
 
 
-router.get('/',usercontroller.landing);
+router.get('/',authcontroller.landing);
 // router.post('/',usercontroller.homepost) 
 
-router.get('/login',usercontroller.login);
-router.post('/login',usercontroller.loginpost)
-router.get('/logout',usercontroller.logout)
+router.get('/login',authcontroller.login);
+router.post('/login',authcontroller.loginpost)
+router.get('/logout',authcontroller.logout)
 
-router.get('/signup',usercontroller.signup);
-router.post('/signup',usercontroller.signuppost);
+router.get('/signup',authcontroller.signup);
+router.post('/signup',authcontroller.signuppost);
 
-router.get('/emailforget',usercontroller.forget);
-router.post("/emailforget",usercontroller.forgetpost)
-router.get("/forgetPassword/:token",usercontroller.forgetPassword);
-router.post('/resetPassword/:email',usercontroller.resetPassword)
+router.get('/emailforget',authcontroller.forget);
+router.post("/emailforget",authcontroller.forgetpost)
+router.get("/forgetPassword/:token",authcontroller.forgetPassword);
+router.post('/resetPassword/:email',authcontroller.resetPassword)
 
-router.get('/otp',usercontroller.otp)
-router.post('/otppost',usercontroller.otppost)
+router.get('/otp',authcontroller.otp)
+router.post('/otppost',authcontroller.otppost)
 
 // resend otp
-router.get('/resendotp',usercontroller.resendOtp)
+router.get('/resendotp',authcontroller.resendOtp)
 
-router.get('/home',checkSessionAndBlocked,usercontroller.home);
+router.get('/home',checkSessionAndBlocked,authcontroller.home);
 // router.get('/home',checkSessionAndBlocked,usercontroller.home);
 
-// user accouts detals 
-// router.get('/profile',usercontroller.profile)
-
-
-
-
-
 // products routes(here product means the iphone )
-router.get('/products',usercontroller.products)
-router.get('/mac',usercontroller.mac)
-router.get('/airpod',usercontroller.airpod);
-router.get('/watch',usercontroller.watch);
+router.get('/iPhone',detailscontroller.products)
+router.get('/mac',detailscontroller.mac)
+router.get('/airpods',detailscontroller.airpod);
+router.get('/watch',detailscontroller.watch);
+// produt details
+router.get('/details/:id',detailscontroller.details)
+
+
 
 // cart starts
 
-router.post('/cart/:id',usercontroller.Addcart)
-router.get('/cart',usercontroller.loadcart)
-router.post('/cartupdate/:id',usercontroller.cartQuantityUpdate);
-router.delete('/cartDelete/:id',usercontroller.cartDelete);
+router.post('/cart/:id',cartcontroller.Addcart)
+router.get('/cart',cartcontroller.loadcart)
+router.post('/cartupdate/:id',cartcontroller.cartQuantityUpdate);
+router.delete('/cartDelete/:id',cartcontroller.cartDelete);
 
 // // checkout page
 router.get('/CheckOutPage',usercontroller.checkoutpage)
@@ -87,15 +88,13 @@ router.post('/cancelOrder/:orderId/:productId', orderController.cancelOrder);
 router.post('/returnProduct',orderController.orderReturn);
 
 // wishlsit
-router.get('/wishlist',usercontroller.whishlistload);
-router.post('/wishlist/:id',usercontroller.addingWhishList)
-router.get('/wishlistdelete/:id',usercontroller.WhishProductDelete)
+router.get('/wishlist',wishlistController.whishlistload);
+router.post('/wishlist/:id',wishlistController.addingWhishList)
+router.get('/wishlistdelete/:id',wishlistController.WhishProductDelete)
 
 // wallet
 router.get('/wallet',usercontroller.wallet)
 
-// produt details
-router.get('/details/:id',usercontroller.details)
 
 
 router.get("/success",usercontroller.success)

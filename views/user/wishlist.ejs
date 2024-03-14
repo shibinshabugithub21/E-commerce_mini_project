@@ -1,86 +1,102 @@
 <%- include('header') %>
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f8f9fa;
-        margin: 0;
-        padding: 0;
-    }
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
 
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-    .wishlist-item {
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        padding: 20px;
-    }
-
-    .wishlist-item .product-image img {
-        width: 100%;
-        height: auto;
-        border-radius: 10px;
-    }
-
-    .wishlist-item .product-details {
-        flex: 1;
-    }
-
-    .wishlist-item .product-details h3 {
-        margin: 0;
-        font-size: 1.2rem;
-        color: #333;
-    }
-
-    .wishlist-item .product-details p {
-        margin: 5px 0;
-        color: #666;
-    }
-
-    .wishlist-item .btn-remove {
-        background-color: #dc3545;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        padding: 8px 16px;
-        font-size: 14px;
-        transition: background-color 0.3s;
-        align-self: flex-end;
-    }
-
-    .wishlist-item .btn-remove:hover {
-        background-color: #c82333;
-    }
-
-    @media (min-width: 768px) {
         .wishlist-item {
-            flex-direction: row;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
         }
 
         .wishlist-item .product-image {
-            width: 200px;
-            margin-right: 20px;
+            position: relative;
+        }
+
+        .wishlist-item .product-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .wishlist-item .no-items-img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px; /* Adjust width as needed */
+        }
+
+        .wishlist-item .no-items-button {
+            margin-top: 20px;
         }
 
         .wishlist-item .product-details {
             flex: 1;
         }
 
-        .wishlist-item .btn-remove {
-            align-self: flex-start;
+        .wishlist-item .product-details h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #333;
         }
-    }
-</style>
+
+        .wishlist-item .product-details p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .wishlist-item .btn-remove {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            align-self: flex-end;
+        }
+
+        .wishlist-item .btn-remove:hover {
+            background-color: #c82333;
+        }
+
+        @media (min-width: 768px) {
+            .wishlist-item {
+                flex-direction: row;
+            }
+
+            .wishlist-item .product-image {
+                width: 200px;
+                margin-right: 20px;
+            }
+
+            .wishlist-item .product-details {
+                flex: 1;
+            }
+
+            .wishlist-item .btn-remove {
+                align-self: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
     
@@ -91,7 +107,6 @@
                     <div class="product-image">
                         <img src="<%= product.image %>" alt="<%= product.name %>">
                         <img src="/productImages/<%= product.Image[0] %>" alt="<%= product.Productname %>">
-
                     </div>
                     <div class="product-details">
                         <h3>PhoneName<%= product.Productname %></h3>
@@ -106,35 +121,14 @@
                 </div>
             <% }); %>
         <% } else { %>
-            <p>No items in wishlist.</p>
+                <div class="product-image">
+                    <img src="/img/f6e464230662e7fa4c6a4afb92631aed.png" alt="No items in wishlist" class="no-items-img">
+                </div>
+                <button class="btn btn-success btn-lg btn-block no-items-button" onclick="window.location.href='/home'">Go Back to Home</button>
+        
         <% } %>
     </div>    
 
-<!-- 
-<script>
-    // Assuming you have a button or link to delete a product from the wishlist
-const deleteButton = document.getElementById('deleteButton');
-
-// Add event listener to the delete button
-deleteButton.addEventListener('click', function() {
-    const productId = this.dataset.productId; // Assuming you set the product ID as a data attribute
-
-    // Send an AJAX request to the server to delete the product from the wishlist
-    fetch(`/wishlistdelete/${productId}`, {
-        method: 'GET', // Assuming you're using DELETE method for deletion
-    })
-    .then(response => {
-        if (response.ok) {
-            // If deletion is successful, you may want to remove the product from the UI as well
-            this.closest('.wishlist-item').remove(); // Assuming the product is displayed as a wishlist item
-        } else {
-            console.error('Failed to delete product from wishlist');
-        }
-    })
-    .catch(error => {
-        console.error('Error deleting product from wishlist:', error);
-    });
-});
-
-</script> -->
 <%- include('footer') %>
+</body>
+</html>

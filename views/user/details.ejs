@@ -301,6 +301,27 @@
             gap: 10px;
         }
     }
+    .product-price {
+    display: flex;
+    position: relative;
+    margin: 10px 0;
+    align-items: center;
+}
+
+.product-price .sale-price {
+    font-size: 22px;
+    font-weight: 500;
+    text-decoration: line-through; /* Add strike-through */
+    color: var(--grey);
+    margin-right: 12px; /* Adjust margin as needed */
+}
+
+.product-price .offer-price {
+    font-size: 48px;
+    font-weight: 700;
+color: black;
+}
+
 
     /* Responsive Tablet */
     @media (min-width: 520px) and (max-width: 1080px) {
@@ -358,8 +379,11 @@
                 
                 <div class="d-flex flex-column">
                     <div class="product-price">
-                        <span class="offer-price">₹<%= element.Price %></span>
-                        <!-- <span class="sale-price">₹156,990</span> -->
+                        <!-- Original price with strike-through -->
+                        <span class="sale-price">₹<%= element.Price%></span>
+                        
+                        <!-- Offer price -->
+                        <span class="offer-price">₹<%= element.OriginalPrice %></span>
                     </div>
     
                     <div class="product-details mb-4">
@@ -371,9 +395,8 @@
                         <form action="/cart/<%= element._id %>" method="post">
                             <button class="add-to-cart btn btn-warning"  data-product-id="<%= element._id %>" data-product-price="<%= element.Price %>" type="submit">Add to Cart</button>
                         </form>                  
-                        <!-- <button type="button" class="btn btn-primary btn-lg btn-block">
-                            <a href="/CheckOutPage/<%= element._id %>" style="text-decoration: none; color: white;">Buy Now</a>
-                        </button> -->
+                        <!-- <button class="buy-now btn btn-primary" onclick="location.href='/CheckOutPage/<%= element._id %>'">Buy Now</button> -->
+
                     </div>
                 </div>
             </div>
@@ -451,6 +474,19 @@
         result.style.display = "none";
     });
 
+    function addToCheckout(productId) {
+    // Make a POST request to the addToCheckout route with the product ID
+    fetch(`/addToCheckout/${productId}`, {
+        method: 'POST'
+    })
+    .then(response => {
+        // Handle response, such as redirecting to the checkout page
+        window.location.href = '/checkout';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
 </script>
 
 <%-include('footer')-%>

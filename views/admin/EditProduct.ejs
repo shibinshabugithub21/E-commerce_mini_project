@@ -2,266 +2,431 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      min-height: 100vh;
-      background-color: #f4f4f4;
-      align-items: center;
-      text-align: center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            align-items: center;
+            text-align: center;
+        }
 
-    .side-nav {
-      background-color: black;
-      color: white;
-      padding: 15px;
-      text-align: left;
-      width: 200px;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-      height: 1280px;
-    }
+        .side-nav {
+            background-color: black;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            width: 200px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
 
-    .side-nav ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      position: absolute;
-      left: 45px;
-      top: 120px;
-    }
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-    .side-nav a {
-      text-decoration: none;
-      color: #fff;
-      text-align: center;
-      display: block;
-      padding: 10px;
-      margin-top: 40px;
-      border-radius: 3px;
-      border-radius: 20px;
-      transition: 0.33s ease-in-out;
-      font-weight: 500;
-    }
+        .side-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
 
-    .side-nav a:hover {
-      color: black;
-      background-color: white;
-      border-radius: 20px;
-    }
+        .side-nav a {
+            text-decoration: none;
+            color: #fff;
+            display: block;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 3px;
+            border-radius: 20px;
+            transition: 0.33s ease-in-out;
+            font-weight: 500;
+        }
 
-    form {
-      max-width: 1000px;
-      width: 100%;
-      padding: 20px;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      margin: 40px;
-      margin-bottom: 280px;
-    }
+        .side-nav a:hover {
+            color: black;
+            background-color: white;
+            border-radius: 20px;
+        }
 
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: bold;
-      text-align: left;
-    }
+         /* Main Content Area */
+         .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto; /* Added overflow-y to allow scrolling if content overflows */
+            margin-left: 200px;
+        }
 
-    input[type="text"],
-    input[type="number"],
-    textarea,
-    input[type="file"] {
-      width: calc(100% - 22px);
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+        form {
+            max-width: 1000px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 40px;
+            margin-bottom: 280px;
+        }
 
-    button[type="submit"] {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-align: left;
+        }
 
-    button[type="submit"]:hover {
-      background-color: #0056b3;
-    }
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        input[type="file"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
 
-    #preview {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-    }
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-    .image-container {
-      position: relative;
-      width: 30%;
-      margin-bottom: 10px;
-    }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
 
-    #preview img {
-      /* width: 100%; */
-      height: 100px;
-      /* Set the desired height */
-      object-fit: cover;
-      border-radius: 5px;
-    }
+        #preview {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
 
-    .delete-button {
-      position: absolute;
-      top: 10px;
-      right: 5px;
-      background-color: #f0f0f0;
-      color: black;
-      border: none;
-      border-radius: 5px solid black;
-      padding: 5px;
-      cursor: pointer;
-    }
-  </style>
+        .image-container {
+            position: relative;
+            width: 30%;
+            margin-bottom: 10px;
+        }
+
+        #preview img {
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .delete-button {
+            position: absolute;
+            top: 10px;
+            right: 5px;
+            background-color: #f0f0f0;
+            color: black;
+            border: none;
+            border-radius: 5px solid black;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: left;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="side-nav">
-    <ul>
-      <li><a href="/admin/home">Dashboard</a></li>
-      <li><a href="/admin/user">User</a></li>
-      <li><a href="/admin/category">Category</a></li>
-      <li><a href="/admin/product">Product</a></li>
-      <li><a href="/admin/order">Order</a></li>
-      <li><a href="/admin/login">logout</a></li>
-    </ul>
-  </div>
-  <form action="/admin/editproduct/<%= element._id%>" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
-    <label for="productName">Product Name:</label>
-    <input type="text" id="productName" name="productName" value="<%=element.Productname%>">
-
-    <label for="category">Category:</label>
-    <input type="text" id="category"  name="category" value="<%=element.Category%>">
-
-    <label for="stock">Stock:</label>
-    <input type="number" id="stock" min="0" name="stock" value="<%=element.Stock%>">
-
-    <label for="price">Price:</label>
-    <input type="number" id="price" name="price" value="<%=element.Price%>" >
-
-    <label for="rating">Rating:</label>
-    <input type="number" id="rating" name="rating" value="<%=element.Rating%>" >
-
-    <label for="description">Description:</label>
-    <textarea id="description" name="description" rows="4" ><%=element.Description %></textarea>
-
-    <label for="productImage">Product Image:</label>
-    <input type="file" id="image" name="image" accept="image/*" multiple onchange="previewImages(event)">
-    <div id="preview">
-      <% element.Image.forEach((image, index) => { %>
-      <div class="image-container">
-        <img id="zoom-image-<%= element._id %>" class="card-img-top" src="/productImages/<%= image %>" />
-        <div class="delete-button" onclick="deleteImage(this, '<%= image %>','<%= element._id %>')">delete</div>
-      </div>
-      <% }); %>
+    <div class="side-nav">
+        <ul>
+            <li><a href="/admin/home">Dashboard</a></li>
+            <li><a href="/admin/user">User</a></li>
+            <li><a href="/admin/category">Category</a></li>
+            <li><a href="/admin/product">Product</a></li>
+            <li><a href="/admin/order">Order</a></li>
+            <li><a href="/admin/login">logout</a></li>
+        </ul>
     </div>
-    <p id="image-count">Image Count: 6</p>
-    <button type="submit">Edit Product</button>
-  </form>
+    <!-- Update the form tag to include an id attribute for easier selection -->
+<!-- <form id="editProductForm" action="/admin/editproduct/<%= element._id%>" method="post" enctype="multipart/form-data"
+    onsubmit="return validateForm()">
+
+        <label for="productName">Product Name:</label>
+        <input type="text" id="productName" name="productName" value="<%=element.Productname%>">
+        <div class="error-message" id="productNameError"></div>
+
+        <label for="category">Category:</label>
+        <input type="text" id="category" name="category" value="<%=element.Category%>">
+        <div class="error-message" id="categoryError"></div>
+
+        <label for="stock">Stock:</label>
+        <input type="number" min="1" id="stock" min="0" name="stock" value="<%=element.Stock%>">
+        <div class="error-message" id="stockError"></div>
+        <label for="discountedPrice">Original Price:</label>
+        <input type="number" min="1" step="0.01" name="discountedPrice" id="discountedPrice" value="<%=element.Price%>">
+        <div class="error-message" id="discountedPriceError"></div>
+        
+        
+        
+    
+        <label for="offer">Offer (%):</label>
+        <input type="number" min="0" max="100" step="1" name="offer" id="offer"  value="<%=element.OfferPercentage%>" >
+        <div class="error-message" id="offerError"></div>
+    
+       
+        <label for="price">Discounted Price:</label>
+        <input type="number" min="1" step="0.01" id="price" name="price" value="<%=element.OriginalPrice%>"readonly>
+        <div class="error-message" id="priceError"></div>
+        
 
 
-  <script>
-    function previewImages(event) {
-      let previewDiv = document.getElementById('preview');
-      previewDiv.innerHTML = "";
+        <label for="rating">Rating:</label>
+        <input type="number" min="1" id="rating" name="rating" value="<%=element.Rating%>">
+        <div class="error-message" id="ratingError"></div>
 
-      const files = event.target.files;
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="4"><%=element.Description %></textarea>
+        <div id="descriptionError" class="error-message"></div>
 
-      for (let i = 0; i < files.length; i++) {
-        const image = URL.createObjectURL(files[i]);
-        const newImage = document.createElement('img');
-        newImage.src = image;
+        <label for="productImage">Product Image:</label>
+        <input type="file" id="image" name="image" accept="image/*" multiple onchange="previewImages(event)">
+        <div id="preview">
+            <% element.Image.forEach((image, index) => { %>
+            <div class="image-container">
+                <img id="zoom-image-<%= element._id %>" class="card-img-top" src="/productImages/<%= image %>" />
+                <div class="delete-button" onclick="deleteImage(this, '<%= image %>','<%= element._id %>')">delete</div>
+            </div>
+            <% }); %>
+        </div>
+        <p id="image-count">Image Count: 6</p>
+        <button type="submit">Edit Product</button>
+    </form> -->
+    <div class="content">
+        <form id="editProductForm" action="/admin/editproduct/<%= element._id%>" method="post" enctype="multipart/form-data">
+    
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" name="productName" value="<%=element.Productname%>">
+            <div class="error-message" id="productNameError"></div>
+            <label for="category">Category:</label>
+            <input type="text" id="category" name="category" value="<%=element.Category%>">
+            <div class="error-message" id="categoryError"></div>
+    
+            <label for="stock">Stock:</label>
+            <input type="number" id="stock" name="stock" value="<%=element.Stock%>">
+            <div class="error-message" id="stockError"></div>
+    
+            <label for="discountedPrice">Original Price:</label>
+            <input type="number" step="0.01" name="discountedPrice" id="discountedPrice" value="<%=element.Price%>">
+            <div class="error-message" id="discountedPriceError"></div>
+    
+            <label for="offer">Offer (%):</label>
+            <input type="number" step="1" name="offer" id="offer" value="<%=element.OfferPercentage%>">
+            <div class="error-message" id="offerError"></div>
+    
+            <label for="price">Discounted Price:</label>
+            <input type="number" step="0.01" id="price" name="price" value="<%=element.OriginalPrice%>" readonly>
+            <div class="error-message" id="priceError"></div> <!-- Unique ID for this error message -->
+    
+            <label for="rating">Rating:</label>
+            <input type="number" id="rating" name="rating" value="<%=element.Rating%>">
+            <div class="error-message" id="ratingError"></div>
+    
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4"><%=element.Description %></textarea>
+            <div class="error-message" id="descriptionError"></div>
+    
+            <label for="productImage">Product Image:</label>
+            <input type="file" id="image" name="image" accept="image/*" multiple onchange="previewImages(event)">
+            <div id="preview">
+                <% element.Image.forEach((image, index) => { %>
+                <div class="image-container">
+                    <img id="zoom-image-<%= element._id %>" class="card-img-top" src="/productImages/<%= image %>" />
+                    <div class="delete-button" onclick="deleteImage(this, '<%= image %>','<%= element._id %>')">delete</div>
+                </div>
+                <% }); %>
+            </div>
+            <p id="image-count">Image Count: 6</p>
+            <button type="submit">Edit Product</button>
+        </form>
+    </div>
 
-        const imageContainer = document.createElement('div');
-        imageContainer.className = 'image-container';
-        imageContainer.appendChild(newImage);
+    <script>
+        const editProductForm = document.getElementById('editProductForm');
+        editProductForm.addEventListener('submit', validateForm)
+        console.log(editProductForm)
 
-        previewDiv.appendChild(imageContainer);
-      }
+        function previewImages(event) {
+            let previewDiv = document.getElementById('preview');
+            previewDiv.innerHTML = "";
 
-      updateImageCount();
-    }
+            const files = event.target.files;
 
-    function deleteImage(button, imageName,productId) {
-      const imageContainer = button.parentNode;
-      const previewDiv = document.getElementById('preview');
-      previewDiv.removeChild(imageContainer);
-      
-      // Send request to the server to delete the image permanently
-      fetch(`/admin/proImgEdite/${productId}`, {method:"post",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body: JSON.stringify({
-      productId:productId,
-      imgName:imageName,
-    })
-  })
-      .then(response => {
-        if (response.ok) {
-          console.log('Image deleted successfully');
-        } else {
-          console.error('Failed to delete image');
+            for (let i = 0; i < files.length; i++) {
+                const image = URL.createObjectURL(files[i]);
+                const newImage = document.createElement('img');
+                newImage.src = image;
+
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'image-container';
+                imageContainer.appendChild(newImage);
+
+                previewDiv.appendChild(imageContainer);
+            }
+
+            updateImageCount();
         }
-      })
-      .catch(error => {
-        console.error('Error deleting image:', error);
-      });
 
-      updateImageCount();
-    }
+        function deleteImage(button, imageName, productId) {
+            const imageContainer = button.parentNode;
+            const previewDiv = document.getElementById('preview');
+            previewDiv.removeChild(imageContainer);
 
-    function updateImageCount() {
-      const previewDiv = document.getElementById('preview');
-      const imageCount = previewDiv.children.length;
-      const countDisplay = document.getElementById('image-count');
-      countDisplay.innerText = `Image Count: ${imageCount}`;
-    }
+            // Send request to the server to delete the image permanently
+            fetch(`/admin/proImgEdite/${productId}`, {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    imgName: imageName,
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Image deleted successfully');
+                    } else {
+                        console.error('Failed to delete image');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting image:', error);
+                });
 
-    function validateForm() {
-      // Get form fields
-      var productName = document.getElementById('productName').value;
-      var price = document.getElementById('price').value;
-      var stock = document.getElementById('stock').value;
-      var rating = document.getElementById('rating').value;
+            updateImageCount();
+        }
 
-      // Product name validation (no space, starting capital letter)
+        function updateImageCount() {
+            const previewDiv = document.getElementById('preview');
+            const imageCount = previewDiv.children.length;
+            const countDisplay = document.getElementById('image-count');
+            countDisplay.innerText = `Image Count: ${imageCount}`;
+        }
 
+       // validation
+       function validateForm(e) {
+            console.log("Form validation")
+            // Reset previous error messages and styles
+            resetErrors();
 
-      var productNameRegex = /^[a-zA-Z]+$/;
-      if (!productNameRegex.test(productName).includes('')) {
-        alert('Product name should contain no spaces and only letters.');
-        return false;
-      }
-      // Price, stock, and rating validation (not negative)
-      if (price < 0 || stock < 0 || rating < 0) {
-        alert('Price, stock, and rating cannot be negative.');
-        return false;
-      }
+            // Get form inputs
+            var productName = document.getElementById("productName").value.trim();
+            var category = document.getElementById("category").value.trim();
+            var stock = document.getElementById("stock").value.trim();
+            var discountedPrice = document.getElementById("discountedPrice").value.trim();
+            var offer = document.getElementById("offer").value.trim();
+            var rating = document.getElementById("rating").value.trim();
+            var description = document.getElementById("description").value.trim();
 
-      // If all validations pass, return true to submit the form
-      return true;
-    }
-  </script>
+            // Flag to track validation status
+            var isValid = true;
+
+            // Validate Product Name
+            if (productName === "") {
+                showError("productName", "Product Name is required");
+                isValid = false;
+            }
+
+            // Validate Category
+            if (category === "") {
+                showError("category", "Category is required");
+                isValid = false;
+            }
+
+            // Validate Stock
+            if (stock === "" || isNaN(stock) || stock <= 0) {
+                showError("stock", "Stock must be a positive number");
+                isValid = false;
+            }
+
+            // Validate Discounted Price
+            if (discountedPrice === "" || isNaN(discountedPrice) || discountedPrice <= 0) {
+                showError("discountedPrice", "Discounted Price must be a positive number");
+                isValid = false;
+            }
+
+            // Validate Offer
+            if (offer === "" || isNaN(offer) || offer < 0 || offer > 100) {
+                showError("offer", "Offer must be a number between 0 and 100");
+                isValid = false;
+            }
+
+            // Validate Rating
+            if (rating === "" || isNaN(rating) || rating < 1) {
+                showError("rating", "Rating must be a number greater than or equal to 1");
+                isValid = false;
+            }
+
+            // Validate Description
+            if (description === "") {
+                showError("description", "Description is required");
+                isValid = false;
+            }
+
+            if(!isValid)
+                e.preventDefault();
+        }
+
+        function showError(fieldId, errorMessage) {
+            var field = document.getElementById(fieldId);
+            var errorElement = field.nextElementSibling;
+            console.log(errorElement)
+            errorElement.innerText = errorMessage;
+            errorElement.style.color = "red";
+        }
+
+        function resetErrors() {
+            var errorElements = document.getElementsByClassName("error-message");
+            for (var i = 0; i < errorElements.length; i++) {
+                errorElements[i].innerText = "";
+            }
+        }
+// offer discount
+        // Function to calculate discounted price based on original price and offer percentage
+function calculateDiscountedPrice() {
+    const originalPrice = parseFloat(document.getElementById('discountedPrice').value);
+    const offerPercentage = parseFloat(document.getElementById('offer').value);
+    const discountedPrice = originalPrice - (originalPrice * (offerPercentage / 100));
+    return discountedPrice.toFixed(2); // Round to two decimal places
+}
+
+// Function to update the "Discounted Price" field with the calculated value
+function updateDiscountedPrice() {
+    const discountedPrice = calculateDiscountedPrice();
+    document.getElementById('price').value = discountedPrice;
+}
+
+// Update discounted price when offer percentage changes
+document.getElementById('offer').addEventListener('input', updateDiscountedPrice);
+
+// Update discounted price when original price changes
+document.getElementById('price').addEventListener('input', updateDiscountedPrice);
+
+    </script>
 </body>
 
 </html>

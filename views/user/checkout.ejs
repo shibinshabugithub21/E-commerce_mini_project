@@ -84,25 +84,20 @@
                 </button>
             </div>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <div class="second" style="align-items: center;">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="secnav-item ">
-                            <a class="nav-link" href="/home">Home</a>
-                        </li>
-                        <li class="secnav-item ">
-                            <a class="nav-link" href="/products">Iphone</a>
-                        </li>
-                        <li class="secnav-item ">
-                            <a class="nav-link" href="/mac">Mac</a>
-                        </li>
-                        <li class="secnav-item">
-                            <a class="nav-link" href="/airpod">Airpods</a>
-                        </li>
-                        <li class="secnav-item">
-                            <a class="nav-link" href="/watch">Watchs</a>
-                        </li>
-                    </ul>
-                </div>
+              <div class="second" style="align-items: center;">
+                <div class="second" style="align-items: center; display: flex;">
+                  <a href="/home" style="color:#000000A6">Home</a>
+                <% category.forEach((value)=>{ %>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="secnav-item ">
+                        <a class="nav-link" href="/<%= value.Category %>">
+                            <%= value.Category %>
+                        </a>
+                        
+                    </li>
+                </ul>
+                <%}) %>
+            </div>
             </div>
         </div>
     </nav>
