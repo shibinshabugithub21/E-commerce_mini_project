@@ -784,10 +784,15 @@ const dataa = {
 }
 
 
-var amount = JSON.parse('<%- JSON.stringify(total) %>')*100;
+// var amount = JSON.parse(' JSON.stringify(total) ')*100;
 
 
 function initializeRazorpay(dataa) {
+
+  var totalPriceElement = document.getElementById("totalAmount");
+var totalPriceText = totalPriceElement.innerText;
+var totalPrice = totalPriceText.replace(/[^\d.]/g, ''); // Remove non-numeric characters
+var amount = totalPrice * 100
   console.log(typeof(amount));
     fetch('/create', {
         method: 'POST',
@@ -798,10 +803,10 @@ function initializeRazorpay(dataa) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        console.log("res",data);
         const options = {
             key: 'rzp_test_yeIbQTeZebXZS2', // Replace with your Razorpay key
-            amount: data.amount,
+            amount: data.discount_amount,
             currency: 'INR',
             name: 'iStore',
             description: 'Test Transaction',
@@ -890,9 +895,17 @@ document.querySelectorAll("#couponDropdownMenu .dropdown-item").forEach(item => 
 });
 
 function couponVal(id,value,total){
+  fetch(`/coupoun/${id}`)
+    .then(response => response.json())
+    .then(data => {
+
+      const totalPrice = document.getElementById("totalAmount");
+      totalPrice.innerHTML = total-value || total;
+      
+    })
+    .catch(error => console.error("Error fetching coupons:", error));
   console.log(id,value,total)
-  const totalPrice = document.getElementById("totalAmount");
-  totalPrice.innerHTML = total-value || total;
+ 
 }
 
 </script>

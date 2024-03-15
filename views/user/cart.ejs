@@ -59,6 +59,7 @@ img {
   <% } else{ %>
 
 <section class="h-100 ">
+
   <div class="container py-5">
     <div class="row d-flex justify-content-center my-4">
       <div class="col-md-8">
@@ -80,7 +81,7 @@ img {
               <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
                 <!-- Data -->
                 <p><strong><%=cartItem.productname.Productname %></strong></p>
-                <p><strong>₹<%=cartItem.totalprice %></strong></p>
+                <p><strong>₹<%=cartItem.productname.OriginalPrice %></strong></p>
               </div>
               <button type="button" id="removebtn" class="remove-from-cart btn btn-danger" data-product-id="<%= cartItem.productname._id %>">Remove</button>
 

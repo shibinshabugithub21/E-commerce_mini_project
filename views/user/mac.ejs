@@ -21,7 +21,7 @@
             <img class="card-img-top" style="width: 100%; height: 21.1em;" src="/productImages/<%= element.Image[0] %>" />
             <div class="card-body">
               <h5 class="card-title"><%= element.Productname %></h5>
-              <p class="card-text">₹<%= element.Price %></p>
+              <span class="offer-price">₹<%= element.OriginalPrice %></span>
               <div class="d-flex justify-content-between align-items-center">
                 <form action="/cart/<%= element._id %>" method="post">
                   <button class="add-to-cart btn btn-warning"  data-product-id="<%= element._id %>" data-product-price="<%= element.Price %>" type="submit">Add to Cart</button>

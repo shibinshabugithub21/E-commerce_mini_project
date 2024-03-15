@@ -33,7 +33,6 @@ const addproduct =async (req, res) => {
     // Check if the user is authenticated
     
     const categories = await collectionCat.find({isBlocked:false});
-console.log(categories);
 
     const errorMessage = req.flash('error');
     if (!req.session.admin) {
@@ -90,10 +89,10 @@ const editproduct = async(req,res)=>{
 
     try {
         const productId = req.params.id;
-
+        const categories = await collectionCat.find({isBlocked:false});
         const element = await collectionProduct.findById(productId);
 
-        res.render('admin/editproduct',{element});
+        res.render('admin/editproduct',{element,categories});
 
     } catch (error) {
         console.log(error)
@@ -113,7 +112,7 @@ const editproductpost = async(req,res)=>{
             return res.status(404).send("priduct not found");
         }
             products.Productname = req.body.productName;  
-            products.Category = req.body.category;
+            products.Category = req.body.Category;
             products.Stock= req.body.stock;
             products.Rating= req.body.rating;
             products.Price =req.body.discountedPrice;

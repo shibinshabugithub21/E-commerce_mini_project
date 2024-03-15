@@ -60,7 +60,7 @@ const schema = new mongoose.Schema({
                 type: Number
             }
         }],
-        grantTotal: {
+       grantTotal : {
             type: Number
         }
     },

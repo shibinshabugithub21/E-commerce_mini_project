@@ -157,8 +157,12 @@
             <li><a href="/admin/user">User</a></li>
             <li><a href="/admin/category">Category</a></li>
             <li><a href="/admin/product">Product</a></li>
-            <li><a href="/admin/order">Order</a></li>
-            <li><a href="/admin/login">logout</a></li>
+            <li><a href="/admin/order">order</a></li>
+            <li><a href="/admin/coupoun">coupoun</a></li>
+            <li><a href="/admin/Banner">Banner</a></li>
+            <li><a href="/admin/sale">Sales</a></li>
+            <li><a href="/admin/logout">logout</a></li>
+            <!-- Add more navigation items as needed -->
         </ul>
     </div>
     <!-- Update the form tag to include an id attribute for easier selection -->
@@ -221,9 +225,13 @@
             <label for="productName">Product Name:</label>
             <input type="text" id="productName" name="productName" value="<%=element.Productname%>">
             <div class="error-message" id="productNameError"></div>
-            <label for="category">Category:</label>
-            <input type="text" id="category" name="category" value="<%=element.Category%>">
-            <div class="error-message" id="categoryError"></div>
+
+           <label for="Category">Category:</label>
+        <select class="select" name="Category">
+            <% categories.forEach(category => { %>
+            <option value="<%= category.Category %>"><%= category.Category %></option>
+            <% }); %>
+        </select>
     
             <label for="stock">Stock:</label>
             <input type="number" id="stock" name="stock" value="<%=element.Stock%>">

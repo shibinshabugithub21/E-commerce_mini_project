@@ -45,7 +45,7 @@ const checkoutpage = async (req, res) => {
                 if (String(values.productname).trim() === String(product._id).trim()) {
                     result.push({
                         name: product.Productname,
-                        price: product.Price
+                        price: product.OriginalPrice
                     });
                     totalPrice += product.Price;
                 }
@@ -64,7 +64,6 @@ const checkoutpage = async (req, res) => {
        }
        });
 
-console.log(validCoupons);
 
         res.render('user/checkout', { user: userDetails, result, total: userDetails.cart.grantTotal, cartCount, validCoupons,category });
 
@@ -76,38 +75,37 @@ console.log(validCoupons);
 };
 
 const coupoun = async (req, res) => {
-    const { code } = req.params;
-    const userId = req.session.user;
+    const { id } = req.params;
+    const userId = req.session.userid;
 
     try {
-        let cart = await collectionModel.findOne({ user: userId });
+        let user = await collectionModel.findById(userId);
+        console.log(user);
 
+        let cart = user.cart
+        cart.grantTotal = cart.items.reduce((total , item) => total + item.totalprice, 0 )
+       
+        console.log(cart);
         if (!cart) {
             return res.status(404).json({ message: "Cart not found" });
         }
 
-        const coupon = await collectionCoupoun.findOne({ code });
-
+        const coupon = await collectionCoupoun.findById(id);
+         console.log(coupon);
         if (!coupon) {
             return res.status(404).json({ message: "Coupon not found" });
         }
 
-        if (cart.couponused.discount_amount !== 0) {
-            return res.status(400).json({ message: "Coupon already applied" });
-        }
+       
 
-        const couponAmount =   coupon.discount
-        if (couponAmount > 0 && cart.totalPrice > couponAmount) {
-            const newTotalPrice = cart.totalPrice - couponAmount;
+        const couponAmount =   coupon.couponValue
+        if (couponAmount > 0 && cart.grantTotal > couponAmount) {
+            const newTotalPrice = cart.grantTotal - couponAmount;
 
-            cart.totalPrice = newTotalPrice;
-            cart.couponused = {
-                couponid: coupon._id,
-                discount_amount: couponAmount,
-            };
+            cart.grantTotal = newTotalPrice;
 
-            await cart.save();
-
+            await user.save();
+            console.log(user);
             return res.json({ message: "Coupon applied successfully", cart });
         } else {
             return res.status(400).json({ message: "Coupon cannot be applied" });
@@ -173,9 +171,6 @@ const orderSuccess = async (req,res)=>{
         }
     });
     
-
-    
-    // console.log(productData)
 
     const deliveryDate = new Date();
     deliveryDate.setDate(currentDate.getDate() + 5);
@@ -319,7 +314,7 @@ const razor=async(req,res)=>{
     const options={
         amount,currency
     };
-console.log(options);
+console.log("options",options);
     try{
         const order = await razorpay.orders.create(options);
         res.json({orderId:order.id});

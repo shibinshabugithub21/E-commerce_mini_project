@@ -53,7 +53,7 @@ const collectionCat = require('../../models/category')
                 return res.status(404).json({ message: 'Product not found' });
             }
             
-            const unitprice = product.Price;
+            const unitprice = product.OriginalPrice;
     
             // Ensure unitprice is a valid number
             if (isNaN(unitprice) || unitprice <= 0) {

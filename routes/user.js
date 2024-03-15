@@ -63,7 +63,8 @@ router.post('/AddressUpdate',usercontroller.addressAddingpost)
 router.post('/CheckOut',usercontroller.orderSuccess)
 router.post('/create',usercontroller.razor)
 
-
+//coupoun
+router.get('/coupoun/:id',usercontroller.coupoun)
 
 // profile
 router.get('/profile',profileController.profile)

@@ -60,7 +60,9 @@ button {
     background-color: #007bff;
     border: none;
 }
-
+.error{
+    color: red;
+}
 button:hover {
     background-color: #0056b3;
 }
@@ -85,7 +87,7 @@ button:hover {
     <div class="col-md-7">
       <h2 class="mb-4">ADD New Category</h2>
       <form id="categoryForm">
-        <div id="error"></div>
+        <div id="error"  style="color: red;"></div>
         <div class="form-group">
           <label for="Category">Category Name:</label>
           <input type="text" class="form-control" id="Category" name="category" placeholder="New Category">
