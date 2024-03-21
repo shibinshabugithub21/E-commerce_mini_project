@@ -219,8 +219,20 @@
                                         <%= order.address[0]?.postalCode %>
                                     </td>
                                     <td><%= cartItem.quantity %></td>
-                                    <td>₹<%= order.payment.amount %></td>
-                                    <td><%= order.payment.method %></td>
+                                    <td>₹<%= order.payment.totalAmount %></td>
+                                    <td>
+                                        <% order.payment.method.forEach( (meth, index) => { %>
+                                            <% if (meth.mode=== "razorpay") { %>
+                                                <strong>Online Payment</strong> 
+                                            <% } else if(meth.mode=== "cashondelivery") {%>
+                                                <strong>COD</strong> 
+                                            <% } else {%>
+                                                <strong>Wallet</strong> 
+                                            <% } %>
+                                            <%= order.payment.method.length == 2 && index == 0 ? ", " : ""  %>
+                                            <% }) %>
+                                        
+                                    </td>
                                     <td>
                                         <select name="itemStatus" id="<%= product._id %>" data-item-id="<%= product._id %>" data-order-id="<%= order._id %>" <%= order.status === 'cancelled' ? 'disabled' : '' %> style="<%= order.status === 'cancelled' ? 'font-weight: bold; color: black;' : '' %>" onchange="status('<%= order._id %>','<%= product._id %>')">
                                             <option value="Pending" <%= product.status === 'Pending' ? 'selected' : '' %>>Pending</option>

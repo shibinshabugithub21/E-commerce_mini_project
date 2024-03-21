@@ -64,14 +64,14 @@ const watch =async (req, res) => {
     // });
 };
 
-
-
 const details = async (req, res) => {
     
     const productid =req.params.id
     const category =await collectionCat.find({isBlocked:false})
     const product = await collectionProduct.find({_id:productid})
-    res.render('user/details',{product,category});
+    const recommendedProducts = await collectionProduct.find({ category: category._id, _id: { $ne: productid } }).limit(4); // Exclude the current product from recommended products
+
+    res.render('user/details', { product, category, recommendedProducts });
 };
 module.exports={
     products,details,mac,airpod,watch,

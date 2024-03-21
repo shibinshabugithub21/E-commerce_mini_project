@@ -82,15 +82,56 @@
                     <div class="order" id="order-<%= order._id %>">
                         <div class="product-details">
                             <p class="orderid"><u><strong>OrderID: <%= product.p_id %></strong></u></p>
-                            <p class="status">Order Status: <%= product.status %></p>
-                            <h3 class="pname"><%= product.p_name %></h3>
-                            <p><strong></strong>₹<%= product.price %></p>
-                            <% if (product.status === "Shipped" || product.status === "Processing") { %>
+                           
+                            <% if(order.paymentstatus == "confirmed") {%>
+                                <p class="status">Order Status: <%= product.status %></p>
+                            <% } else {%>
+                                <p class="status" style="color: red;">Order Failed</p>
+
+                            <% } %>
+                            <h3 class="pname"><strong>Product Name:</strong> <%= product.p_name %></h3>
+                                    <!-- Display individual product prices -->
+                                    <% order.cartProduct.forEach(cartItem => { %>
+                                        <% if (cartItem.productname.toString() === product.p_id.toString()) { %>
+                                            <p><strong>Product Price:</strong> ₹<%= cartItem.totalprice %></p>
+                                        <% } %>
+                                    <% }); %>
+                                            
+                                    <% order.payment.method.forEach(mode => { %>
+                                        <div>
+                                            <% if (mode.mode=== "razorpay") { %>
+                                                <strong>Online Payment</strong> 
+                                            <% } else if(mode.mode=== "cashondelivery") {%>
+                                                <strong>COD</strong> 
+                                            <% } else {%>
+                                                <strong>Wallet</strong> 
+                                            <% } %>
+                                            <span>₹<%= mode.amount %></span>
+                                        </div>
+                                    <% }); %>
+
+                                    <% if (order.paymentstatus == "confirmed" && product.status !== "Cancelled") { %>
+
+                                    <button class="btn btn-primary" onclick="generateInvoice('<%= order._id %>', '<%= product._id %>')">Generate Invoice</button>
+                                    
+                                    
+                                    <% if (product.status === "Shipped" || product.status === "Processing") { %>
                                 <button class="btn btn-outline-danger cancel-btn" onclick="productcancel('<%= order._id %>','<%= product.p_id %>')" >Cancel Order</button>
                             <% } else if (product.status === "Delivered") { %>
                                 <button class="btn btn-outline-success cancel-btn" onclick="returnProduct('<%= order._id %>','<%= product.p_id %>')">Return Product</button>
+                            <% } %>
+                            <% } else { %>
+                                <!-- Update the Continue Payment button -->
+                                <% if (product.status !== "Cancelled") { %>
+                                    <% order.cartProduct.forEach(cartItem => { %>
+                                        <% if (cartItem.productname.toString() === product.p_id.toString()) { %>
+                                            <a style="text-decoration: none;color: #ffffff; background-color: #d52d2d; cursor: pointer;  align-items: center;" onclick="failedpay('<%= cartItem.totalprice%>','<%= order._id %>')">Continue Payment >></a>
+                                        <% } %>
+                                    <% }); %>
                                 <% } %>
-                        </div>
+                            <% } %>
+                            
+                        </div>        
                         <div class="product-image">
                             <img src="/productImages/<%= product.image[0] %>" alt="<%= product.p_name %>">
                         </div>
@@ -100,12 +141,13 @@
         <% } else { %>
             <p>No orders found.</p>
         <% } %>
+        
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
+<script> 
 
     // Define the returnProduct function
     function returnProduct(orderId, productId) {
@@ -222,9 +264,74 @@
         });
     }
 
-   
+    function generateInvoice(orderId, productId) {
+        // Send a GET request to the server to generate the invoice
+        window.location.href = `/generateInvoice/${orderId}/${productId}`;
+    }
+
+    function failedpay(totalprice,orderId){
+        console.log("thus ssssssssss",totalprice,orderId);
+  fetch('/create', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ amount: totalprice * 100, currency: 'INR' }), // Adjust amount and currency as needed
+  })
+    .then(response => response.json())
+    .then(data => {
+      const options = {
+        key: 'rzp_test_yeIbQTeZebXZS2', // Replace with your Razorpay key
+        amount: data.amount,
+        currency: 'INR',
+        name: 'iStore',
+        description: 'Test Transaction',
+        image: 'https://example.com/your_logo',
+        order_id: data.orderId,
+        handler: function (response) {
+          
+            console.log('Payment successful! Payment ID:', response.razorpay_payment_id);
+            fetch('/failpay', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({Id : orderId}),
+            })
+              .then(response => response.json())
+              .then(data => {
+                console.log('Success:', data);
+                window.location.reload()
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+        },
+        prefill: {
+          name: 'Akhil',
+          email: 'akhil@example.com',
+          contact: '9000090000',
+        },
+        notes: {
+          address: 'Razorpay Corporate Office',
+        },
+        theme: {
+          color: '#3399cc',
+        },
+      };
+
+      const rzp = new Razorpay(options);
+
+      rzp.open();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+
+    }
+
 </script>
-
-
+<script src="https://checkout.razorpay.com/v1/razorpay.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <%- include("footer") %>

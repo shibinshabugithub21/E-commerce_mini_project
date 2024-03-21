@@ -1,348 +1,430 @@
-const { render } = require('ejs');
-const { sendEmail,sendforgetpassword } = require('../../middleware/nodeMailer');
-const nodemailer = require('nodemailer');
-const collectionModel = require('../../models/userdb');
+const { render } = require("ejs");
+const { sendEmail, sendforgetpassword } = require("../../middleware/nodeMailer");
+const nodemailer = require("nodemailer");
+const collectionModel = require("../../models/userdb");
 
 // const coll =require('../models/userdb');
-const collectionOtp = require('../../models/otp');
-const collectionProduct = require("../../models/product"); 
-const collectionOrder = require('../../models/order');
+const collectionOtp = require("../../models/otp");
+const collectionProduct = require("../../models/product");
+const collectionOrder = require("../../models/order");
 const bcrypt = require("bcrypt");
-const Razorpay = require('razorpay');
-const collectionCoupoun = require('../../models/coupoun');
+const Razorpay = require("razorpay");
+const collectionCoupoun = require("../../models/coupoun");
 const BannerDB = require("../../models/bannerdb");
-const collectionCat = require('../../models/category');
-
+const collectionCat = require("../../models/category");
 
 const landing = async (req, res) => {
-    try {
-        const searchQuery = req.query.search || '';
-        let product;
+  try {
+    const searchQuery = req.query.search || "";
+    let product;
 
-        if (searchQuery) {
-            // Perform search if there's a search query
-            product = await collectionProduct.find({
-                $and: [
-                    { isDelete: true },
-                    { $or: [
-                        { Productname: { $regex: searchQuery, $options: 'i' } },
-                        { Category: { $regex: searchQuery, $options: 'i' } }
-                    ]}
-                ]
-            });
-        } else {
-            // Otherwise, retrieve all products with isDelete:true
-            product = await collectionProduct.find({ isDelete: true });
-        }
-        const category =await collectionCat.find({isBlocked:false})
-
-        if (req.session.user) {
-            console.log('landing page ', req.session.user);
-            res.redirect("/home");
-        } else {
-            res.render("user/landing", { product, searchQuery,category});
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
+    if (searchQuery) {
+      // Perform search if there's a search query
+      product = await collectionProduct.find({
+        $and: [
+          { isDelete: true },
+          {
+            $or: [
+              { Productname: { $regex: searchQuery, $options: "i" } },
+              { Category: { $regex: searchQuery, $options: "i" } },
+            ],
+          },
+        ],
+      });
+    } else {
+      // Otherwise, retrieve all products with isDelete:true
+      product = await collectionProduct.find({ isDelete: true });
     }
+    const category = await collectionCat.find({ isBlocked: false });
+
+    if (req.session.user) {
+      console.log("landing page ", req.session.user);
+      res.redirect("/home");
+    } else {
+      res.render("user/landing", { product, searchQuery, category });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
 };
 
-
- const login= (req, res) => {
-    console.log('req.session.user' ,req.session.user );
-    if(req.session.user){
-        res.redirect("/home")
-    }
-    else{
-
-        res.render('user/login.ejs');
-    }
+const login = (req, res) => {
+  console.log("req.session.user", req.session.user);
+  if (req.session.user) {
+    res.redirect("/home");
+  } else {
+    res.render("user/login.ejs");
+  }
 };
 
-const loginpost = async(req,res)=>{  
+const loginpost = async (req, res) => {
+  console.log("login post ", req.body);
+  try {
+    const check = await collectionModel.findOne({ email: req.body.email });
+    console.log("checkid", check);
 
-    console.log('login post ' , req.body)
-    try {
-        const check = await collectionModel.findOne({email:req.body.email}) 
-            console.log('checkid', check);
-        
-        const data =  await bcrypt.compare(req.body.password,check.password)
-        if(data){//auth for login
+    const data = await bcrypt.compare(req.body.password, check.password);
+    if (data) {
+      //auth for login
 
-            req.session.user = check.email//session creation
-            req.session.userid=check._id
-            console.log('user login post',req.session.user);
-                res.redirect("/home")
-        }else{
-            // res.send("Wrong Password")
-            res.render('user/login.ejs',{mes:"Incorrect Password"})
-        }
+      req.session.user = check.email; //session creation
+      req.session.userid = check._id;
+      console.log("user login post", req.session.user);
+      res.redirect("/home");
+    } else {
+      // res.send("Wrong Password")
+      res.render("user/login.ejs", { mes: "Incorrect Password" });
     }
-    catch(error) {
-        // res.send("Wrong Details")
-        res.render('user/login.ejs',{mes:"Incorrect Email"})
-    }
-    // res.redirect("/home")
-}
+  } catch (error) {
+    // res.send("Wrong Details")
+    res.render("user/login.ejs", { mes: "Incorrect Email" });
+  }
+  // res.redirect("/home")
+};
 
-const signup= (req, res) => {
-
-    if(req.session.userid){
-        res.redirect("/home")
-    }
-    else{
-        if(req.session.otpGerner){
-            res.redirect("/otp")
-        }
-        
-        res.render('user/signup.ejs');
+const signup = (req, res) => {
+  if (req.session.userid) {
+    res.redirect("/home");
+  } else {
+    if (req.session.otpGerner) {
+      res.redirect("/otp");
     }
 
-}; 
+    res.render("user/signup.ejs");
+  }
+};
 
-    const signuppost =async (req,res) =>{
-        // console.log(req.body,"here int he sign out");
-       
-      
-        const data ={
-            name : req.body.name,
-            email : req.body.email,
-            password :req.body.password,
-            repassword :req.body.repassword,
-            phone:req.body.phone
-        }
-    
-        const newdata = await bcrypt.hash(data.password,10)
+let referral;
+let referredUser;
+let referred = "false";
+// Function to generate a referral code
+const generateReferralCode = (length) => {
+  const characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  let referralCode = "";
 
-        const datahash ={
-            name : req.body.name,
-            email : req.body.email,
-            password :newdata,
-            repassword :req.body.repassword,
-            phone:req.body.phone
-        }
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    referralCode += characters[randomIndex];
+  }
 
-        console.log(newdata)
-        console.log("sign")
+  return referralCode;
+};
 
+const signuppost = async (req, res) => {
+  // console.log(req.body,"here int he sign out");
 
-        const existinUser = await collectionModel.findOne({email:data.email})
-        console.log("alredy exist user")
-        // console.log(existinUser)
-        
-        const randome = Math.floor(Math.random()*90000) +10000;
-        const newOtp = await collectionOtp.create({number: randome, email: data.email});
+  const referralCode = generateReferralCode(8); // Change the length as needed
+  console.log("referralCode", referralCode);
 
-        if(existinUser){
-            res.render("user/signup",{status:true,mes:"user all ready exists"})
+  if (req.body.referralCode) {
+    referral = req.body.referralCode;
+    referredUser = await collectionModel.findOne({ referralCode: referral });
+    console.log("referredUserssssssssss", referredUser);
+    console.log("referralllllllllll", referral);
 
-        }
-        else{
-            await collectionModel.insertMany([datahash]);
-            // data["otpNum"] = randome
-            req.session.otpGerner = data;
-            console.log(data)
-            console.log("here in the signup true")
-            sendEmail(randome,req.body.email)
-    
-            // res.redirect('user/otp')
-            res.redirect('/otp')
-        }
-        
+    if (referredUser) {
+      referred = "true";
+    } else {
+      return res.status(400).json({ success: false, message: "Referral code not found" });
     }
+  }
 
-const forget= async(req,res)=>{
-    res.render("user/forgetemail",)
-}
+  const data = {
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    repassword: req.body.repassword,
+    phone: req.body.phone,
+    referralCode: referralCode,
+    walletbalance: referredUser ? 50 : 0,
+  };
 
+  const newdata = await bcrypt.hash(data.password, 10);
 
-const forgetpost= async(req, res) => {
-    const email = req.body.email;
+  const datahash = {
+    name: req.body.name,
+    email: req.body.email,
+    password: newdata,
+    repassword: req.body.repassword,
+    phone: req.body.phone,
+    referralCode: referralCode,
+    walletbalance: referredUser ? 50 : 0,
+  };
 
-    if (!validateEmail(email)) {
-        return res.status(400).send('Invalid email address');
-    }
+  console.log(newdata);
+  console.log("sign");
 
-    const resetToken = generateOtp();
-    const otpDoc = await collectionOtp.create({
-        email, 
-        number: resetToken
+  const existinUser = await collectionModel.findOne({ email: data.email });
+  console.log("alredy exist user");
+  // console.log(existinUser)
+
+  const randome = Math.floor(Math.random() * 90000) + 10000;
+  const newOtp = await collectionOtp.create({ number: randome, email: data.email });
+
+  if (existinUser) {
+    res.render("user/signup", { status: true, mes: "user all ready exists" });
+  } else {
+    await collectionModel.insertMany([datahash]);
+    // data["otpNum"] = randome
+    req.session.otpGerner = data;
+    console.log(data);
+    console.log("here in the signup true");
+    sendEmail(randome, req.body.email);
+
+    // res.redirect('user/otp')
+    res.redirect("/otp");
+  }
+};
+
+const forget = async (req, res) => {
+  res.render("user/forgetemail");
+};
+
+const forgetpost = async (req, res) => {
+  const email = req.body.email;
+
+  if (!validateEmail(email)) {
+    return res.status(400).send("Invalid email address");
+  }
+
+  const resetToken = generateOtp();
+  const otpDoc = await collectionOtp.create({
+    email,
+    number: resetToken,
+  });
+
+  sendforgetpassword(otpDoc._id, req.body.email)
+    .then(() => {
+      // res.send('Reset page sent to youril!');
+      res.render("user/forgetemail");
     })
-
-
-    sendforgetpassword(otpDoc._id,req.body.email)
-        .then(() => {
-            // res.send('Reset page sent to youril!');
-            res.render("user/forgetemail")
-
-        })
-        .catch((error) => {
-            console.error('Error sending reset email:', error);
-            res.status(500).send('Failed to send reset page. Please try again later.');
-        });
-        // Validate email address
-function validateEmail(email) {
+    .catch((error) => {
+      console.error("Error sending reset email:", error);
+      res.status(500).send("Failed to send reset page. Please try again later.");
+    });
+  // Validate email address
+  function validateEmail(email) {
     const re = /\S+@\S+\.\S+/;
     return re.test(String(email).toLowerCase());
-}
+  }
 
-// Generate reset token
-function generateResetToken() {
+  // Generate reset token
+  function generateResetToken() {
     return Math.random().toString(36).substr(2);
-}
+  }
 
-function generateOtp(){
-    return Math.floor( Math.random() * 5000000)
-}
-
+  function generateOtp() {
+    return Math.floor(Math.random() * 5000000);
+  }
 };
 
+const forgetPassword = async (req, res) => {
+  console.log(req.params);
+  const token = req.params.token;
+  const otpDoc = await collectionOtp.findById(token);
+  if (!otpDoc) {
+    res.status(402).send("Invalid token");
+    return;
+  }
+  res.render("user/forget", { email: otpDoc.email });
+};
 
+const resetPassword = async (req, res) => {
+  try {
+    const { newPassword, confirmPassword } = req.body;
+    const email = req.params.email;
+    // Find the user by ID
+    const user = await collectionModel.findOne({ email });
+    console.log(user);
 
-const forgetPassword=async(req,res)=>{
-    console.log(req.params)
-    const token = req.params.token
-    const otpDoc = await collectionOtp.findById(token);
-    if(!otpDoc) {
-        res.status(402).send("Invalid token")
-        return
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: "New password and confirm password do not match" });
     }
-    res.render("user/forget",{email: otpDoc.email})
-}
+    console.log(newPassword);
+    const newpass = await bcrypt.hash(newPassword, 10);
+    user.password = newpass;
+    await user.save();
+    res.redirect("/login");
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
-
-const resetPassword = async (req,res)=>{
-    try {
-        const {newPassword, confirmPassword } = req.body;
-        const email = req.params.email
-
-
-        // Find the user by ID
-        const user = await collectionModel.findOne({email});
-        console.log(user);
-
-        
-
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({ error: 'New password and confirm password do not match' });
-        }
-        console.log(newPassword)
-        const newpass = await bcrypt.hash(newPassword,10)
-        user.password = newpass;
-        await user.save();
-        res.redirect("/login")
-    } catch (error) {
-        console.error('Error updating password:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-}
-
-const otp=(req,res)=>{
-    if(req.session.otpGerner){
-        res.render('user/otp',{ error: null })
-    }else{
-        res.redirect("/login")
-    }
-    
-
-}
-
+const otp = (req, res) => {
+  if (req.session.otpGerner) {
+    res.render("user/otp", { error: null });
+  } else {
+    res.redirect("/login");
+  }
+};
 
 const otppost = async (req, res) => {
-    try {
-        const num1 = req.body.num1 || '';
-        const num2 = req.body.num2 || '';
-        const num3 = req.body.num3 || '';
-        const num4 = req.body.num4 || '';
-        const num5 = req.body.num5 || '';
+  try {
+    const num1 = req.body.num1 || "";
+    const num2 = req.body.num2 || "";
+    const num3 = req.body.num3 || "";
+    const num4 = req.body.num4 || "";
+    const num5 = req.body.num5 || "";
 
-        if (!num1 || !num2 || !num3 || !num4 || !num5) {
-            return res.status(400).render('user/otp', { error: 'Please enter all the OTP digits' });
-        }
-
-        const isNumber = parseInt(num1 + num2 + num3 + num4 + num5);
-        console.log(typeof(isNumber));
-        const result = await collectionOtp.findOne({ number: isNumber });
-
-        if (result) {
-            console.log(req.session.otpGerner)
-            req.session.user = req.session.otpGerner.email;
-            delete req.session.otpGerner;
-            return res.redirect("/home");
-        } else {
-            return res.status(400).render('user/otp', { error: 'Invalid OTP. Please try again.' });
-        }
-    } catch (error) {
-        console.log(error.message);
-        const message = error.message;
-        res.status(500).render('404-error', { error, message });
+    if (!num1 || !num2 || !num3 || !num4 || !num5) {
+      return res.status(400).render("user/otp", { error: "Please enter all the OTP digits" });
     }
+
+    const isNumber = parseInt(num1 + num2 + num3 + num4 + num5);
+    console.log(typeof isNumber);
+    const result = await collectionOtp.findOne({ number: isNumber });
+
+    if (referred === "true") {
+      await collectionModel.updateOne({ referralCode: referral }, { $inc: { walletbalance: 100 } });
+      console.log("Wallet updated");
+    }
+
+    if (result) {
+      console.log(req.session.otpGerner);
+      req.session.user = req.session.otpGerner.email;
+      delete req.session.otpGerner;
+      return res.redirect("/home");
+    } else {
+      return res.status(400).render("user/otp", { error: "Invalid OTP. Please try again." });
+    }
+  } catch (error) {
+    console.log(error.message);
+    const message = error.message;
+    res.status(500).render("404-error", { error, message });
+  }
 };
+
+// const otppost = async (req, res) => {
+//     try {
+//         const num1 = req.body.num1 || '';
+//         const num2 = req.body.num2 || '';
+//         const num3 = req.body.num3 || '';
+//         const num4 = req.body.num4 || '';
+//         const num5 = req.body.num5 || '';
+
+//         if (!num1 || !num2 || !num3 || !num4 || !num5) {
+//             return res.status(400).render('user/otp', { error: 'Please enter all the OTP digits' });
+//         }
+
+//         const isNumber = parseInt(num1 + num2 + num3 + num4 + num5);
+//         console.log(typeof(isNumber));
+//         const result = await collectionOtp.findOne({ number: isNumber });
+
+//         if (!result) {
+//             return res.status(400).render('user/otp', { error: 'Invalid OTP. Please try again.' });
+//         }
+
+//         // Check if the user was referred
+//         if (req.session.otpGerner && req.session.otpGerner.referralCode) {
+//             // Find the referring user based on the referral code
+//             const referringUser = await collectionModel.findOne({ referralCode: req.session.otpGerner.referralCode });
+//             if (referringUser) {
+//                 // Update the referring user's wallet balance
+//                 await collectionModel.updateOne({ referralCode: req.session.otpGerner.referralCode }, { $inc: { walletbalance: 50 } });
+//                 console.log('Referring user wallet updated');
+
+//                 // Update the referred user's wallet balance if exists
+//                 const referredUser = await collectionModel.findOne({ email: req.session.otpGerner.email });
+//                 if (referredUser) {
+//                     await collectionModel.updateOne({ email: req.session.otpGerner.email }, { $inc: { walletbalance: 100 } });
+//                     console.log('Referred user wallet updated');
+//                 }
+//             } else {
+//                 console.log('Referring user not found');
+//             }
+//         }
+
+//         console.log(req.session.otpGerner);
+//         req.session.user = req.session.otpGerner.email;
+//         delete req.session.otpGerner;
+//         return res.redirect("/home");
+
+//     } catch (error) {
+//         console.log(error.message);
+//         const message = error.message;
+//         return res.status(500).render('404-error', { error, message });
+//     }
+// };
 
 //resend otp
 
-const resendOtp = async(req,res)=>{      
-       try {
-           let randomOTP = Math.floor(Math.random() * 9000) + 10000;
-           console.log('This is your resend OTP:', randomOTP);
-           let entrie = 0;
-              const newUser = new collectionOtp({
-            number: randomOTP,
-            email: req.session.otpGerner.email // Assuming req.session.otpGerner.email holds the email
-        });
-   
-           await newUser.save();
-           console.log(req.session.otpGerner.email)
-           sendEmail(randomOTP,req.session.otpGerner.email)
-        console.log("rtyuio");
-        res.render('user/otp',{ error: null })
-
-        } catch (error) {
-           console.log("Error generating OTP:", error);
-           res.status(500).send("OTP error");
-       }
-   
-   
-   }
-    
-const home = async (req, res) => {
-    console.log( req.url )
-    try {
-        const username = req.session.userid;
-        const searchQuery = req.query.search || '';
-        const categoryQuery = req.query.category || '';
-        const category =await collectionCat.find({isBlocked:false})
-        let productQuery = { isDelete: true };
-        if(searchQuery) 
-            productQuery.Productname = { $regex: searchQuery, $options: "i" }
-        
-        const banner = await BannerDB.find({ status: 'active' });        
-        const product = await collectionProduct.find(productQuery);
-        const user = await collectionModel.findOne({ _id: username });
-        if (user) {
-            res.render("user/home", { product, user: req.session.useremail, searchQuery, categoryQuery,banner,category, wishlist: user.wishlist });
-        } else {
-            res.redirect("/login");
-        }
-
-    } catch (error) {
-        console.log("Error in the home route:", error.message);
-        res.status(500).send('Internal Server Error');
-    }
-};
-const logout =(req,res)=>{
-    
-    req.session.destroy((err) => {
-        console.log("req.session logout" , req.session);
-        if (err) {
-            console.error('Error destroying session:', err);
-        }
+const resendOtp = async (req, res) => {
+  try {
+    let randomOTP = Math.floor(Math.random() * 9000) + 10000;
+    console.log("This is your resend OTP:", randomOTP);
+    let entrie = 0;
+    const newUser = new collectionOtp({
+      number: randomOTP,
+      email: req.session.otpGerner.email, // Assuming req.session.otpGerner.email holds the email
     });
-    res.redirect("/login");
-}
 
-module.exports={
-    landing,login,loginpost,signuppost,home,logout,signup,otp,otppost,resendOtp,forget,forgetpost,forgetPassword,resetPassword,
+    await newUser.save();
+    console.log(req.session.otpGerner.email);
+    sendEmail(randomOTP, req.session.otpGerner.email);
+    console.log("rtyuio");
+    res.render("user/otp", { error: null });
+  } catch (error) {
+    console.log("Error generating OTP:", error);
+    res.status(500).send("OTP error");
+  }
+};
 
-}
+const home = async (req, res) => {
+  console.log(req.url);
+  try {
+    const username = req.session.userid;
+    const searchQuery = req.query.search || "";
+    const categoryQuery = req.query.category || "";
+    const category = await collectionCat.find({ isBlocked: false });
+    let productQuery = { isDelete: true };
+    if (searchQuery) productQuery.Productname = { $regex: searchQuery, $options: "i" };
+
+    const banner = await BannerDB.find({ status: "active" });
+    const product = await collectionProduct.find(productQuery);
+    const user = await collectionModel.findOne({ _id: username });
+    if (user) {
+      res.render("user/home", {
+        product,
+        user: req.session.useremail,
+        searchQuery,
+        categoryQuery,
+        banner,
+        category,
+        wishlist: user.wishlist,
+      });
+    } else {
+      res.redirect("/login");
+    }
+  } catch (error) {
+    console.log("Error in the home route:", error.message);
+    res.status(500).send("Internal Server Error");
+  }
+};
+const logout = (req, res) => {
+  req.session.destroy((err) => {
+    console.log("req.session logout", req.session);
+    if (err) {
+      console.error("Error destroying session:", err);
+    }
+  });
+  res.redirect("/login");
+};
+
+module.exports = {
+  landing,
+  login,
+  loginpost,
+  signuppost,
+  home,
+  logout,
+  signup,
+  otp,
+  otppost,
+  resendOtp,
+  forget,
+  forgetpost,
+  forgetPassword,
+  resetPassword,
+};

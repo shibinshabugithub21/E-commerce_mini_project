@@ -56,7 +56,7 @@ exports.sendEmail = async (randomOTP, userEmail) => {
       to: userEmail, // Use the userEmail parameter here
       subject: 'Hello from Nodemailer', // Subject line
       text: 'This is a test email sent using Nodemailer.', // Plain text body
-      html: `<a href='http://localhost:4000/forgetPassword/${resetToken}'><button type="button" class="btn btn-info">Reset Password</button></a>`, // HTML body
+      html: `<a href='http://localhost:4000/forgetPassword/${resetToken}'><button type="button" class="btn-success ">Reset Password</button></a>`, // HTML body
     };
   
     // console.log('Preview sent: %s', emailData.subject);

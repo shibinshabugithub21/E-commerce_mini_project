@@ -67,12 +67,11 @@ const addproductpost = async (req, res) => {
             Description: Description,
             Image: files.map(file => file.filename)
         };
-
+        
         const newProduct = await collectionProduct.insertMany([data]);
 
         console.log("New product successfully added:", newProduct);
         
-        // Fetch all products again after adding the new one
         const products = await collectionProduct.find({});
         
         // Render the product page with the updated product list

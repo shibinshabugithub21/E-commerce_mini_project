@@ -30,23 +30,27 @@ const addcategory = (req, res) => {
     res.render('admin/addcategory', { status: true, mes: "" })
 }
 
+
 const addcategorypost = async (req, res) => {
     try {
-        const category = req.body.category.trim().toLowerCase(); // Convert to lowercase
+        const { category, offer } = req.body;
+        const lowercaseCategory = category.trim().toLowerCase();
 
-        const existingCategory = await collectionCat.findOne({ Category: { $regex: new RegExp("^" + category + "$", "i") } });
+        const existingCategory = await collectionCat.findOne({ Category: lowercaseCategory });
 
         if (!existingCategory) {
-            const insertingObject = {
-                Category: category,
-            };
-            const newCategory = await collectionCat.insertMany([insertingObject]);
+            const newCategory = new collectionCat({
+                Category: lowercaseCategory,
+                Offer: offer,
+                isBlocked: false // Assuming the category is not blocked by default
+            });
 
+            await newCategory.save();
+            
             console.log("New category successfully added:", newCategory);
-
             res.status(201).json({ mes: "success" });
         } else {
-            console.log("Item already exists");
+            console.log("Category already exists");
             res.status(400).json({ mes: "Category already exists" });
         }
     } catch (error) {
@@ -66,17 +70,46 @@ const editcategory = async (req, res) => {
     }
 };
 
+// const update = async (req, res) => {
+//     try {
+//         const categoryId = req.params.id;
+//         const newName = req.body.name;
+
+//         const category = await collectionCat.findById(categoryId);
+//         console.log(newName)
+
+//         if (category) {
+//             if (newName.trim() !== "") {
+//                 category.Category = newName;
+//                 await category.save();  // Correct way to save changes
+//                 res.redirect('/admin/category');
+//             } else {
+//                 console.log("Error: New name cannot be empty");
+//                 res.status(400).send("New name cannot be empty");
+//             }
+//         } else {
+//             console.log("Error: Category not found");
+//             res.status(404).send("Category not found");
+//         }
+//     } catch (error) {
+//         console.error("Error during update:", error);
+//         res.status(500).send("Internal server error");
+//     }
+// };
+
 const update = async (req, res) => {
     try {
         const categoryId = req.params.id;
         const newName = req.body.name;
+        const newOffer = req.body.offer; // Get the new offer value from the request body
 
         const category = await collectionCat.findById(categoryId);
-        console.log(newName)
+        console.log(newName, newOffer);
 
         if (category) {
             if (newName.trim() !== "") {
                 category.Category = newName;
+                category.Offer = newOffer; // Update the offer value
                 await category.save();  // Correct way to save changes
                 res.redirect('/admin/category');
             } else {
@@ -92,6 +125,7 @@ const update = async (req, res) => {
         res.status(500).send("Internal server error");
     }
 };
+
 
 const deletecategory = async (req, res) => {
     try {

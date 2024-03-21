@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Add Catgeory</title>
+  <title>Add Category</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <style>
   body {
@@ -87,10 +87,15 @@ button:hover {
     <div class="col-md-7">
       <h2 class="mb-4">ADD New Category</h2>
       <form id="categoryForm">
-        <div id="error"  style="color: red;"></div>
+        <div id="error" style="color: red;"></div>
         <div class="form-group">
           <label for="Category">Category Name:</label>
           <input type="text" class="form-control" id="Category" name="category" placeholder="New Category">
+        </div>
+        <div class="form-group">
+          <label for="Offer">Offer (Discount %):</label>
+          <input type="number" class="form-control" id="Offer" name="offer" placeholder="Enter discount">
+          <div id="offerError" class="error"></div> <!-- Error message for offer validation -->
         </div>
         <button type="submit" class="btn btn-primary">Add Category</button>
       </form>
@@ -103,30 +108,39 @@ button:hover {
 document.getElementById('categoryForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    let categoryname = document.getElementById("Category").value.trim();
+    let categoryName = document.getElementById("Category").value.trim();
+    let offer = document.getElementById("Offer").value.trim();
+
     let errorId = document.getElementById("error");
+    let offerError = document.getElementById("offerError");
 
     // Function to show error message
-    function showError(message) {
-        const errorDiv = document.createElement("div");
-        errorDiv.textContent = message;
-        errorDiv.classList.add("error-message");
-        errorId.appendChild(errorDiv);
+    function showError(message, element) {
+        element.textContent = message;
+        element.classList.add("error-message");
 
         setTimeout(() => {
-            errorId.removeChild(errorDiv);
+            element.textContent = "";
+            element.classList.remove("error-message");
         }, 5000);
     }
 
     // Check if category name is empty
-    if (!categoryname) {
-        showError("Category name is required");
+    if (!categoryName) {
+        showError("Category name is required", errorId);
         return;
     }
 
-    // Submit the form
+    // Check if offer is a negative number
+    if (offer < 0) {
+        showError("Offer cannot be a negative number", offerError);
+        return;
+    }
+
+    // Submit the form with both category name and offer
     const data = {
-        category: categoryname
+        category: categoryName,
+        offer: offer
     };
 
     const response = await fetch("/admin/AddCategory", {
@@ -142,9 +156,10 @@ document.getElementById('categoryForm').addEventListener('submit', async functio
         window.location.href = "/admin/category";
     } else {
         const errorMessage = await response.json();
-        showError(errorMessage.mes);
+        showError(errorMessage.mes, errorId);
     }
 });
+
 </script>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>

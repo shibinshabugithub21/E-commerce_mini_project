@@ -23,8 +23,6 @@ const razorpay = new Razorpay({
 const checkoutpage = async (req, res) => {
     try {
         const userId = req.session.userid;
-        
-
         const category =await collectionCat.find({isBlocked:false})
 
         const userDetails = await collectionModel.findOne({ _id: userId });
@@ -124,17 +122,18 @@ const orderSuccess = async (req,res)=>{
     console.log(req.body)
     const currentDate = new Date();
     const dataa = req.body
+    console.log(dataa)
     const id = req.session.userid;
     const foundUser = await collectionModel.findOne({ _id:id });
     
-
     const cartItems = foundUser.cart.items;
     console.log(cartItems);
     console.log("addres",dataa);
     const cartProductIds = cartItems.map(item => item.productname);
     const cartProducts = await collectionProduct.find({ _id: { $in: cartProductIds }});
-    console.log(cartProducts)
 
+    const paymentstatus = dataa.paymentstatus
+    const paymentStatus =  paymentstatus || "confirmed"
     const userId = foundUser._id;
     const addressId = dataa.selectedAddress;
     const method = dataa.method;
@@ -142,7 +141,7 @@ const orderSuccess = async (req,res)=>{
     console.log(('hey man this your ordered amount'));
     console.log(amount)
 
-    if(method === "wallet"){
+    if(method.mode === "wallet"){
         if (foundUser.walletbalance < amount) {
              return res.status(400).json({ error: 'Insufficient wallet balance.' });
 
@@ -170,7 +169,6 @@ const orderSuccess = async (req,res)=>{
             p_id:product._id
         }
     });
-    
 
     const deliveryDate = new Date();
     deliveryDate.setDate(currentDate.getDate() + 5);
@@ -180,10 +178,11 @@ const orderSuccess = async (req,res)=>{
         products: productData,
         payment: {
             method: method,
-            amount: amount
+            totalAmount: amount
         },
         status: "Processing",
         proCartDetail: cartProducts,
+        paymentstatus:paymentStatus,
         cartProduct: cartItems,
         createdAt: currentDate,
         expectedDelivery: deliveryDate
@@ -373,6 +372,28 @@ const wallet = async (req, res) => {
         res.status(500).send('Internal server error');
     }
 }
+// failed pay
+const failedpay = async (req, res) => {
+    const { Id } = req.body;
+    try {
+        const order = await collectionOrder.findById(Id);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        order.paymentstatus = 'confirmed';
+
+        await order.save();
+
+        return res.status(200).json({ message: 'Retrying Payment Successful' });
+
+    } catch (error) {
+        console.error('Error during finding the order:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
 
 // success
 const success= async(req,res)=>{
@@ -384,5 +405,5 @@ const success= async(req,res)=>{
 
 module.exports={
      checkoutpage,addressAdding,addressAddingpost,
-    orderSuccess,walletSuccess,razor, coupoun,success,wallet
+    orderSuccess,walletSuccess,razor, coupoun,success,wallet,failedpay
 }

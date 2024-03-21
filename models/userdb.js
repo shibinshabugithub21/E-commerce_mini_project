@@ -18,6 +18,9 @@ const schema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    referralCode: {
+        type: String 
+    },
     profile: {
         address: [{
             name: {

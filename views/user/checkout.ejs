@@ -465,7 +465,6 @@
            <!-- Space for the coupon -->
 <div style="margin-bottom: 20px;"> <!-- Adjust margin as needed -->
   <!-- Coupon dropdown -->
-  <!-- Coupon dropdown -->
 <div class="dropdown">
   <button class="btn btn-secondary dropdown-toggle" type="button" id="couponDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
       Select Coupon
@@ -482,6 +481,9 @@
 <div id="selectedCoupon" style="display: none;">
   <label for="selectedCouponField">Selected Coupon:</label>
   <input type="text" id="selectedCouponField" class="form-control" readonly>
+  <!-- Button to remove selected coupon -->
+  <button  onclick="removeCoupon()">Remove Coupon</button>
+
 </div>
 
 </div>
@@ -504,6 +506,10 @@
                 <div style="display: block;">
                     <input type="radio" id="razorpay" name="paymentMethod" value="razorpay"> Razorpay
                 </div>
+                <div style="display: block;">
+                  <input type="radio" id="partial" name="paymentMethod" value="partial" > Partial
+              </div>
+              <input type="text" id="inputpartial" class="d-none">
             </div>
             <hr>
             <!-- Buttons section -->
@@ -670,27 +676,40 @@
   <script>
     let userAddress;
     document.getElementById('existing-address').addEventListener('change', function() {
-    var selectedIndex = this.selectedIndex;
-    if (selectedIndex !== 0) {
-        var Address = JSON.parse('<%- JSON.stringify(user.profile.address) %>');
-        var selectedAddress = Address[selectedIndex - 1]; // Adjust index to match array index
-        console.log(selectedAddress);
-        userAddress = selectedAddress;
-        document.getElementById('adr').value = selectedAddress.houseName;
-        document.getElementById('city').value = selectedAddress.city;
-        document.getElementById('pincode').value = selectedAddress.postalCode;
-        document.getElementById('inputPhone').value = selectedAddress.phone;
-        document.getElementById('fname').value = selectedAddress.name;
-        document.getElementById('email').value = selectedAddress.emailid;
-    } else {
-        // Reset fields if "Select an existing address" is chosen
-        document.getElementById('adr').value = "";
-        document.getElementById('city').value = "";
-        document.getElementById('pincode').value = "";
-        document.getElementById('inputPhone').value = "";
-    }
-});
+        var selectedIndex = this.selectedIndex;
+        if (selectedIndex !== 0) {
+            var Address = JSON.parse('<%- JSON.stringify(user.profile.address) %>');
+            var selectedAddress = Address[selectedIndex - 1]; // Adjust index to match array index
+            console.log(selectedAddress);
+            userAddress = selectedAddress;
+            document.getElementById('adr').value = selectedAddress.houseName;
+            document.getElementById('city').value = selectedAddress.city;
+            document.getElementById('pincode').value = selectedAddress.postalCode;
+            document.getElementById('inputPhone').value = selectedAddress.phone;
+            document.getElementById('fname').value = selectedAddress.name;
+            document.getElementById('email').value = selectedAddress.emailid;
+        } else {
+            // Reset fields if "Select an existing address" is chosen
+            document.getElementById('adr').value = "";
+            document.getElementById('city').value = "";
+            document.getElementById('pincode').value = "";
+            document.getElementById('inputPhone').value = "";
+        }
+    });
  
+    // Get the radio button and input field elements
+    const partialRadio = document.getElementById("partial");
+    const partialInput = document.getElementById("inputpartial");
+
+    // Add event listener to the partial radio button
+    partialRadio.addEventListener("change", function() {
+        // If partial radio button is checked, show the input field; otherwise, hide it
+        if (partialRadio.checked) {
+            partialInput.classList.remove("d-none"); // Show input field
+        } else {
+            partialInput.classList.add("d-none"); // Hide input field
+        }
+    });
 
   const email = document.getElementById("email");
   const addressid = this.value;
@@ -700,21 +719,53 @@
 console.log(userAddress)
 const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
     if (!selectedPaymentMethod) {
-        alert('Please select a payment method.');
-        return;
+ // Show SweetAlert message for selecting a payment method
+ await Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Please select a payment method.'
+        });
+        return;        return;
     }
 
     const paymentMethod = selectedPaymentMethod.value;
-    console.log(paymentMethod);
-const dataa = {
-  
-  emailAddress:email.value,
-      method:paymentMethod,
-      addressid : userAddress
-}
 
+
+    const partialAmount = document.getElementById('inputpartial').value
+    console.log("Partial amount", partialAmount)
+
+    let dataa = {
+        emailAddress:email.value,
+        addressid : userAddress, 
+        partialAmount, 
+        method: []
+    }
+
+
+
+
+
+    const totalPriceElement = document.getElementById("totalAmount");
+    const totalPriceText = totalPriceElement.innerText;
+    const totalPrice = parseFloat(totalPriceText.replace(/[^\d.]/g, '')); // Remove non-numeric characters and convert to float
+
+    // Check if the total price is greater than 10000
+    if (totalPrice > 10000) {
+        // Show alert message
+    // Show SweetAlert message
+          Swal.fire({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: 'Total price is greater than 10000. Please choose another payment method.'
+           });
+                return;
+    }
 
     if (paymentMethod === "cashondelivery") {
+        dataa.method = [{
+            mode: "cashondelivery", 
+            amount: totalPrice
+        }]
       
     try {
       const response = await fetch("/CheckOut",{method:"post",
@@ -744,10 +795,18 @@ const dataa = {
       
     }
   } else if(paymentMethod === "razorpay"){
+    dataa.method = [{
+            mode: "razorpay", 
+            amount: totalPrice
+        }]
     initializeRazorpay(dataa)      
 
  }
  else if(paymentMethod === "wallet"){
+    dataa.method = {
+            mode: "wallet", 
+            amount: totalPrice
+        }
   try {
 
       const response = await fetch("/CheckOut",{method:"post",
@@ -756,6 +815,7 @@ const dataa = {
     },
     body: JSON.stringify(dataa)
   })
+
   
   if (response.ok) {
     const result = await response.json();
@@ -777,9 +837,16 @@ const dataa = {
       
     }    
 
- }
- else {
-
+    }
+    else{
+        dataa.method = [{
+            mode: "razorpay", 
+            amount: partialAmount
+        }, {
+            mode: "cashondelivery",
+            amount: totalPrice - partialAmount
+        }]
+        initializeRazorpay(dataa)    
     }
 }
 
@@ -790,9 +857,12 @@ const dataa = {
 function initializeRazorpay(dataa) {
 
   var totalPriceElement = document.getElementById("totalAmount");
-var totalPriceText = totalPriceElement.innerText;
-var totalPrice = totalPriceText.replace(/[^\d.]/g, ''); // Remove non-numeric characters
-var amount = totalPrice * 100
+  var totalPriceText = totalPriceElement.innerText;
+  var totalPrice = totalPriceText.replace(/[^\d.]/g, ''); // Remove non-numeric characters 
+    let amount = (totalPrice * 100)
+  if(dataa.method.length == 2)
+    amount = parseInt(dataa.method[0].amount) * 100
+  console.log(dataa)
   console.log(typeof(amount));
     fetch('/create', {
         method: 'POST',
@@ -861,6 +931,30 @@ var amount = totalPrice * 100
 
         const rzp = new Razorpay(options);
         rzp.open();
+
+        rzp.on('payment.failed', function (response) {
+        console.error('Payment failed with error:', response);
+        fetch('/CheckOut', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ ...dataa, paymentstatus: 'failed' }),
+            })
+              .then(response => response.json())
+              .then(data => {
+                console.log('Success:', data);
+                 rzp.close();
+                window.location.href = '/order'
+                
+
+                // handlePaymentFailure(response);
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+       
+      });
     })
     .catch(error => {
         console.error('Error:', error);
@@ -894,19 +988,30 @@ document.querySelectorAll("#couponDropdownMenu .dropdown-item").forEach(item => 
     });
 });
 
-function couponVal(id,value,total){
-  fetch(`/coupoun/${id}`)
-    .then(response => response.json())
-    .then(data => {
-
-      const totalPrice = document.getElementById("totalAmount");
-      totalPrice.innerHTML = total-value || total;
-      
-    })
-    .catch(error => console.error("Error fetching coupons:", error));
-  console.log(id,value,total)
- 
+function couponVal(id, value, total) {
+    fetch(`/coupoun/${id}`)
+        .then(response => response.json())
+        .then(data => {
+            const totalPrice = document.getElementById("totalAmount");
+            totalPrice.innerHTML = total - value; // Adjust total amount by subtracting the coupon value
+        })
+        .catch(error => console.error("Error fetching coupons:", error));
 }
+
+function removeCoupon(){
+    // Restore the original total amount
+    const originalTotalAmount = `<%= total %>`;
+    const totalPrice = document.getElementById("totalAmount");
+    totalPrice.innerHTML = "₹" + originalTotalAmount;
+
+    // Hide the selected coupon field
+    document.getElementById("selectedCoupon").style.display = "none";
+    // Optionally, re-enable the coupon selection dropdown
+    document.getElementById("couponDropdownMenu").disabled = false;
+    // Clear the selected coupon field
+    document.getElementById("selectedCouponField").value = "";
+}
+
 
 </script>
 <script src="https://checkout.razorpay.com/v1/razorpay.js"></script>

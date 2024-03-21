@@ -81,16 +81,18 @@ const schema = new mongoose.Schema({
         }
     }],
     payment: {
-        method: {
-            type: String,
-        },
-        amount: {
-            type: String,
-        }
+        method: [{
+            mode: String,
+            amount: {
+                type: String,
+            }
+        }],
+        totalAmount:Number,
     },
     proCartDetail: {
         type: Array
     },
+    paymentstatus : {type: String, enum : ['confirmed','failed'],default : 'confirmed'},
     cartProduct: {
         type: Array
     },

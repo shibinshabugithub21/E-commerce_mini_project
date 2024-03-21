@@ -6,9 +6,13 @@ const schema =new mongoose.Schema({
         type:String,
         required:true
     },
+    Offer:{
+        type:Number,
+        required:true
+    },
    isBlocked:{
     type:Boolean,
-    default:true
+    default:false
    }
 })
 

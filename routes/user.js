@@ -88,6 +88,9 @@ router.post('/addAddrresscheckout', usercontroller.addressAddingpost);
 router.post('/cancelOrder/:orderId/:productId', orderController.cancelOrder);
 router.post('/returnProduct',orderController.orderReturn);
 
+// invoivce
+router.get('/generateInvoice/:orderId/:productId',orderController.generateInvoice);
+
 // wishlsit
 router.get('/wishlist',wishlistController.whishlistload);
 router.post('/wishlist/:id',wishlistController.addingWhishList)
@@ -96,7 +99,8 @@ router.get('/wishlistdelete/:id',wishlistController.WhishProductDelete)
 // wallet
 router.get('/wallet',usercontroller.wallet)
 
-
+// failedpay
+router.post('/failpay',usercontroller.failedpay)
 
 router.get("/success",usercontroller.success)
 module.exports = router;

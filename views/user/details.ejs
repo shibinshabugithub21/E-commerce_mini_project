@@ -349,11 +349,9 @@ color: black;
             </div>
             <div class="product-image-slider">
                 <!-- Update IDs for zoom functionality -->
-                <img id="zoom-image-<%= element._id %>-0" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= element.Image[0] %>" />
-                <img id="zoom-image-<%= element._id %>-1" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= element.Image[1] %>" />
-                <img id="zoom-image-<%= element._id %>-2" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= element.Image[2] %>" />
-                <img id="zoom-image-<%= element._id %>-3" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= element.Image[3] %>" />
-                <img id="zoom-image-<%= element._id %>-4" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= element.Image[4] %>" />
+                <% element.Image.forEach((img, index) => { %>
+                    <img id="zoom-image-<%= element._id %>-<%= index %>" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= img %>" onclick="changeMainImage('<%= element.id %>', '<%= img %>')" />
+                <% }) %>
             </div>
         </div>
         
@@ -400,81 +398,95 @@ color: black;
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <%})%>
 </div>
 
 
-<script>
-    const containers = document.querySelectorAll(".container-img");
+<h1><center>Recommented Prdoducts</center></h1>
 
-    containers.forEach(container => {
+
+<div class="container mt-4">
+    <div class="row row-cols-3">
+        <% recommendedProducts.forEach(recommendedProduct => { %>
+            <div class="col-md-4 col-lg-3">
+                <div class="card">
+                    <img class="card-img-top" style="width: 100%; height: 21.1em;" src="/productImages/<%= recommendedProduct.Image[0] %>" />
+                    <div class="card-body">
+                        <h5 class="card-title"><%= recommendedProduct.Productname %></h5>
+                        <span class="offer-price">₹<%= recommendedProduct.OriginalPrice %></span>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <form action="/cart/<%= recommendedProduct._id %>" method="post">
+                                <button class="add-to-cart btn btn-warning"  data-product-id="<%= recommendedProduct._id %>" data-product-price="<%= recommendedProduct.Price %>" type="submit">Add to Cart</button>
+                            </form>
+                            <a href="/details/<%= recommendedProduct._id %>" class="btn btn-primary">Buy Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+
+
+<script>
+   const containers = document.querySelectorAll(".container-img");
+
+containers.forEach(container => {
+    const lens = container.querySelector(".lens");
+    const result = container.querySelector(".result");
+
+    container.addEventListener("mousemove", zoomImage);
+    container.addEventListener("mouseenter", () => {
+        lens.style.display = "block";
+        result.style.display = "block";
+    });
+    container.addEventListener("mouseleave", () => {
+        lens.style.display = "none";
+        result.style.display = "none";
+    });
+
+    function zoomImage(e) {
         const productId = container.querySelector(".lens").getAttribute("data-productid");
         const image = container.querySelector(`#image-${productId}`);
         const lens = container.querySelector(".lens");
         const result = container.querySelector(".result");
 
-
         const containerRect = container.getBoundingClientRect();
-        const imageRect = image.getBoundingClientRect();
         const lensRect = lens.getBoundingClientRect();
         const resultRect = result.getBoundingClientRect();
 
-        container.addEventListener("mousemove", zoomImage);
-        container.addEventListener("mouseenter", () => {
-            lens.style.display = "block";
-            result.style.display = "block";
-        });
-        container.addEventListener("mouseleave", () => {
-            lens.style.display = "none";
-            result.style.display = "none";
-        });
+        const { x, y } = getMousePos(e);
 
-        result.style.backgroundImage = `url(${image.src})`;
+        lens.style.left = x + "px";
+        lens.style.top = y + "px";
 
-        function zoomImage(e) {
-            const { x, y } = getMousePos(e);
+        let fx = resultRect.width / lensRect.width;
+        let fy = resultRect.height / lensRect.height;
 
-            lens.style.left = x + "px";
-            lens.style.top = y + "px";
+        result.style.backgroundImage = `url('${image.src}')`;
+        result.style.backgroundSize = `${image.width * fx}px ${image.height * fy}px`;
+        result.style.backgroundPosition = `-${x * fx}px -${y * fy}px`;
+    }
 
+    function getMousePos(e) {
+        const containerRect = container.getBoundingClientRect();
+        return {
+            x: e.clientX - containerRect.left - lens.offsetWidth / 2,
+            y: e.clientY - containerRect.top - lens.offsetHeight / 2
+        };
+    }
+});
 
-            let fx = resultRect.width / lensRect.width;
-            let fy = resultRect.height / lensRect.height;
+function changeMainImage(productId, imageSrc) {
+    const mainImage = document.querySelector(`#image-${productId}`);
+    mainImage.src = `/productImages/${imageSrc}`;
+}
 
-            result.style.backgroundSize = `${imageRect.width * fx}px ${imageRect.height * fy}px`;
-            result.style.backgroundPosition = `-${x * fx}px -${y * fy}px`;
-        }
-
-        function getMousePos(e) {
-            let x = e.clientX - containerRect.left - lensRect.width / 2;
-            let y = e.clientY - containerRect.top - lensRect.height / 2;
-
-            let minX = 0;
-            let minY = 0;
-            let maxX = containerRect.width - lensRect.width;
-            let maxY = containerRect.height - lensRect.height;
-
-            if (x <= minX) {
-                x = minX;
-            } else if (x >= maxX) {
-                x = maxX;
-            }
-            if (y <= minY) {
-                y = minY;
-            } else if (y >= maxY) {
-                y = maxY;
-            }
-
-            return { x, y };
-        }
-        
-        
-        result.style.display = "none";
-    });
-
-    function addToCheckout(productId) {
+function addToCheckout(productId) {
     // Make a POST request to the addToCheckout route with the product ID
     fetch(`/addToCheckout/${productId}`, {
         method: 'POST'

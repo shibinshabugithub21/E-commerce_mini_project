@@ -4,22 +4,12 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      /* background-color: #f0f0f0; */
-      /* background-image:url('/img/adminbg.jpg'); */
       margin: 0;
       padding: 0;
     }
-.container{
-  margin-top: 105px;
-}
-
-    /* h1 {
-      background-color: #333;
-      color: #fff;
-      padding: 20px;
-      margin: 0;
-      text-align: center;
-    } */
+    .container {
+      margin-top: 105px;
+    }
 
     form {
       max-width: 400px;
@@ -38,7 +28,7 @@
     }
 
     input[type="text"],
-    input[type="email"] {
+    input[type="number"] {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
@@ -61,20 +51,49 @@
     button[type="submit"]:hover {
       background-color: #0056b3;
     }
+
+    .error {
+      color: red;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
     
 <div class="container w-25 border py-5">
  <!-- admin/editcategory.ejs -->
-<form action="/admin/editcategory/<%=Category._id %>" method="POST">
+<form id="editCategoryForm" action="/admin/editcategory/<%=Category._id %>" method="POST">
     <label for="name">Name:</label>
     <input type="text" name="name" id="name" value="<%=Category.Category%>" required>
-    <!-- Add other fields you want to edit -->
+    <label for="offer">Offer (Discount %):</label>
+    <input type="number" name="offer" id="offer" value="<%=Category.Offer%>" required>
+    <div id="offerError" class="error"></div> <!-- Error message for offer validation -->
     <button type="submit">Save Changes</button>
 </form>
-
-  </form>
 </div>
+
+<script>
+document.getElementById('editCategoryForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    let offer = document.getElementById("offer").value.trim();
+    let offerError = document.getElementById("offerError");
+
+    // Function to show error message
+    function showError(message) {
+        offerError.textContent = message;
+    }
+
+    // Check if offer is a negative number
+    if (offer < 0) {
+        showError("Offer cannot be a negative number");
+        return;
+    }
+
+    // If offer is valid, submit the form
+    this.submit();
+});
+</script>
+
 </body>
 </html>

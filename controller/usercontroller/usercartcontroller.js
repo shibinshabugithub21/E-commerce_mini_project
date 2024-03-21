@@ -12,6 +12,7 @@ const Razorpay = require('razorpay');
 const collectionCoupoun = require('../../models/coupoun');
 const BannerDB = require("../../models/bannerdb");
 const collectionCat = require('../../models/category')
+
     //cart details
     const loadcart = async (req, res) => {
         try {
@@ -124,11 +125,10 @@ const collectionCat = require('../../models/category')
     
             // Update the cart item quantity and total price
             cartItem.quantity = quantity;
-            cartItem.totalprice = product.Price * quantity;
+            cartItem.totalprice = product.OriginalPrice * quantity;
     
             // Recalculate grantTotal and total
             userDetails.cart.grantTotal = userDetails.cart.items.reduce((accu, element) => accu + element.totalprice, 0);
-            // userDetails.total = userDetails.cart.items.reduce((accu, element) => accu + (element.quantity * element.Price), 0);
             const totalAmount = userDetails.cart.grantTotal;
     
             // Save the changes to the user details

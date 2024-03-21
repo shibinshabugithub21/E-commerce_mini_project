@@ -9,11 +9,9 @@ const { render } = require('ejs');
 const PDFDocument = require('pdfkit');
 const excelJS = require('exceljs');
 
-
 const fs = require('fs');
 
 const login = (req, res) => {
-  // Check if the user is already logged in
   if (req.session.admin) {
     res.redirect('/admin/home');
   } else {
@@ -22,7 +20,6 @@ const login = (req, res) => {
 };
 
 const loginpost = (req,res)=>{
-    
     const name = 'admin@gmail.com'
     const password = 'admin@123'
     console.log(req.body)
@@ -133,8 +130,7 @@ const order = async(req,res)=>{
     const orderList = await collectionOrder.find();
     const user = orderList.map(item => item.userId);
     const userData = await collectionModel.find({ _id: { $in: user } });
-   // console.log('hello man i am inside')
-    //console.log(userData)
+  
     const ordersWithData = orderList.map(order => {
        // console.log(' man its fear')
         const user = userData.find(user => user._id.toString() === order.userId.toString());
@@ -195,8 +191,6 @@ const orderput = async (req, res) => {
 };
 
 
-
-
 // const blockCoupon = async (req, res) => {
 //     try {
 //         const couponId = req.params.id;
@@ -220,12 +214,11 @@ const orderput = async (req, res) => {
 // banner
 
 
-
 const sales = async (req, res) => {
     try {
         const startDate = req.query.startDate;
         const endDate = req.query.endDate;
-        const salesReport = [];
+        let salesReport = [];
 
         // Add logic to construct MongoDB query based on the start and end dates
         const query = {};
@@ -239,31 +232,59 @@ const sales = async (req, res) => {
         }
 
         const orderList = await collectionOrder.find(query);
+        // console.log(orderList)
 
-       
-        orderList.forEach((item) => {
-            item.products.forEach((productList) => {
-                salesReport.push({
-                    _id: productList._id,
-                    p_name: productList.p_name,
-                    quantity: productList.quantity,
-                    price: productList.realPrice,
-                    createdAt: item.createdAt,
+        salesReport = orderList.map( (order) => {
+            let orderDetails = {}
+
+            order.products.forEach((productList) => {
+                order.proCartDetail.forEach((value)=>{
+                    orderDetails = {
+                        _id: productList._id,
+                        p_name: productList.p_name,
+                        address: order.address,
+                        quantity: productList.quantity,
+                        price: productList.realPrice,
+                        createdAt: order.createdAt,
+                        totalprice: value.OriginalPrice,
+                        paymentMethod: order.payment 
+                    }
                 });
             });
-        });
 
+            orderDetails.payment = order.payment
+            return orderDetails
+        })
+
+        // orderList.forEach((item) => {
+        //     item.products.forEach((productList) => {
+        //         item.proCartDetail.forEach((value)=>{
+        //             salesReport.push({
+        //             _id: productList._id,
+        //             p_name: productList.p_name,
+        //             address: item.address,
+        //             quantity: productList.quantity,
+        //             price: productList.realPrice,
+        //             createdAt: item.createdAt,
+        //             totalprice: value.OriginalPrice,
+        //             paymentMethod: item.payment 
+
+        //         });
+        //     });
+        //     });
+        // });
+// console.log("hello",salesReport);
+
+
+        console.log(salesReport, "sales report new object")
         req.session.salesReport = salesReport;
 
         res.render('admin/sales', { salesReport });
-        console.log(salesReport);
     } catch (error) {
         console.error("Error generating sales report:", error);
         res.status(500).send("Internal server error");
     }
 };
-
-
 
 
 const generatePDF = async (req, res) => {
@@ -272,16 +293,11 @@ const generatePDF = async (req, res) => {
         const doc = new PDFDocument();
 
         const salesReport = req.session.salesReport;
+        const username = req.session.username; // Assuming username is stored in session
 
         if (!Array.isArray(salesReport)) {
             salesReport = [];
         }
-
-         // Calculate the total amount
-         let totalAmount = 0;
-         for (const report of salesReport) {
-             totalAmount += report.price;
-         }
 
         // Set response headers for PDF download
         res.setHeader('Content-Type', 'application/pdf');
@@ -290,33 +306,52 @@ const generatePDF = async (req, res) => {
         // Pipe the PDF document to the response
         doc.pipe(res);
 
-        // Add content to the PDF document
-        doc.fontSize(18).text('Sales Report', { align: 'center' }).moveDown();
+        // Styling
+        doc.font('Helvetica-Bold');
+        const headerColor = '#333';
+        const rowColor = '#666';
 
-        // Loop through the sales report data and add rows to the PDF
-        for (let i = 0; i < salesReport.length; i++) {
-            const report = salesReport[i];
+       // Add content to the PDF document
+doc.fontSize(24).fillColor(headerColor).text('iStore', { align: 'center' }).moveDown();
+doc.fontSize(20).fillColor(headerColor).text('Sales Report', { align: 'center' }).moveDown();
 
-            // Format each row with proper spacing and alignment
-            doc.fontSize(12).text(`Product ID: ${report._id}`, { align: 'left' }).moveDown();
-            doc.fontSize(12).text(`Product Name: ${report.p_name}`, { align: 'left' }).moveDown();
-            doc.fontSize(12).text(`Date: ${report.createdAt}`, { align: 'left' }).moveDown();
-            doc.fontSize(12).text(`Quantity: ${report.quantity}`, { align: 'left' }).moveDown();
-            doc.fontSize(12).text(`Price: ${report.price}`, { align: 'left' }).moveDown();
+// Loop through the sales report data and add rows to the PDF
+for (let i = 0; i < salesReport.length; i++) {
+    const report = salesReport[i];
 
-            // Move the starting point of the line downwards for spacing
-            doc.moveTo(50, doc.y + 20)
-               .lineTo(550, doc.y + 20)
-               .stroke();
+    const paymentMethod = report.payment.method.map( x => {
+        return x.mode
+    }).join(" ,")
+    // Format each row with proper spacing and alignment
+doc.moveDown().fillColor(rowColor);
+doc.text(`Product Name: ${report.p_name}`);
+doc.text(`Product ID: ${report._id}`);
+doc.text(`Price: ${report.price}`);
 
-            // Add some space after each product except for the last one
-            if (i !== salesReport.length - 1) {
-                doc.moveDown(2); // Add 2 lines of space
-            }
-        }
+// Check if offerPrice is defined before adding it to the PDF
+if (report.totalprice!== undefined) {
+    doc.text(`OfferPrice: ${report.payment.totalAmount}`); // Display the original price instead of offer price
+} else {
+    doc.text('Offer Price: Not Available');
+}
+    doc.text(`Quantity: ${report.quantity}`);
 
-// Add total amount at the end of the PDF
-// doc.fontSize(14).text(`Total Amount: ${totalAmount.toLocaleString()}`, { align: 'right' }).moveDown();
+    // Check if address exists and has length greater than 0 before accessing its properties
+    if (report.address && report.address.length > 0) {
+        const address = report.address[0];
+        doc.text(`Customer Name: ${address.name}`);
+        doc.text(`House Name: ${address.houseName}`);
+        doc.text(`City: ${address.city}`);
+        doc.text(`City: ${address.phone}`);
+        doc.text(`Postal Code: ${address.postalCode}`);
+    } else {
+        doc.text('Address Not Available');
+    }
+
+    doc.text(`Date of Purchase: ${report.createdAt}`);
+    doc.text(`Payment Method: ${paymentMethod}`);
+    doc.strokeColor(rowColor).lineWidth(1).moveTo(50, doc.y + 15).lineTo(550, doc.y + 15).stroke();
+}
 
 
         // Finalize the PDF
@@ -327,9 +362,10 @@ const generatePDF = async (req, res) => {
     }
 };
 
+
 const downloadExcel = async (req, res) => {
     try {
-       const salesReport = req.session.salesReport;
+        const salesReport = req.session.salesReport;
 
         // Check if data is present and is an array
         if (!Array.isArray(salesReport) || salesReport.length === 0) {
@@ -347,11 +383,41 @@ const downloadExcel = async (req, res) => {
             { header: 'Date', key: 'createdAt', width: 15 },
             { header: 'Quantity', key: 'quantity', width: 15 },
             { header: 'Price', key: 'price', width: 15 },
+            { header: 'Offer Price', key: 'totalprice', width: 15 },
+            { header: 'Customer Name', key: 'customerName', width: 20 },
+            { header: 'House Name', key: 'houseName', width: 20 },
+            { header: 'City', key: 'city', width: 15 },
+            { header: 'Phone', key: 'phone', width: 15 },
+            { header: 'Postal Code', key: 'postalCode', width: 15 },
+            { header: 'Payment Method', key: 'paymentMethod', width: 20 },
         ];
 
         // Add rows to the worksheet
         salesReport.forEach((item) => {
-            worksheet.addRow(item);
+            // Extract address details from the first address object
+            const address = item.address && item.address.length > 0 ? item.address[0] : {};
+
+            const formattedDate = item.createdAt ? new Date(item.createdAt).toISOString().split('T')[0] : '';
+
+            const paymentMethod = item.payment.method.map( x => {
+                return x.mode
+            })
+
+            // Add row data to include address details and payment method
+            worksheet.addRow({
+                _id: item._id ? item._id.toString() : '',
+                p_name: item.p_name || '',
+                createdAt: formattedDate,
+                quantity: item.quantity || '',
+                price: item.price || '',
+                totalprice: item.totalprice || '',
+                customerName: address.name || '',
+                houseName: address.houseName || '',
+                city: address.city || '',
+                phone: address.phone || '',
+                postalCode: address.postalCode || '',
+                paymentMethod: paymentMethod.join(", ")
+            });
         });
 
         // Set response headers
@@ -369,43 +435,80 @@ const downloadExcel = async (req, res) => {
     }
 };
 
-
-const graph = async (req,res)=>{
-    try {
-        data = await collectionOrder.aggregate([
-            {
-              $match: {
+// const graph = async (req,res)=>{
+//     try {
+//         data = await collectionOrder.aggregate([
+//             {
+//               $match: {
                 
-                createdAt: {
-                  $gte: new Date(2022, 0, 1),
-                  $lt: new Date(2024 + 1, 0, 1)
+//                 createdAt: {
+//                   $gte: new Date(2022, 0, 1),
+//                   $lt: new Date(2024 + 1, 0, 1)
+//                 }
+//               }
+//             },
+//             {
+//                 $unwind: "$products"
+//             },
+//             {
+//               $group: {
+//                 _id: "$products.status", 
+//                 count: { $sum: 1 } 
+//               }
+//             },
+//             {
+//               $project: {
+//                 _id: 0, 
+//                 label: "$_id", 
+//                 value: "$count" 
+//               }
+//             }
+//           ]);
+          
+
+//         res.json(data);
+//     } catch (error) {
+        
+//     }
+// }
+const graph = async (req, res) => {
+    try {
+        // Assuming collectionOrder is your MongoDB collection
+        const data = await collectionOrder.aggregate([
+            {
+                $match: {
+                    createdAt: {
+                        $gte: new Date(2022, 0, 1),
+                        $lt: new Date(2024 + 1, 0, 1)
+                    }
                 }
-              }
             },
             {
                 $unwind: "$products"
             },
             {
-              $group: {
-                _id: "$products.status", 
-                count: { $sum: 1 } 
-              }
+                $group: {
+                    _id: "$products.status",
+                    count: { $sum: 1 }
+                }
             },
             {
-              $project: {
-                _id: 0, 
-                label: "$_id", 
-                value: "$count" 
-              }
+                $project: {
+                    _id: 0,
+                    label: "$_id",
+                    value: "$count"
+                }
             }
-          ]);
-          
+        ]);
 
         res.json(data);
     } catch (error) {
-        
+        console.error("Error fetching data:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
-}
+};
+
+
 
 module.exports = {
     login,loginpost,logout,home,user,

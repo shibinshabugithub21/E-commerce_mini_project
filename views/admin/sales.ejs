@@ -215,21 +215,53 @@
             <table id="example" class="table table-striped" style="width:100%">
                 <thead>
                     <tr>
+                        <th>Sl No</th>
                         <th>Product ID</th>
                         <th>Product Name</th>
+                        <th>user Details</th>
                         <th>Date</th>
                         <th>Quantity</th>
-                        <th>Price</th>
+                        <th>Offer Price</th>
+                        <th>Original Price</th>
+                        <th>Payment Method</th>
+                       
                     </tr>
                 </thead>
                 <tbody>
-                    <% salesReport.forEach(function(report) { %>
+                    <% salesReport.forEach(function(report, index) { %>
                     <tr>
+                        <td><%= index + 1 %></td>
                         <td><%= report._id %></td>
                         <td><%= report.p_name %></td>
+                        <td>
+                            <% const address = report.address; %>
+                            <% if (address && address.length > 0) { %>
+                                <%= address[0].name %><br>
+                                <%= address[0].houseName %><br>
+                                <%= address[0].city %><br>
+                                <%= address[0].postalCode %>
+                            <% } else { %>
+                                Address Not Available
+                            <% } %>
+                        </td>
                         <td><%= report.createdAt.toLocaleString() %></td>
                         <td><%= report.quantity %></td>
-                        <td><%= report.price %></td>
+                        <td>₹<%= report.payment.totalAmount %></td>
+
+                         <td><%= report.price %></td>
+                         <td>
+                            <% report.payment.method.forEach( (meth, index) => { %>
+                                <% if (meth.mode=== "razorpay") { %>
+                                    <strong>Online Payment</strong> 
+                                <% } else if(meth.mode=== "cashondelivery") {%>
+                                    <strong>COD</strong> 
+                                <% } else {%>
+                                    <strong>Wallet</strong> 
+                                <% } %>
+                                <%= report.payment.method.length == 2 && index == 0 ? ", " : ""  %>
+                                <% }) %>
+                            
+                        </td>
                     </tr>
                     <% }); %>
                 </tbody>

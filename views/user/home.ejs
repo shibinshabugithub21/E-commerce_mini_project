@@ -193,9 +193,9 @@
         <% product.forEach((element, index) => { %>
         <div class="card">
             <!-- Wishlist icon -->
-            <a href="#" class="wishlist-icon" id="wishlist-icon-<%= index %>" data-product-id="<%= element.id %>">
-                <i  id="heartIcon wishlist<%=element._d %>" class="fa-solid fa-heart fa-lg <%= wishlist.find( (x) => x.productId.toString() == element._id.toString()) ?  "inWishlist" : "notInWishlist"  %>" style="cursor: pointer"></i>
-            </a>
+        <a href="#" class="wishlist-icon" id="wishlist-icon-<%= index %>" data-product-id="<%= element.id %>">
+            <i id="heartIcon-wishlist-<%= element.id %>" class="fa-solid fa-heart fa-lg <%= wishlist.find(x => x.productId.toString() === element._id.toString()) ? 'inWishlist' : 'notInWishlist' %>" style="cursor: pointer;"></i>
+        </a>
             <!-- Product image -->
             <a href="/details/<%= element.id %>">
                 <img class="card-img" style="width: 100%; height: 21.1em;" src="/productImages/<%= element.Image[0] %>" />
@@ -248,6 +248,26 @@ function addProductToWishlist(productId, target) {
     })
     .catch(error => {
         console.error('Error adding product to wishlist:', error);
+    });
+}
+
+function removeFromWishlist(productId, target) {
+    fetch(`/wishlistdelete/${productId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Product removed from wishlist');
+            productElement.remove();
+        } else {
+            console.error('Failed to remove product from wishlist');
+        }
+    })
+    .catch(error => {
+        console.error('Error removing product from wishlist:', error);
     });
 }
 </script>

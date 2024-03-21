@@ -191,9 +191,9 @@ async function graphData(){
         })
         .then(function(data) {
             Jsondata = data;
-            console.log(data)
+            // console.log(data)
             createChart(Jsondata, 'bar');
-            document.getElementById('chartTypes').style.display = 'block'; // Show buttons after chart creation
+            document.getElementById('chartTypes').style.display = 'block'; 
         });
 }
 
@@ -221,6 +221,8 @@ function createChart(data,type = bar) {
     });
 }
 
+
+
 function setChartType(chartType) {
     if (myChart) {
         myChart.destroy();
@@ -228,7 +230,13 @@ function setChartType(chartType) {
     createChart(Jsondata, chartType);
 }
 
-    </script>
+
+
+
+</script>
+
+
+
 </body>
 
 </html>
