@@ -244,9 +244,9 @@
                                 Address Not Available
                             <% } %>
                         </td>
-                        <td><%= report.createdAt.toLocaleString() %></td>
+                        <td><%= report.createdAt%></td>
                         <td><%= report.quantity %></td>
-                        <td>₹<%= report.payment.totalAmount %></td>
+                        <td>₹<%= report.payment.method.reduce( (acc, x) => acc + parseFloat(x.amount), 0) %></td>
 
                          <td><%= report.price %></td>
                          <td>

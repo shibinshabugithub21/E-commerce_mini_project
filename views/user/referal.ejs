@@ -1,0 +1,101 @@
+<%-include('header')-%>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .main-container {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 500px;
+        width: 90%;
+        margin: auto;
+        margin-bottom: 20px; /* Add margin bottom to avoid overlap with the fixed footer */
+    }
+
+    .copy-icon {
+        cursor: pointer;
+        vertical-align: middle;
+        color: #333;
+        margin-left: 5px;
+    }
+
+    .referral-code-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .popup-message {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        bottom: calc(100% + 10px); /* Adjusted bottom position */
+        left: 50%;
+        transform: translateX(-50%);
+        display: none; /* Initially hide the message */
+    }
+
+    /* Fixed footer styles */
+    .footer {
+        background-color: #333;
+        color: #fff;
+        padding: 10px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+    }
+</style>
+</head>
+<body>
+    <div class="container-xl px-4 mt-4">
+        <nav class="nav nav-borders">
+            <!-- <a class="nav-link active ms-0" href="/profile">Profile</a> -->
+            <a class="nav-link" href="/manageAddress">Manage Address</a>
+            <a class="nav-link" href="/managePassword">Manage Password</a>
+            <a class="nav-link" href="/order">Order</a>
+            <a class="nav-link" href="/wallet">Wallet</a>
+            <a class="nav-link" href="/refferal">Invite a friend </a>
+    
+        </nav>
+        <hr class="mt-0 mb-4">
+    <div class="main-container">
+        <h2>Invite Your Friends</h2>
+        <p>Share the code with your friends and earn ₹100 for you and ₹50 for your friend.</p>
+        <div class="referral-code-container">
+            <input type="text" id="referral-code" value="<%= user.referralCode %>" readonly>
+            <i class="fas fa-copy copy-icon" onclick="copyToClipboard()"></i>
+            <span class="popup-message" id="popupMessage">Copied!</span>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        function copyToClipboard() {
+            var copyText = document.getElementById("referral-code");
+            copyText.select();
+            document.execCommand("copy");
+            var popup = document.getElementById("popupMessage");
+            popup.style.display = "block"; // Show the message
+            setTimeout(function () {
+                popup.style.display = "none"; // Hide the message after 2 seconds
+            }, 2000);
+            // Deselect the text
+            window.getSelection().removeAllRanges();
+        }
+    </script>
+
+<%-include('footer')-%>

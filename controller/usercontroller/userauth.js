@@ -67,7 +67,6 @@ const loginpost = async (req, res) => {
     const data = await bcrypt.compare(req.body.password, check.password);
     if (data) {
       //auth for login
-
       req.session.user = check.email; //session creation
       req.session.userid = check._id;
       console.log("user login post", req.session.user);
@@ -120,8 +119,7 @@ const signuppost = async (req, res) => {
   if (req.body.referralCode) {
     referral = req.body.referralCode;
     referredUser = await collectionModel.findOne({ referralCode: referral });
-    console.log("referredUserssssssssss", referredUser);
-    console.log("referralllllllllll", referral);
+  
 
     if (referredUser) {
       referred = "true";

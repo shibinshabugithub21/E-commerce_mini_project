@@ -33,7 +33,7 @@ const addcategory = (req, res) => {
 
 const addcategorypost = async (req, res) => {
     try {
-        const { category, offer } = req.body;
+        const { category } = req.body;
         const lowercaseCategory = category.trim().toLowerCase();
 
         const existingCategory = await collectionCat.findOne({ Category: lowercaseCategory });
@@ -41,7 +41,6 @@ const addcategorypost = async (req, res) => {
         if (!existingCategory) {
             const newCategory = new collectionCat({
                 Category: lowercaseCategory,
-                Offer: offer,
                 isBlocked: false // Assuming the category is not blocked by default
             });
 
@@ -101,15 +100,13 @@ const update = async (req, res) => {
     try {
         const categoryId = req.params.id;
         const newName = req.body.name;
-        const newOffer = req.body.offer; // Get the new offer value from the request body
 
         const category = await collectionCat.findById(categoryId);
-        console.log(newName, newOffer);
+        console.log(newName);
 
         if (category) {
             if (newName.trim() !== "") {
                 category.Category = newName;
-                category.Offer = newOffer; // Update the offer value
                 await category.save();  // Correct way to save changes
                 res.redirect('/admin/category');
             } else {
@@ -135,7 +132,6 @@ const deletecategory = async (req, res) => {
         res.redirect('/admin/category');  // Add a forward slash at the beginning
     } catch (error) {
         console.log(error);
-        // Handle the error, send an appropriate response, or redirect to an error page
         res.status(500).send("Internal Server Error");
     }
 };

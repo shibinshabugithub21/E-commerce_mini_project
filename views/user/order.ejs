@@ -70,6 +70,8 @@
         <a class="nav-link" href="/managePassword">Manage Password</a>
         <a class="nav-link" href="/orderdetails">Order</a>
         <a class="nav-link" href="/wallet">Wallet</a>
+        <a class="nav-link" href="/refferal">Invite a friend </a>
+
 
     </nav>
     <hr class="mt-0 mb-4">
@@ -91,11 +93,14 @@
                             <% } %>
                             <h3 class="pname"><strong>Product Name:</strong> <%= product.p_name %></h3>
                                     <!-- Display individual product prices -->
-                                    <% order.cartProduct.forEach(cartItem => { %>
+                                    <!-- <% order.cartProduct.forEach(cartItem => { %>
                                         <% if (cartItem.productname.toString() === product.p_id.toString()) { %>
                                             <p><strong>Product Price:</strong> ₹<%= cartItem.totalprice %></p>
                                         <% } %>
-                                    <% }); %>
+                                    <% }); %> -->
+
+                                    <p><strong>Product Price:</strong> ₹<%= order.payment.method.length == 1 ? order.payment.method[0].amount : parseFloat(order.payment.method[0].amount) + parseFloat(order.payment.method[1].amount) %></p>
+
                                             
                                     <% order.payment.method.forEach(mode => { %>
                                         <div>
@@ -308,8 +313,8 @@
               });
         },
         prefill: {
-          name: 'Akhil',
-          email: 'akhil@example.com',
+          name: 'Shibin',
+          email: 'Shibin@example.com',
           contact: '9000090000',
         },
         notes: {

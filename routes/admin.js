@@ -7,6 +7,7 @@ const Bannercontroller = require("../controller/admincontroller/Bannercontroller
 const categorycontroller = require("../controller/admincontroller/categorycontroller");
 const productcontroller = require("../controller/admincontroller/productcontroller")
 const coupouncontroller = require('../controller/admincontroller/coupouncontroller')
+const filtercontroller = require('../controller/admincontroller/filtercontrolller')
 const { isAdmin,authMiddleware } = require('../middleware/adminside'); 
 
 // ... Other imports
@@ -19,7 +20,11 @@ adminrouter.use(isAdmin);
 adminrouter.use(authMiddleware)
 
 adminrouter.get('/home', admincontroller.home);
-adminrouter.post("/graph",admincontroller.graph)
+adminrouter.post('/line-graph', filtercontroller.lineGraph);
+adminrouter.post('/bar-graph', filtercontroller.barGraph);
+adminrouter.post('/doughnut-graph', filtercontroller.doughnutGraph);
+adminrouter.post('/doughnut-category-graph', filtercontroller.doughnutGraph2);
+
 
 // user starts
 adminrouter.get('/user', admincontroller.user);

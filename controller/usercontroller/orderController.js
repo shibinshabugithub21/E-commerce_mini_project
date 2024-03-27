@@ -52,7 +52,7 @@ const cancelOrder = async (req, res) => {
         await product.save()
         
         const onlinePayments = order.payment.method.find((meth) => meth.mode != "cashondelivery")
-        if(!onlinePayments){
+        if(onlinePayments){
             const bal= await collectionModel.updateOne(
                 { _id: req.session.userid, walletbalance: { $exists: true } },
                 { $inc: { walletbalance: onlinePayments.amount } }
@@ -180,6 +180,8 @@ const generateInvoice = async (req, res) => {
         if (!order) {
             return res.status(404).send('Order not found');
         }
+        const user= await collectionModel.findOne()
+
 
         // Find the product in the order based on productId
         const product = order.products.find(prod => prod._id.toString() === productId);
@@ -195,15 +197,15 @@ const generateInvoice = async (req, res) => {
         // Add content to the PDF document
         doc.font('Helvetica-Bold').fontSize(24).text('', { align: 'center' }).moveDown(0.5);
         doc.font('Helvetica').fontSize(16).text('iStore', { align: 'center' });
-        doc.text('India,Kerala,Trv', { align: 'center' });
+        doc.text('India,Kerala,Thiruvananthapuram', { align: 'center' });
         doc.text('Phone No:9207951313 ', { align: 'center' });
         doc.text('Email:istore@gmai', { align: 'center' }).moveDown(2);
         
         doc.font('Helvetica-Bold').text('Customer Details:');
         doc.font('Helvetica').text(`Name: ${order.address[0].name}`);
-        doc.text(`Address: ${order.address[0].houseName}, ${order.address[0].city}, ${order.address[0].postalCode}, ${order.address[0].country}`);
+        doc.text(`Address: ${order.address[0].houseName}, ${order.address[0].city},${order.address[0].postalCode}`);
         doc.text(`Phone No: ${order.address[0].phone}`);
-        doc.text(`Email: `); // You can add customer email here if available
+        doc.text(`Email:${user.email}`); // You can add customer email here if available
 
         doc.moveDown(2);
         doc.font('Helvetica-Bold').text('Invoice Details:');
@@ -215,18 +217,31 @@ const generateInvoice = async (req, res) => {
         doc.font('Helvetica-Bold').text('Product Details:');
         doc.font('Helvetica').text(`Product Name: ${product.p_name}`);
         doc.text(`Quantity: ${product.quantity}`);
-        doc.text(`Price: ₹${product.price}`);
+        doc.text(`Payment Method: ${order.payment.method.map( x => x.mode).join(", ")}`);
+        
         // Add more product details as needed
 
         // Calculate total amount
         const totalAmount = product.quantity * parseFloat(product.price);
-        doc.font('Helvetica-Bold').text(`Total Amount: ₹${totalAmount}`, { align: 'right' });
+        doc.font('Helvetica-Bold').text(`Total Amount: ${order.payment.method.reduce( (acc, x) => acc + parseFloat(x.amount), 0)}`, { align: 'right' });
 
         // Finalize the PDF document
         doc.end();
 
         // Send the PDF file as a response
-        res.sendFile(invoicePath);
+        // res.sendFile(invoicePath);
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=invoice.pdf');
+
+        // Stream the generated PDF to the response
+        const pdfStream = fs.createReadStream(invoicePath);
+        pdfStream.pipe(res);
+
+        // Clean up: Delete the generated PDF file after streaming
+        pdfStream.on('end', () => {
+            fs.unlinkSync(invoicePath);
+        });
     } catch (error) {
         console.error('Error generating invoice:', error);
         res.status(500).send('Internal Server Error');

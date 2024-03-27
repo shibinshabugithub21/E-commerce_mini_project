@@ -56,6 +56,30 @@ const addproductpost = async (req, res) => {
         const Price = OriginalPrice - (OriginalPrice * (OfferPercentage / 100)); 
         const Description = req.body.description;
 
+         // Validate Stock
+         if (Stock < 0 || isNaN(Stock)) {
+            req.flash('error', 'Stock must be a non-negative number');
+            return res.redirect('/admin/addproduct');
+        }
+
+        // Validate Original Price
+        if (OriginalPrice < 0 || isNaN(OriginalPrice)) {
+            req.flash('error', 'Original Price must be a non-negative number');
+            return res.redirect('/admin/addproduct');
+        }
+
+        // Validate Offer Percentage
+        if (OfferPercentage < 0 || OfferPercentage > 100 || isNaN(OfferPercentage)) {
+            req.flash('error', 'Offer Percentage must be a number between 0 and 100');
+            return res.redirect('/admin/addproduct');
+        }
+
+        // Validate Rating
+        if (Rating < 0 || isNaN(Rating) || Rating > 5) {
+            req.flash('error', 'Rating must be a number between 0 and 5');
+            return res.redirect('/admin/addproduct');
+        }
+
         const data = {
             Productname: Productname,
             Category: Category,
@@ -98,38 +122,46 @@ const editproduct = async(req,res)=>{
     }
 }
 
-const editproductpost = async(req,res)=>{
-
-    console.log("Editproduct")
+const editproductpost = async (req, res) => {
+    console.log("Editproduct");
     try {
-        const productId =req.params.id;
-        // console.log("hello",productId);
+        const productId = req.params.id;
         const image = req.files;
         const products = await collectionProduct.findById(productId);
 
-        if(!productId){
-            return res.status(404).send("priduct not found");
+        if (!products) {
+            return res.status(404).send("Product not found");
         }
-            products.Productname = req.body.productName;  
-            products.Category = req.body.Category;
-            products.Stock= req.body.stock;
-            products.Rating= req.body.rating;
-            products.Price =req.body.discountedPrice;
-            products.OfferPercentage=req.body.offer
-            products.OriginalPrice=req.body.price
-            products.Description= req.body.description;
 
-            if(req.files && req.files.length > 0){
-                products.Image =products.Image.concat(image.map(file=>file.filename));
-            }
-  await products.save();
-  res.redirect('/admin/product');
+        if(req.body.stock < 0)
+            return res.redirect('/admin/product')
+
+            if(req.body.rating < 0)
+            return res.redirect('/admin/product')
+
+        // Perform other validation as needed
+
+        // Update product details
+        products.Productname = req.body.productName;
+        products.Category = req.body.Category;
+        products.Stock = req.body.stock;
+        products.Rating = req.body.rating;
+        products.Price = req.body.discountedPrice;
+        products.OfferPercentage = req.body.offer;
+        products.OriginalPrice = Math.ceil(req.body.discountedPrice - ((req.body.discountedPrice / 100) * req.body.offer));
+        products.Description = req.body.description;
+
+        if (req.files && req.files.length > 0) {
+            products.Image = products.Image.concat(image.map(file => file.filename));
+        }
+
+        await products.save();
+        res.redirect('/admin/product');
     } catch (error) {
-        console.log(error)
-        res.status(500).send(error.message)
+        console.log(error);
+        res.status(500).send(error.message);
     }
-}
-
+};
 
 const deletImage = async(req,res)=>{
     try {

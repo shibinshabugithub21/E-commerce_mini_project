@@ -10,7 +10,7 @@ const cartcontroller = require("../controller/usercontroller/usercartcontroller"
 const detailscontroller = require("../controller/usercontroller/userproductdetails")
 const collectionModel = require('../models/userdb');
 const {isUser,checkSessionAndBlocked} = require('../middleware/userside');
-
+const { user } = require('../controller/admincontroller/admincontroller');
 
 
 
@@ -37,7 +37,7 @@ router.post('/otppost',authcontroller.otppost)
 router.get('/resendotp',authcontroller.resendOtp)
 
 router.get('/home',checkSessionAndBlocked,authcontroller.home);
-// router.get('/home',checkSessionAndBlocked,usercontroller.home);
+// router.use(checkSessionAndBlocked)
 
 // products routes(here product means the iphone )
 router.get('/iPhone',detailscontroller.products)
@@ -58,6 +58,7 @@ router.delete('/cartDelete/:id',cartcontroller.cartDelete);
 
 // // checkout page
 router.get('/CheckOutPage',usercontroller.checkoutpage)
+router.get('/buy-product', usercontroller.productCheckout)
 router.get("/AddressUpdate",usercontroller.addressAdding)
 router.post('/AddressUpdate',usercontroller.addressAddingpost)
 router.post('/CheckOut',usercontroller.orderSuccess)
@@ -87,7 +88,6 @@ router.get('/addressadding',usercontroller.addressAdding)
 router.post('/addAddrresscheckout', usercontroller.addressAddingpost);
 router.post('/cancelOrder/:orderId/:productId', orderController.cancelOrder);
 router.post('/returnProduct',orderController.orderReturn);
-
 // invoivce
 router.get('/generateInvoice/:orderId/:productId',orderController.generateInvoice);
 
@@ -98,6 +98,9 @@ router.get('/wishlistdelete/:id',wishlistController.WhishProductDelete)
 
 // wallet
 router.get('/wallet',usercontroller.wallet)
+
+// refferal code
+router.get('/refferal',usercontroller.refferal)
 
 // failedpay
 router.post('/failpay',usercontroller.failedpay)

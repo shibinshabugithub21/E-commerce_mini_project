@@ -436,7 +436,7 @@
           <select id="existing-address">
               <option id="address" value="">Select an existing address</option>
               <% user.profile.address.forEach(function(address) { %>
-                  <option value="<%= address._id %>"><%=address.name %> - <%= address.houseName %> - <%= address.city %>, <%= address.postalCode %>,<%=address.phone %></option>
+                  <option value="<%= address._id %>"><%=address.name %> - <%= user.email %><%= address.houseName %> - <%= address.city %>, <%= address.postalCode %>,<%=address.phone %></option>
               <% }); %>
           </select>
           <form>
@@ -687,7 +687,7 @@
             document.getElementById('pincode').value = selectedAddress.postalCode;
             document.getElementById('inputPhone').value = selectedAddress.phone;
             document.getElementById('fname').value = selectedAddress.name;
-            document.getElementById('email').value = selectedAddress.emailid;
+            document.getElementById('email').value = JSON.parse('<%- JSON.stringify(user.email) %>');
         } else {
             // Reset fields if "Select an existing address" is chosen
             document.getElementById('adr').value = "";
@@ -749,7 +749,6 @@ const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"
     const totalPriceText = totalPriceElement.innerText;
     const totalPrice = parseFloat(totalPriceText.replace(/[^\d.]/g, '')); // Remove non-numeric characters and convert to float
 
-    // Check if the total price is greater than 10000
     if (totalPrice > 10000) {
         // Show alert message
     // Show SweetAlert message
@@ -789,7 +788,6 @@ const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"
         }
     });
 }
-
 
     } catch (error) {
       

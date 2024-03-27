@@ -92,11 +92,6 @@ button:hover {
           <label for="Category">Category Name:</label>
           <input type="text" class="form-control" id="Category" name="category" placeholder="New Category">
         </div>
-        <div class="form-group">
-          <label for="Offer">Offer (Discount %):</label>
-          <input type="number" class="form-control" id="Offer" name="offer" placeholder="Enter discount">
-          <div id="offerError" class="error"></div> <!-- Error message for offer validation -->
-        </div>
         <button type="submit" class="btn btn-primary">Add Category</button>
       </form>
     </div>
@@ -109,10 +104,8 @@ document.getElementById('categoryForm').addEventListener('submit', async functio
     event.preventDefault();
 
     let categoryName = document.getElementById("Category").value.trim();
-    let offer = document.getElementById("Offer").value.trim();
 
     let errorId = document.getElementById("error");
-    let offerError = document.getElementById("offerError");
 
     // Function to show error message
     function showError(message, element) {
@@ -131,16 +124,10 @@ document.getElementById('categoryForm').addEventListener('submit', async functio
         return;
     }
 
-    // Check if offer is a negative number
-    if (offer < 0) {
-        showError("Offer cannot be a negative number", offerError);
-        return;
-    }
-
+    
     // Submit the form with both category name and offer
     const data = {
         category: categoryName,
-        offer: offer
     };
 
     const response = await fetch("/admin/AddCategory", {

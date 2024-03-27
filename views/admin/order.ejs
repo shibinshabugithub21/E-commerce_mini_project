@@ -154,6 +154,10 @@
         .headline u {
             text-decoration: none;
         }
+
+        .dt-row {
+            z-index: -1;
+        }
     </style>
 </head>
 
@@ -161,7 +165,6 @@
 
     <!-- Sidebar Navigation -->
     <div class="side-nav">
-        <!-- <img src="/Public/img/bg.png" width="100px",height="150px"> -->
         <ul>
             <li><a href="/admin/home">Dashboard</a></li>
             <li><a href="/admin/user">User</a></li>
@@ -190,6 +193,7 @@
 
                 <thead>
                     <tr>
+
                         <th>Product</th>
                         <th>Product Name</th>
                         <th>Order ID</th>
@@ -208,6 +212,7 @@
                             <% if (order.products.some(product => product._id.$oid === cartItem.productname.$oid)) { %>
                                 <% const product = order.products.find(product => product._id.$oid === cartItem.productname.$oid); %>
                                 <tr>
+                                    
                                     <td><img src="/productImages/<%= product.image[0] %>" style="width:70px" height="70px"></td>
                                     <td><%= product.p_name %></td>
                                     <td><%= order._id %></td>
@@ -219,7 +224,7 @@
                                         <%= order.address[0]?.postalCode %>
                                     </td>
                                     <td><%= cartItem.quantity %></td>
-                                    <td>₹<%= order.payment.totalAmount %></td>
+                                    <td>₹<%= order.payment.method.reduce( (acc, x) => acc + parseFloat(x.amount), 0) %></td>
                                     <td>
                                         <% order.payment.method.forEach( (meth, index) => { %>
                                             <% if (meth.mode=== "razorpay") { %>

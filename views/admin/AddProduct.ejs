@@ -172,12 +172,14 @@
         }
 
         /* Error message styling */
-        .error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
-            text-align: left;
-        }
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+    text-align: left;
+    display: block; /* Ensure the error message is displayed as a block element */
+}
+
     </style>
 </head>
 
@@ -216,24 +218,38 @@
         <div class="error-message" id="CategoryError"></div>
     
         <label for="stock">Stock:</label>
-        <input type="number" min="1" name="stock">
+        <input type="number" name="stock">
         <div class="error-message" id="stockError"></div>
+        <% if (errorMessage && errorMessage.stock) { %>
+            <div class="error-message"><%= errorMessage.stock %></div>
+        <% } %>
     
         <label for="price">Original Price:</label>
-        <input type="number" min="0" step="0.01" name="price" id="price">
+        <input type="number"  name="price" id="price">
         <div class="error-message" id="priceError"></div>
+        <% if (errorMessage && errorMessage.price) { %>
+            <div class="error-message"><%= errorMessage.price %></div>
+        <% } %>
+    
     
         <label for="offer">Offer (%):</label>
-        <input type="number" min="0" max="100" step="1" name="offer" id="offer">
+        <input type="number" name="offer" id="offer">
         <div class="error-message" id="offerError"></div>
+        <% if (errorMessage && errorMessage.offer) { %>
+            <div class="error-message"><%= errorMessage.offer %></div>
+        <% } %>
     
         <label for="discountedPrice">Discounted Price:</label>
-        <input type="number" min="1" step="0.01" name="discountedPrice" id="discountedPrice" readonly>
+        <input type="number"  name="discountedPrice" id="discountedPrice" readonly>
         <div class="error-message" id="discountedPriceError"></div>
     
         <label for="rating">Rating:</label>
-        <input type="number" min="1" name="rating">
+        <input type="number"  name="rating">
         <div class="error-message" id="ratingError"></div>
+        <% if (errorMessage && errorMessage.rating) { %>
+            <div class="error-message"><%= errorMessage.rating %></div>
+        <% } %>
+
     
         <label for="description">Description:</label>
         <textarea name="description" rows="4"></textarea>
@@ -270,66 +286,105 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js'></script>
     <script>
         // Function to validate the form fields
-        function validateForm() {
-            console.log("form validating")
-            // Reset error messages
-            document.querySelectorAll('.error-message').forEach(element => {
-                element.innerText = '';
-            });
+    // Function to validate the form fields
+    function validateForm() {
+        console.log("form validating")
+        // Reset error messages
+        document.querySelectorAll('.error-message').forEach(element => {
+            element.innerText = '';
+        });
 
-            let isValid = true;
+        let isValid = true;
 
-            // Validate Product Name
-            const productName = document.querySelector('input[name="productName"]').value.trim();
-            if (productName === '') {
-                document.getElementById('productNameError').innerText = 'Product Name is required';
-                isValid = false;
-            }
-
-            // Validate Category
-            const category = document.querySelector('select[name="Category"]').value;
-            if (category === '') {
-                document.getElementById('CategoryError').innerText = 'Category is required';
-                isValid = false;
-            }
-
-            // Validate Stock
-            const stock = document.querySelector('input[name="stock"]').value.trim();
-            if (stock === '' || isNaN(stock) || parseInt(stock) <= 0) {
-                document.getElementById('stockError').innerText = 'Stock must be a positive number';
-                isValid = false;
-            }
-
-            // Validate Price
-            const price = document.querySelector('input[name="price"]').value.trim();
-            if (price === '' || isNaN(price) || parseFloat(price) <= 0) {
-                document.getElementById('priceError').innerText = 'Price must be a positive number';
-                isValid = false;
-            }
-
-            // Validate Rating
-            const rating = document.querySelector('input[name="rating"]').value.trim();
-            if (rating === '' || isNaN(rating) || parseInt(rating) <= 0) {
-                document.getElementById('ratingError').innerText = 'Rating must be a positive number';
-                isValid = false;
-            }
-
-            // Validate Description
-            const description = document.querySelector('textarea[name="description"]').value.trim();
-            if (description === '') {
-                document.getElementById('descriptionError').innerText = 'Description is required';
-                isValid = false;
-            }
-
-            // Validate Image Upload
-            const fileUploader = document.getElementById('fileUploader');
-            if (fileUploader.files.length === 0) {
-                document.getElementById('imageError').innerText = 'Please upload at least one image';
-                isValid = false;
-            }
-
-            return isValid;
+        // Validate Product Name
+        const productName = document.querySelector('input[name="productName"]').value.trim();
+        if (productName === '') {
+            document.getElementById('productNameError').innerText = 'Product Name is required';
+            isValid = false;
         }
+
+        // Validate Category
+        const category = document.querySelector('select[name="Category"]').value;
+        if (category === '') {
+            document.getElementById('CategoryError').innerText = 'Category is required';
+            isValid = false;
+        }
+
+        // Validate Stock
+        const stock = document.querySelector('input[name="stock"]').value.trim();
+        if (stock === '' || isNaN(stock) || parseInt(stock) <= 0) {
+            document.getElementById('stockError').innerText = 'Stock must be a positive number';
+            isValid = false;
+        } else if (parseInt(stock) < 0) {
+            document.getElementById('stockError').innerText = 'Stock cannot be negative';
+            isValid = false;
+        }
+
+        // Validate Price
+        const price = document.querySelector('input[name="price"]').value.trim();
+        if (price === '' || isNaN(price) || parseFloat(price) <= 0) {
+            document.getElementById('priceError').innerText = 'Price must be a positive number';
+            isValid = false;
+        } else if (parseFloat(price) < 0) {
+            document.getElementById('priceError').innerText = 'Price cannot be negative';
+            isValid = false;
+        }
+
+        // Validate Offer Percentage
+        const offer = document.querySelector('input[name="offer"]').value.trim();
+        if (offer === '' || isNaN(offer) || parseFloat(offer) < 0 || parseFloat(offer) > 100) {
+            document.getElementById('offerError').innerText = 'Offer percentage must be a number between 0 and 100';
+            isValid = false;
+        }
+
+        // Validate Rating
+        const rating = document.querySelector('input[name="rating"]').value.trim();
+        if (rating === '' || isNaN(rating) || parseInt(rating) < 0) {
+            document.getElementById('ratingError').innerText = 'Rating must be a non-negative number';
+            isValid = false;
+        }
+
+        // Validate Description
+        const description = document.querySelector('textarea[name="description"]').value.trim();
+        if (description === '') {
+            document.getElementById('descriptionError').innerText = 'Description is required';
+            isValid = false;
+        }
+
+        // Validate Image Upload
+        const fileUploader = document.getElementById('fileUploader');
+        if (fileUploader.files.length === 0) {
+            document.getElementById('imageError').innerText = 'Please upload at least one image';
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    // Attach event listener to form submission
+    document.querySelector('form').addEventListener('submit', function(event) {
+        if (!validateForm()) {
+            event.preventDefault(); // Prevent form submission if validation fails
+        }
+    });
+
+    // Function to calculate the discounted price
+    function calculateDiscountedPrice() {
+        // Get the original price and offer percentage entered by the user
+        const originalPrice = parseFloat(document.getElementById('price').value);
+        const offer = parseFloat(document.getElementById('offer').value);
+
+        // Calculate the discounted price
+        const discountedPrice = originalPrice - (originalPrice * (offer / 100));
+
+        // Display the discounted price in the respective input field
+        document.getElementById('discountedPrice').value = discountedPrice.toFixed(2);
+    }
+
+    // Attach event listeners to the original price and offer inputs to trigger calculation
+    document.getElementById('price').addEventListener('input', calculateDiscountedPrice);
+    document.getElementById('offer').addEventListener('input', calculateDiscountedPrice);
+
 
         // Attach event listener to form submission
         document.querySelector('form').addEventListener('submit', function(event) {

@@ -331,26 +331,52 @@ color: black;
             padding: 20px;
         }
     }
+    #error{
+        color: red;
+        font-size: large;
+    }
+    /* Reduce size of recommended product cards */
+    .card {
+        width: 200px; /* Adjust width as needed */
+        margin-bottom: 20px; /* Adjust margin as needed */
+    }
+
+    .card-img-top {
+        height: 200px; /* Adjust height as needed */
+        object-fit: cover;
+    }
+
+    .card-body {
+        padding: 10px; /* Adjust padding as needed */
+    }
+
+    .card-title {
+        font-size: 16px; /* Adjust font size as needed */
+        margin-bottom: 5px; /* Adjust margin as needed */
+    }
+
+    .offer-price {
+        font-size: 14px; /* Adjust font size as needed */
+    }
 
 </style>
 
 <div class="container">
-    <% product.forEach(element => { %>
     <div class="single-product">
         <div class="product-image">
             <div class="product-image-main">
                 <div class="container-img">
-                    <div id="zoomContainer-<%= element.id %>" class="zoom-container">
-                    <img id="image-<%= element.id %>" class="card-img-top image" style="width: 100%; height: 21.1em;" src="/productImages/<%= element.Image[0] %>" />
-                    <div class="lens" data-productid="<%= element.id %>"></div>
-                    <div class="result" data-productid="<%= element.id %>" style="z-index: 1000;"></div>
+                    <div id="zoomContainer-<%= product.id %>" class="zoom-container">
+                    <img id="image-<%= product.id %>" class="card-img-top image" style="width: 100%; height: 21.1em;" src="/productImages/<%= product.Image[0] %>" />
+                    <div class="lens" data-productid="<%= product.id %>"></div>
+                    <div class="result" data-productid="<%= product.id %>" style="z-index: 1000;"></div>
                 </div>
                 </div>
             </div>
             <div class="product-image-slider">
                 <!-- Update IDs for zoom functionality -->
-                <% element.Image.forEach((img, index) => { %>
-                    <img id="zoom-image-<%= element._id %>-<%= index %>" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= img %>" onclick="changeMainImage('<%= element.id %>', '<%= img %>')" />
+                <% product.Image.forEach((img, index) => { %>
+                    <img id="zoom-image-<%= product._id %>-<%= index %>" class="card-img-top" style="width: 15%; height: 50%;" src="/productImages/<%= img %>" onclick="changeMainImage('<%= product.id %>', '<%= img %>')" />
                 <% }) %>
             </div>
         </div>
@@ -364,7 +390,7 @@ color: black;
 
             <div class="product">
                 <div class="product-title">
-                    <h2><%= element.Productname %></h2>
+                    <h2><%= product.Productname %></h2>
                 </div>
                 <div class="product-rating">
                     <span><i class="bx bxs-star"></i></span>
@@ -372,57 +398,55 @@ color: black;
                     <span><i class="bx bxs-star"></i></span>
                     <span><i class="bx bxs-star"></i></span>
                     <span><i class="bx bxs-star"></i></span>
-                    <span class="review">(<%= element.Rating %>.rating)</span>
+                    <span class="review">(<%= product.Rating %>.rating)</span>
                 </div>
                 
                 <div class="d-flex flex-column">
                     <div class="product-price">
                         <!-- Original price with strike-through -->
-                        <span class="sale-price">₹<%= element.Price%></span>
+                        <span class="sale-price">₹<%= product.Price%></span>
                         
                         <!-- Offer price -->
-                        <span class="offer-price">₹<%= element.OriginalPrice %></span>
+                        <span class="offer-price">₹<%= product.OriginalPrice %></span>
                     </div>
     
                     <div class="product-details mb-4">
                         <h3>About</h3>
-                        <p><%= element.Description %></p>
+                        <p><%= product.Description %></p>
                     </div>
     
                     <div class="product-btn-group">
-                        <form action="/cart/<%= element._id %>" method="post">
-                            <button class="add-to-cart btn btn-warning"  data-product-id="<%= element._id %>" data-product-price="<%= element.Price %>" type="submit">Add to Cart</button>
+                        <% if (!errorMessage) { %>
+                        <form action="/cart/<%= product._id %>" method="post">
+                            <button class="add-to-cart btn btn-warning"  data-product-id="<%= product._id %>" data-product-price="<%= product.Price %>" type="submit">Add to Cart</button>
+                            <div type="button" class="btn btn-primary btn-lg btn-block">
+                                <a href="/buy-product?productId=<%=product._id%>" style="text-decoration: none; color: white;">Buy Now</a>
+                            </div>
                         </form>                  
-                        <!-- <button class="buy-now btn btn-primary" onclick="location.href='/CheckOutPage/<%= element._id %>'">Buy Now</button> -->
-
+                        <% } else { %>
+                            <p id="error"><%= errorMessage %></p>
+                        <% } %>
                     </div>
                 </div>
             </div>
 
         </div>
     </div>
-    <%})%>
 </div>
 
-
-<h1><center>Recommented Prdoducts</center></h1>
-
+<h1><center>Recommended Products</center></h1>
 
 <div class="container mt-4">
-    <div class="row row-cols-3">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
         <% recommendedProducts.forEach(recommendedProduct => { %>
-            <div class="col-md-4 col-lg-3">
-                <div class="card">
-                    <img class="card-img-top" style="width: 100%; height: 21.1em;" src="/productImages/<%= recommendedProduct.Image[0] %>" />
+            <div class="col">
+                <div class="card mb-4">
+                    <a href="/details/<%= recommendedProduct._id %>"> <!-- Details Page URL -->
+                        <img class="card-img-top" src="/productImages/<%= recommendedProduct.Image[0] %>" alt="<%= recommendedProduct.Productname %>">
+                    </a>
                     <div class="card-body">
                         <h5 class="card-title"><%= recommendedProduct.Productname %></h5>
                         <span class="offer-price">₹<%= recommendedProduct.OriginalPrice %></span>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <form action="/cart/<%= recommendedProduct._id %>" method="post">
-                                <button class="add-to-cart btn btn-warning"  data-product-id="<%= recommendedProduct._id %>" data-product-price="<%= recommendedProduct.Price %>" type="submit">Add to Cart</button>
-                            </form>
-                            <a href="/details/<%= recommendedProduct._id %>" class="btn btn-primary">Buy Now</a>
-                        </div>
                     </div>
                 </div>
             </div>

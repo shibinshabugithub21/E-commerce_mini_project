@@ -72,6 +72,48 @@ const checkoutpage = async (req, res) => {
     }
 };
 
+const productCheckout = async (req, res) => {
+    try {
+        const userId = req.session.userid;
+        const category =await collectionCat.find({isBlocked:false})
+
+        const userDetails = await collectionModel.findOne({ _id: userId });
+
+        const user = userDetails._id;
+
+        const productId = req.query.productId
+
+        const product = await collectionProduct.findById(productId);
+
+        let totalPrice = 0;
+        const result = [{
+            name: product.Productname,
+            price: product.OriginalPrice
+        }];
+
+
+        const coupons = await collectionCoupoun.find({});
+
+        let checktotal = userDetails.cart.grantTotal
+
+        const validCoupons = [];
+
+         coupons.forEach(coupon => {
+         if (coupon.couponValue < checktotal) {
+        validCoupons.push(coupon);
+       }
+       });
+
+
+        res.render('user/checkout', { user: userDetails, result, total:result[0].price, cartCount: 1, validCoupons,category });
+
+    } catch (error) {
+        console.log(error);
+        const message = error.message;
+        res.render('404-error', { error, message });
+    }
+};
+
 const coupoun = async (req, res) => {
     const { id } = req.params;
     const userId = req.session.userid;
@@ -372,6 +414,14 @@ const wallet = async (req, res) => {
         res.status(500).send('Internal server error');
     }
 }
+//refferal
+const refferal= async (req,res)=>{
+    console.log("session user" ,req.session.userid)
+        const category =await collectionCat.find({isBlocked:false})
+        const user = await collectionModel.findById(req.session.userid);
+        res.render("user/referal",{user,category})
+} 
+
 // failed pay
 const failedpay = async (req, res) => {
     const { Id } = req.body;
@@ -405,5 +455,5 @@ const success= async(req,res)=>{
 
 module.exports={
      checkoutpage,addressAdding,addressAddingpost,
-    orderSuccess,walletSuccess,razor, coupoun,success,wallet,failedpay
+    orderSuccess,walletSuccess,razor, coupoun,success,wallet,failedpay, productCheckout,refferal
 }

@@ -165,60 +165,7 @@
             <!-- Add more navigation items as needed -->
         </ul>
     </div>
-    <!-- Update the form tag to include an id attribute for easier selection -->
-<!-- <form id="editProductForm" action="/admin/editproduct/<%= element._id%>" method="post" enctype="multipart/form-data"
-    onsubmit="return validateForm()">
-
-        <label for="productName">Product Name:</label>
-        <input type="text" id="productName" name="productName" value="<%=element.Productname%>">
-        <div class="error-message" id="productNameError"></div>
-
-        <label for="category">Category:</label>
-        <input type="text" id="category" name="category" value="<%=element.Category%>">
-        <div class="error-message" id="categoryError"></div>
-
-        <label for="stock">Stock:</label>
-        <input type="number" min="1" id="stock" min="0" name="stock" value="<%=element.Stock%>">
-        <div class="error-message" id="stockError"></div>
-        <label for="discountedPrice">Original Price:</label>
-        <input type="number" min="1" step="0.01" name="discountedPrice" id="discountedPrice" value="<%=element.Price%>">
-        <div class="error-message" id="discountedPriceError"></div>
-        
-        
-        
-    
-        <label for="offer">Offer (%):</label>
-        <input type="number" min="0" max="100" step="1" name="offer" id="offer"  value="<%=element.OfferPercentage%>" >
-        <div class="error-message" id="offerError"></div>
-    
-       
-        <label for="price">Discounted Price:</label>
-        <input type="number" min="1" step="0.01" id="price" name="price" value="<%=element.OriginalPrice%>"readonly>
-        <div class="error-message" id="priceError"></div>
-        
-
-
-        <label for="rating">Rating:</label>
-        <input type="number" min="1" id="rating" name="rating" value="<%=element.Rating%>">
-        <div class="error-message" id="ratingError"></div>
-
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" rows="4"><%=element.Description %></textarea>
-        <div id="descriptionError" class="error-message"></div>
-
-        <label for="productImage">Product Image:</label>
-        <input type="file" id="image" name="image" accept="image/*" multiple onchange="previewImages(event)">
-        <div id="preview">
-            <% element.Image.forEach((image, index) => { %>
-            <div class="image-container">
-                <img id="zoom-image-<%= element._id %>" class="card-img-top" src="/productImages/<%= image %>" />
-                <div class="delete-button" onclick="deleteImage(this, '<%= image %>','<%= element._id %>')">delete</div>
-            </div>
-            <% }); %>
-        </div>
-        <p id="image-count">Image Count: 6</p>
-        <button type="submit">Edit Product</button>
-    </form> -->
+  
     <div class="content">
         <form id="editProductForm" action="/admin/editproduct/<%= element._id%>" method="post" enctype="multipart/form-data">
     
@@ -233,25 +180,22 @@
             <% }); %>
         </select>
     
-            <label for="stock">Stock:</label>
-            <input type="number" id="stock" name="stock" value="<%=element.Stock%>">
-            <div class="error-message" id="stockError"></div>
+        <label for="stock">Stock:</label>
+        <input type="number" id="stock" name="stock" value="<%=element.Stock%>">
+        <div class="error-message" id="stockError"></div> <!-- Error message for Stock field -->
     
-            <label for="discountedPrice">Original Price:</label>
-            <input type="number" step="0.01" name="discountedPrice" id="discountedPrice" value="<%=element.Price%>">
-            <div class="error-message" id="discountedPriceError"></div>
+        <label for="discountedPrice">Original Price:</label>
+        <input type="number" name="discountedPrice" id="discountedPrice" value="<%=element.Price%>">
+        <div class="error-message" id="discountedPriceError"></div> <!-- Error message for Original Price field -->
     
-            <label for="offer">Offer (%):</label>
-            <input type="number" step="1" name="offer" id="offer" value="<%=element.OfferPercentage%>">
-            <div class="error-message" id="offerError"></div>
+        <label for="offer">Offer (%):</label>
+        <input type="number" name="offer" id="offer" value="<%=element.OfferPercentage%>">
+        <div class="error-message" id="offerError"></div> <!-- Error message for Offer field -->
     
-            <label for="price">Discounted Price:</label>
-            <input type="number" step="0.01" id="price" name="price" value="<%=element.OriginalPrice%>" readonly>
-            <div class="error-message" id="priceError"></div> <!-- Unique ID for this error message -->
-    
-            <label for="rating">Rating:</label>
-            <input type="number" id="rating" name="rating" value="<%=element.Rating%>">
-            <div class="error-message" id="ratingError"></div>
+        <label for="rating">Rating:</label>
+        <input type="number" id="rating" name="rating" value="<%=element.Rating%>">
+        <div class="error-message" id="ratingError"></div> 
+        
     
             <label for="description">Description:</label>
             <textarea id="description" name="description" rows="4"><%=element.Description %></textarea>
@@ -334,78 +278,66 @@
             const countDisplay = document.getElementById('image-count');
             countDisplay.innerText = `Image Count: ${imageCount}`;
         }
+// Validation
+document.getElementById('editProductForm').addEventListener('submit', function(event) {
+    event.preventDefault();
 
-       // validation
-       function validateForm(e) {
-            console.log("Form validation")
-            // Reset previous error messages and styles
-            resetErrors();
+    let stock = document.getElementById("stock").value.trim();
+    let stockError = document.getElementById("stockError");
+    let discountedPrice = document.getElementById("discountedPrice").value.trim();
+    let discountedPriceError = document.getElementById("discountedPriceError");
+    let offer = document.getElementById("offer").value.trim();
+    let offerError = document.getElementById("offerError");
+    let rating = document.getElementById("rating").value.trim();
+    let ratingError = document.getElementById("ratingError");
 
-            // Get form inputs
-            var productName = document.getElementById("productName").value.trim();
-            var category = document.getElementById("category").value.trim();
-            var stock = document.getElementById("stock").value.trim();
-            var discountedPrice = document.getElementById("discountedPrice").value.trim();
-            var offer = document.getElementById("offer").value.trim();
-            var rating = document.getElementById("rating").value.trim();
-            var description = document.getElementById("description").value.trim();
+    // Function to show error message
+    function showError(element, message) {
+        element.textContent = message; // Display the error message
+    }
 
-            // Flag to track validation status
-            var isValid = true;
+    // Function to clear error message
+    function clearError(element) {
+        element.textContent = ""; // Clear the error message
+    }
 
-            // Validate Product Name
-            if (productName === "") {
-                showError("productName", "Product Name is required");
-                isValid = false;
-            }
+    // Check if stock is a negative number
+    if (stock < 0) {
+        showError(stockError, "Stock cannot be a negative number");
+        return;
+    }
+    clearError(stockError);
 
-            // Validate Category
-            if (category === "") {
-                showError("category", "Category is required");
-                isValid = false;
-            }
+    // Check if discounted price is a negative number
+    if (discountedPrice < 0) {
+        showError(discountedPriceError, "Original Price cannot be a negative number");
+        return;
+    }
+    clearError(discountedPriceError);
 
-            // Validate Stock
-            if (stock === "" || isNaN(stock) || stock <= 0) {
-                showError("stock", "Stock must be a positive number");
-                isValid = false;
-            }
+    // Check if offer is a negative number
+    if (offer < 0) {
+        showError(offerError, "Offer cannot be a negative number");
+        return;
+    }
+    clearError(offerError);
 
-            // Validate Discounted Price
-            if (discountedPrice === "" || isNaN(discountedPrice) || discountedPrice <= 0) {
-                showError("discountedPrice", "Discounted Price must be a positive number");
-                isValid = false;
-            }
+    // Check if rating is a negative number
+    if (rating < 0) {
+        showError(ratingError, "Rating cannot be a negative number");
+        return;
+    }
+    clearError(ratingError);
 
-            // Validate Offer
-            if (offer === "" || isNaN(offer) || offer < 0 || offer > 100) {
-                showError("offer", "Offer must be a number between 0 and 100");
-                isValid = false;
-            }
+    // If all inputs are valid, submit the form
+    this.submit();
+});
 
-            // Validate Rating
-            if (rating === "" || isNaN(rating) || rating < 1) {
-                showError("rating", "Rating must be a number greater than or equal to 1");
-                isValid = false;
-            }
-
-            // Validate Description
-            if (description === "") {
-                showError("description", "Description is required");
-                isValid = false;
-            }
-
-            if(!isValid)
-                e.preventDefault();
-        }
-
-        function showError(fieldId, errorMessage) {
-            var field = document.getElementById(fieldId);
-            var errorElement = field.nextElementSibling;
-            console.log(errorElement)
-            errorElement.innerText = errorMessage;
-            errorElement.style.color = "red";
-        }
+function showError(fieldId, errorMessage) {
+    var errorElement = document.getElementById(fieldId + "Error"); // Append "Error" to fieldId to target the error message placeholder
+    errorElement.innerText = errorMessage;
+    errorElement.style.color = "red";
+}
 
         function resetErrors() {
             var errorElements = document.getElementsByClassName("error-message");
