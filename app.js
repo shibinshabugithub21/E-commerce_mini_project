@@ -27,7 +27,7 @@ app.use(session({
 
 // connecting moongodb
 
-    mongoose.connect(`mongodb://${process.env.DATABASE}`).then(()=>{
+    mongoose.connect(process.env.DATABASE).then(()=>{
         console.log('mongodb had connected');
     }).catch(()=>{
         console.log('mongodb has not connected');
