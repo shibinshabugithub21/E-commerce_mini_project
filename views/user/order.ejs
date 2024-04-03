@@ -115,7 +115,7 @@
                                         </div>
                                     <% }); %>
 
-                                    <% if (order.paymentstatus == "confirmed" && product.status !== "Cancelled") { %>
+                                    <% if (order.paymentstatus === "confirmed" && product.status === "Delivered") { %>
 
                                     <button class="btn btn-primary" onclick="generateInvoice('<%= order._id %>', '<%= product._id %>')">Generate Invoice</button>
                                     
@@ -127,13 +127,15 @@
                             <% } %>
                             <% } else { %>
                                 <!-- Update the Continue Payment button -->
-                                <% if (product.status !== "Cancelled") { %>
-                                    <% order.cartProduct.forEach(cartItem => { %>
-                                        <% if (cartItem.productname.toString() === product.p_id.toString()) { %>
-                                            <a style="text-decoration: none;color: #ffffff; background-color: #d52d2d; cursor: pointer;  align-items: center;" onclick="failedpay('<%= cartItem.totalprice%>','<%= order._id %>')">Continue Payment >></a>
-                                        <% } %>
-                                    <% }); %>
-                                <% } %>
+                               
+<% if (order.paymentstatus !== "confirmed" || product.status === "Failed") { %>
+    <!-- Display continue payment button for failed orders -->
+    <% order.cartProduct.forEach(cartItem => { %>
+        <% if (cartItem.productname.toString() === product.p_id.toString()) { %>
+            <a style="text-decoration: none;color: #ffffff; background-color: #d52d2d; cursor: pointer;  align-items: center;" onclick="failedpay('<%= cartItem.totalprice%>','<%= order._id %>')">Continue Payment >></a>
+        <% } %>
+    <% }); %>
+<% } %>
                             <% } %>
                             
                         </div>        
@@ -334,6 +336,7 @@
     });
 
     }
+
 
 </script>
 <script src="https://checkout.razorpay.com/v1/razorpay.js"></script>

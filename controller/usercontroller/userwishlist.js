@@ -1,16 +1,6 @@
-const { render } = require('ejs');
-const { sendEmail,sendforgetpassword } = require('../../middleware/nodeMailer');
-const nodemailer = require('nodemailer');
-const collectionModel = require('../../models/userdb');
 
-// const coll =require('../models/userdb');
-const collectionOtp = require('../../models/otp');
+const collectionModel = require('../../models/userdb');
 const collectionProduct = require("../../models/product"); 
-const collectionOrder = require('../../models/order');
-const bcrypt = require("bcrypt");
-const Razorpay = require('razorpay');
-const collectionCoupoun = require('../../models/coupoun');
-const BannerDB = require("../../models/bannerdb");
 const collectionCat = require('../../models/category')
 
 //whish list 

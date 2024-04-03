@@ -16,8 +16,8 @@
             padding: 0;
             display: flex;
             min-height: 100vh;
-            background-color: #f4f4f4;
             overflow-x: hidden; /* Remove horizontal scrolling */
+            background-color: #f4f4f4;
         }
 
         /* Sidebar Navigation */
@@ -32,10 +32,6 @@
             position: fixed;
             top: 0;
             left: 0;
-
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
 
         .side-nav ul {
@@ -64,11 +60,10 @@
 
         /* Main Content Area */
         .content {
-            flex: 1;
-            padding: 30px;
-            /* margin-left: 167px; */
-            overflow-x: hidden; /* Hide horizontal overflow */
-        }
+    margin-left: 220px; /* Adjusted to accommodate sidebar */
+    padding: 20px; /* Adjusted padding */
+    flex: 1;
+}
 
         /* Top Navigation */
         .top-nav {
@@ -81,12 +76,14 @@
             margin-left: 212px;
         }
 
-        /* Table Styling */
-        table {
-            border-collapse: collapse;
-            margin: 20px auto;
-             margin-left: 210px;
-        }
+       
+/* Table Styling */
+table {
+    width: calc(100% - 240px); /* Adjusted table width */
+    border-collapse: collapse;
+    margin: 20px auto;
+}
+
 
         th,
         td {
@@ -100,7 +97,6 @@
             color: white;
         }
 
-        
         /* Pagination Styling */
         .pagination {
             display: flex;
@@ -136,27 +132,13 @@
             .side-nav {
                 display: none;
             }
-
-            .top-nav {
-                padding: 10px;
-            }
-
             .content {
-                padding: 10px;
-                margin-left: 0;
-            }
-
-            .add-product-btn {
-                margin-left: 10px;
+                margin-left: 0; /* Adjusted for smaller screens */
             }
         }
 
         .headline u {
             text-decoration: none;
-        }
-
-        .dt-row {
-            z-index: -1;
         }
     </style>
 </head>
@@ -239,7 +221,7 @@
                                         
                                     </td>
                                     <td>
-                                        <select name="itemStatus" id="<%= product._id %>" data-item-id="<%= product._id %>" data-order-id="<%= order._id %>" <%= order.status === 'cancelled' ? 'disabled' : '' %> style="<%= order.status === 'cancelled' ? 'font-weight: bold; color: black;' : '' %>" onchange="status('<%= order._id %>','<%= product._id %>')">
+                                        <select id="<%= product._id %>" onchange="status('<%= order._id %>', '<%= product._id %>')" name="itemStatus" <%= order.status === 'cancelled' ? 'disabled' : '' %> style="<%= order.status === 'cancelled' ? 'font-weight: bold; color: black;' : '' %>" class="status-select">
                                             <option value="Pending" <%= product.status === 'Pending' ? 'selected' : '' %>>Pending</option>
                                             <option value="Shipped" <%= product.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                                             <option value="Delivered" <%= product.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
@@ -248,6 +230,8 @@
                                             <option value="Return" <%= product.status === 'Return' ? 'selected' : '' %>>Return</option>
                                         </select>
                                     </td>
+                                    
+                                    
                                     <td><%= order.createdAt.toISOString().slice(0, 19).replace("T", " ") %></td>
                                 </tr>
                             <% } %>
@@ -269,39 +253,35 @@
    
   </script>
 
-    <script>
-     // Express Route for updating order status
-        // JavaScript
-        async function status(orderId, productId) {
-    const newStatus = document.getElementById(productId).value;
+<script>
+    // JavaScript function to handle status update
+    async function status(orderId, productId) {
+        const newStatus = document.getElementById(productId).value;
 
-    // Send HTTP request to update order status
-    await fetch(`/admin/order/${orderId}/${productId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status: newStatus })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to update order status');
+        // Send HTTP request to update order status
+        try {
+            const response = await fetch(`/admin/order/${orderId}/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update order status');
+            }
+
+            const data = await response.json();
+            console.log('Order status updated successfully:', data);
+            // Implement UI update logic here if needed
+        } catch (error) {
+            console.error('Error updating order status:', error.message);
+            // Handle error
         }
-        return response.json();
-    })
-    .then(data => {
-        // Update UI with the new order status
-        console.log('Order status updated successfully:', data);
-        // Implement UI update logic here if needed
-    })
-    .catch(error => {
-        console.error('Error updating order status:', error.message);
-        // Handle error
-    });
-};
+    }
+</script>
 
-
-    </script>
 
 </body>
 

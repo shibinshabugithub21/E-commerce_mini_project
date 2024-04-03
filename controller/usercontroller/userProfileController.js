@@ -1,16 +1,5 @@
 const collectionModel = require('../../models/userdb');
 const collectionCat=require('../../models/category');
-const collectionProduct = require('../../models/product');
-const { products } = require('./usercontroller');
-const collectionOrder = require('../../models/order');
-const collectionCoupoun = require('../../models/coupoun');
-const collectionBanner=require("../../models/bannerdb")
-const bcrypt = require("bcrypt");
-const { render } = require('ejs');
-const PDFDocument = require('pdfkit');
-const excelJS = require('exceljs');
-
-const fs = require('fs');
 
 
 // profile
@@ -19,8 +8,6 @@ const profile = async(req,res)=>{
     try {
         if(req.session.user){
         console.log('i am profile')
-        // console.log(req.session.user)
-        // console.log(req.session.userid)
         const category =await collectionCat.find({isBlocked:false})
         const userData = await collectionModel.findOne({ _id: req.session.userid});
         const name = userData.profile.address;
@@ -200,30 +187,21 @@ const deleteAddress = async (req, res) => {
     try {
         const addressId = req.params.id;
         const userEmail = req.session.user;
-        
-        
-        // Find the user by email
-        // const userData = await collectionModel.findOne({ email: userEmail });
+       
         const user = await collectionModel.findOne({ email: userEmail });
         
         // Check if user exists
         if (!user) {
             return res.status(404).send("User not found");
         }
-
-        // Find the index of the address to be deleted
         const addressIndex = user.profile.address.findIndex(addr => addr._id.toString() === addressId);
         if (addressIndex === -1) {
             return res.status(404).send("Address not found");
         }
-
-        // Remove the address from the array
         user.profile.address.splice(addressIndex, 1);
         
-        // Save the updated user document
         await user.save();
 
-        // Redirect to the manageAddress page
         res.redirect('/manageAddress');
     } catch (error) {
         console.error("Error deleting address:", error);
@@ -246,14 +224,6 @@ const changePassword = async (req, res) => {
         // Find the user by ID
         const user = await collectionModel.findById(userId);
         console.log(user);
-
-        // // Verify current password
-        // if (user.password !== currentPassword) {
-        // }
-
-        // if (newPassword !== confirmPassword) {
-        //     return res.status(400).json({ error: 'New password and confirm password do not match' });
-        // }
         const newpass = await bcrypt.hash(newPassword,10)
         user.password = newpass;
         await user.save();

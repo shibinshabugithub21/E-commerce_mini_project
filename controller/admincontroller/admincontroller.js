@@ -185,26 +185,6 @@ const orderput = async (req, res) => {
   }
 };
 
-// const blockCoupon = async (req, res) => {
-//     try {
-//         const couponId = req.params.id;
-//         const updatedCoupon = await collectionCoupoun.findByIdAndUpdate(couponId, { blocked: true }, { new: true });
-//         res.json(updatedCoupon);
-//     } catch (error) {
-//         res.status(500).json({ error: "Error blocking coupon" });
-//     }
-// };
-
-// const unblockCoupon = async (req, res) => {
-//     try {
-//         const couponId = req.params.id;
-//         const updatedCoupon = await collectionCoupoun.findByIdAndUpdate(couponId, { blocked: false }, { new: true });
-//         res.json(updatedCoupon);
-//     } catch (error) {
-//         res.status(500).json({ error: "Error unblocking coupon" });
-//     }
-// };
-
 // banner
 
 const sales = async (req, res) => {
@@ -227,7 +207,6 @@ const sales = async (req, res) => {
       order.products.forEach((productList) => {
         order.proCartDetail.forEach((value) => {
           orderDetails = {
-            _id: productList._id,
             p_name: productList.p_name,
             address: order.address,
             quantity: productList.quantity,
@@ -285,7 +264,6 @@ const generatePDF = async (req, res) => {
 
       doc.moveDown().fillColor(rowColor);
       doc.text(`Product Name: ${report.p_name}`);
-      doc.text(`Product ID: ${report._id}`);
       doc.text(`Price: ${report.price}`);
 
       if (report.totalprice !== undefined) {
@@ -306,7 +284,9 @@ const generatePDF = async (req, res) => {
         doc.text("Address Not Available");
       }
 
-      doc.text(`Date of Purchase: ${report.createdAt}`);
+      const formattedDate = new Date(report.createdAt).toLocaleDateString("en-GB");
+
+      doc.text(`Date of Purchase: ${formattedDate}`);
       doc.text(`Payment Method: ${paymentMethod}`);
       doc
         .strokeColor(rowColor)
@@ -336,7 +316,6 @@ const downloadExcel = async (req, res) => {
     const worksheet = workbook.addWorksheet("Sales Report");
 
     worksheet.columns = [
-      { header: "Product ID", key: "_id", width: 15 },
       { header: "Product Name", key: "p_name", width: 20 },
       { header: "Date", key: "createdAt", width: 15 },
       { header: "Quantity", key: "quantity", width: 15 },
@@ -360,7 +339,6 @@ const downloadExcel = async (req, res) => {
       });
 
       worksheet.addRow({
-        _id: item._id ? item._id.toString() : "",
         p_name: item.p_name || "",
         createdAt: formattedDate,
         quantity: item.quantity || "",

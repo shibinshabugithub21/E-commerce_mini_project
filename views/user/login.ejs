@@ -13,6 +13,33 @@
     <!---Boxicons CDN Setup for icons-->
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
 </head>
+<style>
+    .center-div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: rgb(74, 69, 69);
+            border-radius: 25px;
+            color: white;
+            padding: 30px;
+            width: 80%; /* Adjust width for larger screens */
+            max-width: 400px; /* Set a maximum width to prevent it from stretching too much */
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem; /* Increase spacing between form elements */
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                width: 80%; /* Adjust width for mobile view */
+            }
+        }
+</style>
 <body>
     <!-- navrbar starts -->
 
@@ -43,40 +70,30 @@
         </div>
     </nav>
 <!-- navbar ends -->
-
-<div class="text-center center-div" id="login" style="background-color:white; height: 600px; padding-top: 100px;" >
-  <div class="container w-25 border py-5"  style="border-radius: 25px; color: white; background-color:rgb(74, 69, 69);" >
-      <div class="title pb-5">
-          <h2 class="font-weight-bold">
-              Login 
-          </h2>
-          
-      </div>
-      
-      <form  class="pt-3" action="/login" method="post" >
-      <!-- <form  class="pt-3"  onsubmit="submitForm(event)"> -->
-          
-          <div class="form-group">
-              <div id="error" ></div>
-              
-              <input type="email"  id="email" class="form-control" placeholder="email" name="email" required>
-              <!-- <small class="form-text text-muted text-left">Log In</small> -->
-          </div>
-          <div class="form-group">
-              <input type="password"  id="password" class="form-control" name="password" placeholder="password" required>
-          </div>
-          <div id="error"></div>
-
-          <a href="/emailforget">Forget Password</a>
-          <br>
-          
-          <button type="submit" class="btn btn-outline-success">Submit</button>
-          <p>Don't have any account? <a href="/signup">signup</a></p>
-          <div class="d-flex align-items-center justify-content-center pb-4">
+<div class="text-center center-div">
+    <div class="login-container">
+        <div class="title pb-3">
+            <h2 class="font-weight-bold">Login</h2>
+        </div>
+        
+        <form action="/login" method="post">
+            <div class="form-group">
+                <input type="email" id="email" class="form-control" placeholder="Email" name="email" required>
             </div>
-      </form>
-  </div>
-   </div>
+            <div class="form-group">
+                <input type="password" id="password" class="form-control" name="password" placeholder="Password" required>
+            </div>
+            <div id="error"></div>
+            <a href="/emailforget" class="text-white">Forgot Password?</a>
+            <br>
+            <button type="submit" class="btn btn-outline-success mt-3">Submit</button>
+            <p class="mt-3">Don't have an account? <a href="/signup" class="text-white">Signup</a></p>
+        </form>
+    </div>
+</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js"></script>
    <script>
       let emailUser = document.getElementById("email");
       let passwordUser = document.getElementById("password");

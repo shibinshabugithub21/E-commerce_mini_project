@@ -499,7 +499,13 @@
                 <h3>Payment</h3>
                 <div style="display: block;">
                     <input type="radio" id="cashOnDelivery" name="paymentMethod" value="cashondelivery"> Cash on Delivery
+                   
                 </div>
+                
+    <div id="cashOnDeliveryError" style="display: none; color: red;">
+      Cash on delivery is not available for orders exceeding ₹10,000.
+  </div>
+  
                 <div style="display: block;">
                   <input type="radio" id="wallet" name="paymentMethod" value="wallet"> Wallet Pay
               </div>
@@ -518,8 +524,10 @@
             </div>
             <!-- End of buttons section -->
             <hr>
-            <p>Total <span class="price" id="totalAmount" style="color:black"><b>₹<%= total %></b></span></p>
-        </div>
+            
+            <p>Total:<span class="price" id="totalAmount" style="color:black"><b>₹<%= total %></b></span></p>
+            <p>Delivery Charge: ₹<%= deliveryCharge %></p>
+                    </div>
     </div>
     
     </div>
@@ -666,13 +674,7 @@
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script> -->
-  <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script> -->
-  <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
-
   <script>
     let userAddress;
     document.getElementById('existing-address').addEventListener('change', function() {
@@ -700,6 +702,7 @@
     // Get the radio button and input field elements
     const partialRadio = document.getElementById("partial");
     const partialInput = document.getElementById("inputpartial");
+        const cashOnDeliveryRadioButton = document.getElementById("cashOnDelivery");
 
     // Add event listener to the partial radio button
     partialRadio.addEventListener("change", function() {
@@ -714,51 +717,49 @@
   const email = document.getElementById("email");
   const addressid = this.value;
 
- async function checkoutChecking(){
-    console.log("checkout")
-console.log(userAddress)
-const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+  async function checkoutChecking() {
+    console.log("checkout");
+    console.log(userAddress);
+    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
     if (!selectedPaymentMethod) {
- // Show SweetAlert message for selecting a payment method
- await Swal.fire({
+        // Show SweetAlert message for selecting a payment method
+        await Swal.fire({
             icon: 'error',
             title: 'Oops...',
             text: 'Please select a payment method.'
         });
-        return;        return;
+        return;
     }
 
     const paymentMethod = selectedPaymentMethod.value;
 
-
-    const partialAmount = document.getElementById('inputpartial').value
-    console.log("Partial amount", partialAmount)
+    const partialAmount = document.getElementById('inputpartial').value;
+    console.log("Partial amount", partialAmount);
 
     let dataa = {
-        emailAddress:email.value,
-        addressid : userAddress, 
-        partialAmount, 
+        emailAddress: email.value,
+        addressid: userAddress,
+        partialAmount,
         method: []
-    }
+    };
 
-
-
-
-
+   
     const totalPriceElement = document.getElementById("totalAmount");
     const totalPriceText = totalPriceElement.innerText;
     const totalPrice = parseFloat(totalPriceText.replace(/[^\d.]/g, '')); // Remove non-numeric characters and convert to float
 
-    if (totalPrice > 10000) {
-        // Show alert message
-    // Show SweetAlert message
-          Swal.fire({
-                      icon: 'error',
-                      title: 'Oops...',
-                      text: 'Total price is greater than 10000. Please choose another payment method.'
-           });
-                return;
+    console.log("Total price:", totalPrice);
+
+    if (totalPrice > 10000 && paymentMethod === "cashondelivery") {
+        // Disable the Cash on Delivery (COD) radio button
+        console.log("Disabling Cash on Delivery...");
+        document.getElementById("cashOnDelivery").disabled = true;
+        // Show error message
+        document.getElementById("cashOnDeliveryError").style.display = "block";
+        return;
     }
+
+
 
     if (paymentMethod === "cashondelivery") {
         dataa.method = [{

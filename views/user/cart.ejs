@@ -129,14 +129,14 @@ img {
               </li>
               <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                 Shipping
-                <span>Free</span>
+                <span>₹<%= deliveryFee %></span>
               </li>
               <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
                 <div>
                   <strong>Total amount</strong>
                  
                 </div>
-                <span><strong id="Totalamount">₹<%= grantTotal %></strong></span>
+                <span><strong id="Totalamount">₹<%= grantTotal + deliveryFee %></strong></span>
               </li>
             </ul>
 
@@ -153,80 +153,6 @@ img {
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
-// Function to update quantity and send request to server
-// async function updateQuantity(itemId, quantityChange) {
-//     const quantityInput = document.getElementById(`quantity_${itemId}`);
-//     const newQuantity = parseInt(quantityInput.value) + parseInt(quantityChange);
-// console.log(newQuantity,"heloo");
-//     if (newQuantity <= 0) {
-//         // Handle removing the item from the cart if quantity becomes zero or negative
-//         // You can implement your logic here or display a message to the user
-//         return;
-//     }
-//     console.log(itemId);
-//     try {
-//         // Send a fetch request to update the quantity on the server
-//         const response = await fetch(`/cartupdate/${itemId}`, {
-//             method: 'post',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({ quantity: newQuantity }),
-//         });
-//         if (!response.ok) {
-//             throw new Error('Failed to update quantity');
-//         }
-//         // Refresh the page to reflect the updated cart
-//         location.reload();
-//     } catch (error) {
-//         console.error('Error updating quantity:', error);
-//         // Handle the error (e.g., show a message to the user)
-//     }
-// }
-
-// async function updateQuantity(itemId, direction) {
-//     const quantityInput = document.getElementById(`quantity_${itemId}`);
-//     let newQuantity = parseInt(quantityInput.value);
-
-//     // Increment or decrement the quantity based on the direction
-//     if (direction === 'increment') {
-//         newQuantity++;
-//     } else if (direction === 'decrement' && newQuantity > 1) {
-//         newQuantity--;
-//     } else {
-//         // Don't allow the quantity to go below 1
-//         return;
-//     }
-
-//     try {
-//         // Send a fetch request to update the quantity on the server
-//         const response = await fetch(`/cartupdate/${itemId}`, {
-//             method: 'post',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({ quantity: newQuantity }),
-//         });
-//         if (!response.ok) {
-//             throw new Error('Failed to update quantity');
-//         }
-//         // Parse the JSON response
-//         const data = await response.json();
-//         // Update the quantity and total price on the page
-//         quantityInput.value = newQuantity;
-//         const totalPriceElement = document.getElementById(`totalPrice_${itemId}`);
-//         totalPriceElement.innerText = `₹${data.grantTotal}`;
-        
-//         // Check if the server response contains showAlert flag
-//         if (data.showAlert) {
-//             // Display a SweetAlert if showAlert is true
-//             swal("Out of Stock", data.alertMessage, "warning");
-//         }
-//     } catch (error) {
-//         console.error('Error updating quantity:', error);
-//         // Handle the error (e.g., show a message to the user)
-//     }
-// }
 
 
 async function updateQuantity(itemId, direction) {

@@ -247,81 +247,60 @@
         color: var(--accent-color);
     }
 
-    /* Responsive Mobile */
-    @media screen and (max-width: 520px) {
-        .container {
-            padding: 20px;
-            height: auto;
+    /* Responsive styles */
+    @media screen and (max-width: 768px) {
+        .single-product {
+            flex-direction: column;
+            align-items: center;
         }
 
-        .row {
-            display: block;
-        }
-
-        .col-6 {
-            width: 100%;
-            display: block;
+        .product-image {
+            margin-right: 0;
+            margin-bottom: 20px;
         }
 
         .product-image-main {
-            width: 100%;
-            height: 200px;
+            margin-left: 0;
         }
 
         .product-image-slider {
-            gap: 5px;
-            margin: 50px;
+            margin: 20px auto;
+            justify-content: center;
+        }
+
+        .product-image-slider img {
+            width: 80px; /* Adjust size as needed */
+            height: auto;
+        }
+
+        .product-details {
+            text-align: center;
         }
 
         .breadcrumb {
             display: none;
         }
 
-        .product-title h2 {
-            font-size: 24px;
-            line-height: 1.6rem;
+        /* Adjust zoom container size for smaller screens */
+        .zoom-container {
+            width: 80%; /* Adjust width as needed */
+            height: auto;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .product-size {
-            display: block;
+        /* Adjust lens size for smaller screens */
+        .lens {
+            width: 20px; /* Adjust size as needed */
+            height: 20px;
         }
 
-        .product-size .size-layout {
-            display: block;
-            margin: 10px 0;
-        }
-
-        .product-size .size-layout .size {
-            padding: 6px 10px;
-        }
-
-        .product-btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        /* Adjust result container size for smaller screens */
+        .result {
+            width: 200px; /* Adjust size as needed */
+            height: 200px;
         }
     }
-    .product-price {
-    display: flex;
-    position: relative;
-    margin: 10px 0;
-    align-items: center;
-}
-
-.product-price .sale-price {
-    font-size: 22px;
-    font-weight: 500;
-    text-decoration: line-through; /* Add strike-through */
-    color: var(--grey);
-    margin-right: 12px; /* Adjust margin as needed */
-}
-
-.product-price .offer-price {
-    font-size: 48px;
-    font-weight: 700;
-color: black;
-}
-
 
     /* Responsive Tablet */
     @media (min-width: 520px) and (max-width: 1080px) {
@@ -358,6 +337,7 @@ color: black;
     .offer-price {
         font-size: 14px; /* Adjust font size as needed */
     }
+    
 
 </style>
 
@@ -457,72 +437,76 @@ color: black;
 
 
 <script>
-   const containers = document.querySelectorAll(".container-img");
+    const containers = document.querySelectorAll(".container-img");
 
-containers.forEach(container => {
-    const lens = container.querySelector(".lens");
-    const result = container.querySelector(".result");
-
-    container.addEventListener("mousemove", zoomImage);
-    container.addEventListener("mouseenter", () => {
-        lens.style.display = "block";
-        result.style.display = "block";
-    });
-    container.addEventListener("mouseleave", () => {
-        lens.style.display = "none";
-        result.style.display = "none";
-    });
-
-    function zoomImage(e) {
-        const productId = container.querySelector(".lens").getAttribute("data-productid");
-        const image = container.querySelector(`#image-${productId}`);
+    containers.forEach(container => {
         const lens = container.querySelector(".lens");
         const result = container.querySelector(".result");
 
-        const containerRect = container.getBoundingClientRect();
-        const lensRect = lens.getBoundingClientRect();
-        const resultRect = result.getBoundingClientRect();
+        // Check if the window width is greater than or equal to 520 pixels
+        if (window.innerWidth >= 520) {
+            container.addEventListener("mousemove", zoomImage);
+            container.addEventListener("mouseenter", () => {
+                lens.style.display = "block";
+                result.style.display = "block";
+            });
+            container.addEventListener("mouseleave", () => {
+                lens.style.display = "none";
+                result.style.display = "none";
+            });
+        }
 
-        const { x, y } = getMousePos(e);
+        function zoomImage(e) {
+            const productId = container.querySelector(".lens").getAttribute("data-productid");
+            const image = container.querySelector(`#image-${productId}`);
+            const lens = container.querySelector(".lens");
+            const result = container.querySelector(".result");
 
-        lens.style.left = x + "px";
-        lens.style.top = y + "px";
+            const containerRect = container.getBoundingClientRect();
+            const lensRect = lens.getBoundingClientRect();
+            const resultRect = result.getBoundingClientRect();
 
-        let fx = resultRect.width / lensRect.width;
-        let fy = resultRect.height / lensRect.height;
+            const { x, y } = getMousePos(e);
 
-        result.style.backgroundImage = `url('${image.src}')`;
-        result.style.backgroundSize = `${image.width * fx}px ${image.height * fy}px`;
-        result.style.backgroundPosition = `-${x * fx}px -${y * fy}px`;
-    }
+            lens.style.left = x + "px";
+            lens.style.top = y + "px";
 
-    function getMousePos(e) {
-        const containerRect = container.getBoundingClientRect();
-        return {
-            x: e.clientX - containerRect.left - lens.offsetWidth / 2,
-            y: e.clientY - containerRect.top - lens.offsetHeight / 2
-        };
-    }
-});
+            let fx = resultRect.width / lensRect.width;
+            let fy = resultRect.height / lensRect.height;
 
-function changeMainImage(productId, imageSrc) {
-    const mainImage = document.querySelector(`#image-${productId}`);
-    mainImage.src = `/productImages/${imageSrc}`;
-}
+            result.style.backgroundImage = `url('${image.src}')`;
+            result.style.backgroundSize = `${image.width * fx}px ${image.height * fy}px`;
+            result.style.backgroundPosition = `-${x * fx}px -${y * fy}px`;
+        }
 
-function addToCheckout(productId) {
-    // Make a POST request to the addToCheckout route with the product ID
-    fetch(`/addToCheckout/${productId}`, {
-        method: 'POST'
-    })
-    .then(response => {
-        // Handle response, such as redirecting to the checkout page
-        window.location.href = '/checkout';
-    })
-    .catch(error => {
-        console.error('Error:', error);
+        function getMousePos(e) {
+            const containerRect = container.getBoundingClientRect();
+            return {
+                x: e.clientX - containerRect.left - lens.offsetWidth / 2,
+                y: e.clientY - containerRect.top - lens.offsetHeight / 2
+            };
+        }
     });
-}
+
+    function changeMainImage(productId, imageSrc) {
+        const mainImage = document.querySelector(`#image-${productId}`);
+        mainImage.src = `/productImages/${imageSrc}`;
+    }
+
+    function addToCheckout(productId) {
+        // Make a POST request to the addToCheckout route with the product ID
+        fetch(`/addToCheckout/${productId}`, {
+            method: 'POST'
+        })
+        .then(response => {
+            // Handle response, such as redirecting to the checkout page
+            window.location.href = '/checkout';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
 </script>
+
 
 <%-include('footer')-%>

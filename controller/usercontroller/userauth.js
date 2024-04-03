@@ -1,6 +1,4 @@
-const { render } = require("ejs");
-const { sendEmail, sendforgetpassword } = require("../../middleware/nodeMailer");
-const nodemailer = require("nodemailer");
+
 const collectionModel = require("../../models/userdb");
 
 // const coll =require('../models/userdb');
@@ -8,8 +6,6 @@ const collectionOtp = require("../../models/otp");
 const collectionProduct = require("../../models/product");
 const collectionOrder = require("../../models/order");
 const bcrypt = require("bcrypt");
-const Razorpay = require("razorpay");
-const collectionCoupoun = require("../../models/coupoun");
 const BannerDB = require("../../models/bannerdb");
 const collectionCat = require("../../models/category");
 
@@ -19,7 +15,6 @@ const landing = async (req, res) => {
     let product;
 
     if (searchQuery) {
-      // Perform search if there's a search query
       product = await collectionProduct.find({
         $and: [
           { isDelete: true },
@@ -32,7 +27,6 @@ const landing = async (req, res) => {
         ],
       });
     } else {
-      // Otherwise, retrieve all products with isDelete:true
       product = await collectionProduct.find({ isDelete: true });
     }
     const category = await collectionCat.find({ isBlocked: false });
@@ -76,10 +70,8 @@ const loginpost = async (req, res) => {
       res.render("user/login.ejs", { mes: "Incorrect Password" });
     }
   } catch (error) {
-    // res.send("Wrong Details")
     res.render("user/login.ejs", { mes: "Incorrect Email" });
   }
-  // res.redirect("/home")
 };
 
 const signup = (req, res) => {
@@ -111,7 +103,6 @@ const generateReferralCode = (length) => {
 };
 
 const signuppost = async (req, res) => {
-  // console.log(req.body,"here int he sign out");
 
   const referralCode = generateReferralCode(8); // Change the length as needed
   console.log("referralCode", referralCode);
@@ -155,7 +146,6 @@ const signuppost = async (req, res) => {
 
   const existinUser = await collectionModel.findOne({ email: data.email });
   console.log("alredy exist user");
-  // console.log(existinUser)
 
   const randome = Math.floor(Math.random() * 90000) + 10000;
   const newOtp = await collectionOtp.create({ number: randome, email: data.email });
@@ -164,13 +154,11 @@ const signuppost = async (req, res) => {
     res.render("user/signup", { status: true, mes: "user all ready exists" });
   } else {
     await collectionModel.insertMany([datahash]);
-    // data["otpNum"] = randome
     req.session.otpGerner = data;
     console.log(data);
     console.log("here in the signup true");
     sendEmail(randome, req.body.email);
 
-    // res.redirect('user/otp')
     res.redirect("/otp");
   }
 };
@@ -294,57 +282,6 @@ const otppost = async (req, res) => {
   }
 };
 
-// const otppost = async (req, res) => {
-//     try {
-//         const num1 = req.body.num1 || '';
-//         const num2 = req.body.num2 || '';
-//         const num3 = req.body.num3 || '';
-//         const num4 = req.body.num4 || '';
-//         const num5 = req.body.num5 || '';
-
-//         if (!num1 || !num2 || !num3 || !num4 || !num5) {
-//             return res.status(400).render('user/otp', { error: 'Please enter all the OTP digits' });
-//         }
-
-//         const isNumber = parseInt(num1 + num2 + num3 + num4 + num5);
-//         console.log(typeof(isNumber));
-//         const result = await collectionOtp.findOne({ number: isNumber });
-
-//         if (!result) {
-//             return res.status(400).render('user/otp', { error: 'Invalid OTP. Please try again.' });
-//         }
-
-//         // Check if the user was referred
-//         if (req.session.otpGerner && req.session.otpGerner.referralCode) {
-//             // Find the referring user based on the referral code
-//             const referringUser = await collectionModel.findOne({ referralCode: req.session.otpGerner.referralCode });
-//             if (referringUser) {
-//                 // Update the referring user's wallet balance
-//                 await collectionModel.updateOne({ referralCode: req.session.otpGerner.referralCode }, { $inc: { walletbalance: 50 } });
-//                 console.log('Referring user wallet updated');
-
-//                 // Update the referred user's wallet balance if exists
-//                 const referredUser = await collectionModel.findOne({ email: req.session.otpGerner.email });
-//                 if (referredUser) {
-//                     await collectionModel.updateOne({ email: req.session.otpGerner.email }, { $inc: { walletbalance: 100 } });
-//                     console.log('Referred user wallet updated');
-//                 }
-//             } else {
-//                 console.log('Referring user not found');
-//             }
-//         }
-
-//         console.log(req.session.otpGerner);
-//         req.session.user = req.session.otpGerner.email;
-//         delete req.session.otpGerner;
-//         return res.redirect("/home");
-
-//     } catch (error) {
-//         console.log(error.message);
-//         const message = error.message;
-//         return res.status(500).render('404-error', { error, message });
-//     }
-// };
 
 //resend otp
 

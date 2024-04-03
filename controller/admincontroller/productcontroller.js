@@ -1,37 +1,19 @@
-const collectionModel = require('../../models/userdb');
 const collectionCat=require('../../models/category');
 const collectionProduct = require('../../models/product');
-const { products } = require('../usercontroller/usercontroller');
-const collectionOrder = require('../../models/order');
-const collectionCoupoun = require('../../models/coupoun');
-const BannerDB=require("../../models/bannerdb")
-const { render } = require('ejs');
-const PDFDocument = require('pdfkit');
-const excelJS = require('exceljs');
-
-
-const fs = require('fs');
-
-
 
 // products starts
 const product = async (req, res) => {
     try {
         
-        // Fetch products from the database
         const productList = await collectionProduct.find({});
-        
-        // Render the product page with the fetched products
-        res.render('admin/product', { product: productList });
+                res.render('admin/product', { product: productList });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
 };
 
-const addproduct =async (req, res) => {
-    // Check if the user is authenticated
-    
+const addproduct =async (req, res) => {    
     const categories = await collectionCat.find({isBlocked:false});
 
     const errorMessage = req.flash('error');
@@ -139,9 +121,6 @@ const editproductpost = async (req, res) => {
             if(req.body.rating < 0)
             return res.redirect('/admin/product')
 
-        // Perform other validation as needed
-
-        // Update product details
         products.Productname = req.body.productName;
         products.Category = req.body.Category;
         products.Stock = req.body.stock;
@@ -206,7 +185,6 @@ const isdelete = async (req, res) => {
 
 const notdelete = async (req, res) => {
     try {
-        // Get the username from the query parameters
         const productId =req.params.id
         await collectionProduct.updateOne({ _id: productId }, {
             $set: {
