@@ -185,6 +185,7 @@ const orderput = async (req, res) => {
   }
 };
 
+
 // banner
 
 const sales = async (req, res) => {
@@ -284,7 +285,7 @@ const generatePDF = async (req, res) => {
         doc.text("Address Not Available");
       }
 
-      const formattedDate = new Date(report.createdAt).toLocaleDateString("en-GB");
+      const formattedDate = new Date(report.createdAt).toLocaleDateString('en-GB');
 
       doc.text(`Date of Purchase: ${formattedDate}`);
       doc.text(`Payment Method: ${paymentMethod}`);

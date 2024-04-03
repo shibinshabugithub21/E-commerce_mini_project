@@ -1,11 +1,16 @@
-
+const { render } = require('ejs');
+const { sendEmail,sendforgetpassword } = require('../../middleware/nodeMailer');
+const nodemailer = require('nodemailer');
 const collectionModel = require('../../models/userdb');
 
-
+// const coll =require('../models/userdb');
+const collectionOtp = require('../../models/otp');
 const collectionProduct = require("../../models/product"); 
 const collectionOrder = require('../../models/order');
+const bcrypt = require("bcrypt");
 const Razorpay = require('razorpay');
 const collectionCoupoun = require('../../models/coupoun');
+const BannerDB = require("../../models/bannerdb");
 const collectionCat = require('../../models/category');
 
 const razorpay = new Razorpay({
@@ -19,12 +24,17 @@ const checkoutpage = async (req, res) => {
     try {
         const userId = req.session.userid;
         const category = await collectionCat.find({ isBlocked: false })
+
         const userDetails = await collectionModel.findOne({ _id: userId });
+
         const user = userDetails._id;
         const cartItems = userDetails.cart.items;
         const cartCount = cartItems.length;
+
         const cartProductIds = cartItems.map(item => item.productname);
+
         const cartProducts = await collectionProduct.find({ _id: { $in: cartProductIds } });
+
         let totalPrice = 0;
         const result = [];
         const deliveryCharge = 10;
@@ -36,14 +46,18 @@ const checkoutpage = async (req, res) => {
                         name: product.Productname,
                         price: product.OriginalPrice
                     });
-                    totalPrice += product.OriginalPrice; 
+                    totalPrice += product.OriginalPrice; // Use OriginalPrice instead of Price
                 }
             }
         }
+
+        // Add delivery charge to the total price
         totalPrice += deliveryCharge;
+
         const coupons = await collectionCoupoun.find({});
         let checktotal = userDetails.cart.grantTotal;
         const validCoupons = [];
+
         coupons.forEach(coupon => {
             if (coupon.couponValue < checktotal) {
                 validCoupons.push(coupon);
@@ -53,11 +67,11 @@ const checkoutpage = async (req, res) => {
         res.render('user/checkout', { 
             user: userDetails, 
             result, 
-            total: totalPrice,
+            total: totalPrice, // Pass totalPrice instead of userDetails.cart.grantTotal
             cartCount, 
             validCoupons, 
             category,
-            deliveryCharge
+            deliveryCharge // Pass deliveryCharge to the EJS template
         });
 
     } catch (error) {
@@ -86,7 +100,7 @@ const productCheckout = async (req, res) => {
             price: product.OriginalPrice
         }];
 
-        const deliveryCharge = 10; 
+        const deliveryCharge = 10; // Define the delivery charge here
 
         const coupons = await collectionCoupoun.find({});
 
@@ -100,16 +114,17 @@ const productCheckout = async (req, res) => {
             }
         });
 
+        // Calculate the total price including the product price and delivery charge
         totalPrice = result[0].price + deliveryCharge;
 
         res.render('user/checkout', { 
             user: userDetails, 
             result, 
-            total: totalPrice, 
+            total: totalPrice, // Pass the total price including delivery charge
             cartCount: 1, 
             validCoupons, 
             category, 
-            deliveryCharge 
+            deliveryCharge // Pass the delivery charge to the EJS template
         });
 
     } catch (error) {
@@ -262,11 +277,15 @@ const walletSuccess = async (req, res) => {
     
     try {
         const foundUser = await collectionModel.findOne({ _id: id });
-        const walletBalance = foundUser.walletbalance; 
-                const orderTotal = foundUser.cart?.grantTotal;
-                if (walletBalance < orderTotal) {
+        const walletBalance = foundUser.walletbalance; // Assuming walletBalance is the property name
+        
+        // Calculate the total amount of the order
+        const orderTotal = foundUser.cart?.grantTotal;
+        
+        // Check if the wallet balance is sufficient
+        if (walletBalance < orderTotal) {
             return res.status(400).json({ error: 'Insufficient wallet balance.' });
-            // alert('Insufficient wallet balance.');
+            alert('Insufficient wallet balance.');
 
         }
         
@@ -369,7 +388,7 @@ const addressAdding= async(req,res)=>{
 
 const addressAddingpost = async (req, res) => {
     const { name, houseName, city, phone, postalCode} = req.body;
-    const userId = req.session.user; 
+    const userId = req.session.user; // Assuming you have a session userId
     console.log(userId);
     try {
         const user = await collectionModel.findOne({ email : userId});

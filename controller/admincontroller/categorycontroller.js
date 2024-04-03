@@ -1,18 +1,35 @@
-
+const collectionModel = require('../../models/userdb');
 const collectionCat=require('../../models/category');
+const collectionProduct = require('../../models/product');
+const { products } = require('../usercontroller/usercontroller');
+const collectionOrder = require('../../models/order');
+const collectionCoupoun = require('../../models/coupoun');
+const BannerDB=require("../../models/bannerdb")
+const { render } = require('ejs');
+const PDFDocument = require('pdfkit');
+const excelJS = require('exceljs');
+
+
+const fs = require('fs');
+
 
 const category = async (req, res) => {
     try {
+        
         const categoryList = await collectionCat.find({});
+        
         res.render('admin/category', { category: categoryList });
     } catch (error) {
+        console.error(error);
         res.status(500).send('Internal Server Error');
     }
 };
 
+
 const addcategory = (req, res) => {
     res.render('admin/addcategory', { status: true, mes: "" })
 }
+
 
 const addcategorypost = async (req, res) => {
     try {
@@ -24,7 +41,7 @@ const addcategorypost = async (req, res) => {
         if (!existingCategory) {
             const newCategory = new collectionCat({
                 Category: lowercaseCategory,
-                isBlocked: false 
+                isBlocked: false // Assuming the category is not blocked by default
             });
 
             await newCategory.save();
@@ -52,7 +69,32 @@ const editcategory = async (req, res) => {
     }
 };
 
+// const update = async (req, res) => {
+//     try {
+//         const categoryId = req.params.id;
+//         const newName = req.body.name;
 
+//         const category = await collectionCat.findById(categoryId);
+//         console.log(newName)
+
+//         if (category) {
+//             if (newName.trim() !== "") {
+//                 category.Category = newName;
+//                 await category.save();  // Correct way to save changes
+//                 res.redirect('/admin/category');
+//             } else {
+//                 console.log("Error: New name cannot be empty");
+//                 res.status(400).send("New name cannot be empty");
+//             }
+//         } else {
+//             console.log("Error: Category not found");
+//             res.status(404).send("Category not found");
+//         }
+//     } catch (error) {
+//         console.error("Error during update:", error);
+//         res.status(500).send("Internal server error");
+//     }
+// };
 
 const update = async (req, res) => {
     try {
@@ -65,7 +107,7 @@ const update = async (req, res) => {
         if (category) {
             if (newName.trim() !== "") {
                 category.Category = newName;
-                await category.save();  
+                await category.save();  // Correct way to save changes
                 res.redirect('/admin/category');
             } else {
                 console.log("Error: New name cannot be empty");
@@ -85,9 +127,10 @@ const update = async (req, res) => {
 const deletecategory = async (req, res) => {
     try {
         const deletecategory = req.params.id;
+        // console.log(deletecategory);
         await collectionCat.findByIdAndDelete(deletecategory);
-        res.redirect('/admin/category'); 
-     } catch (error) {
+        res.redirect('/admin/category');  // Add a forward slash at the beginning
+    } catch (error) {
         console.log(error);
         res.status(500).send("Internal Server Error");
     }

@@ -1,7 +1,16 @@
-
+const { render } = require("ejs");
+const { sendEmail, sendforgetpassword } = require("../../middleware/nodeMailer");
+const nodemailer = require("nodemailer");
 const collectionModel = require("../../models/userdb");
+
+// const coll =require('../models/userdb');
+const collectionOtp = require("../../models/otp");
 const collectionProduct = require("../../models/product");
 const collectionOrder = require("../../models/order");
+const bcrypt = require("bcrypt");
+const Razorpay = require("razorpay");
+const collectionCoupoun = require("../../models/coupoun");
+const BannerDB = require("../../models/bannerdb");
 const collectionCat = require("../../models/category");
 
 //cart details
@@ -19,7 +28,7 @@ const loadcart = async (req, res) => {
     }
     const deliveryFee = DELIVERY_FEE;
     const cartItems = user.cart.items;
-    const grantTotal = user.cart.grantTotal;
+    const grantTotal = user.cart.grantTotal + deliveryFee;
     // Render the cart view with the fetched data
     res.render("user/cart", { user, cartItems, grantTotal: grantTotal, deliveryFee, category });
   } catch (error) {
@@ -49,6 +58,7 @@ const Addcart = async (req, res) => {
 
     // Ensure unitprice is a valid number
     if (isNaN(unitprice) || unitprice <= 0) {
+      // Handle the case where unitprice is not a valid number
       return res.status(400).json({ message: "Invalid unit price" });
     }
 
@@ -57,6 +67,8 @@ const Addcart = async (req, res) => {
 
     if (existingCartItemIndex !== -1) {
       cartItems[existingCartItemIndex].quantity += 1;
+
+      // Update totalprice only if unitprice is a valid number
       if (!isNaN(cartItems[existingCartItemIndex].quantity) && cartItems[existingCartItemIndex].quantity > 0) {
         cartItems[existingCartItemIndex].totalprice = cartItems[existingCartItemIndex].quantity * unitprice;
       }
@@ -73,6 +85,8 @@ const Addcart = async (req, res) => {
 
     const cartItemsCount = user.cart.items.length;
 
+    // Return the updated user object or any other response as needed
+    // return res.status(200).json({ message: 'Cart updated successfully', cartItemsCount });
   } catch (error) {
     console.error("Error from Addcart:", error);
     return res.status(500).json({ error: "Internal server error" });
@@ -85,17 +99,23 @@ const cartQuantityUpdate = async (req, res) => {
     const quantity = req.body.quantity;
     const userEmail = req.session.user;
 
+    // Find the user details
     const userDetails = await collectionModel.findOne({ email: userEmail });
 
+    // Find the cart item corresponding to the provided ID
     const cartItem = userDetails.cart.items.find((item) => item.productname == cartId);
 
+    // Find the product details from the product collection
     const product = await collectionProduct.findById(cartId);
 
+    // Check if the product exists
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
 
+    // Check if the requested quantity exceeds the available stock
     if (quantity > product.Stock) {
+      // If quantity exceeds stock, return a client-side alert
       return res.status(400).json({
         error: "Requested quantity exceeds available stock",
         showAlert: true,
@@ -103,12 +123,15 @@ const cartQuantityUpdate = async (req, res) => {
       });
     }
 
+    // Update the cart item quantity and total price
     cartItem.quantity = quantity;
     cartItem.totalprice = product.OriginalPrice * quantity;
 
+    // Recalculate grantTotal and total
     userDetails.cart.grantTotal = userDetails.cart.items.reduce((accu, element) => accu + element.totalprice, 0);
     const totalAmount = userDetails.cart.grantTotal;
 
+    // Save the changes to the user details
     await userDetails.save();
 
     res.json({ grantTotal: userDetails.cart.grantTotal, totalAmount });
@@ -120,8 +143,12 @@ const cartQuantityUpdate = async (req, res) => {
 
 const cartDelete = async (req, res) => {
   try {
+    // Get the item ID from the request parameters
     const deletecart = req.params.id;
+    // Get the user's email from the session
     const userEmail = req.session.user;
+
+    // Find the user and remove the cart item
     const user = await collectionModel.findOneAndUpdate(
       { email: userEmail },
       { $pull: { "cart.items": { productname: deletecart } } },
@@ -136,6 +163,7 @@ const cartDelete = async (req, res) => {
     user.cart.grantTotal = user.cart.items.reduce((total, item) => total + item.totalprice, 0);
     await user.save();
 
+    // Send a success response
     res.sendStatus(200);
   } catch (error) {
     console.error("Error from cartDelete:", error);
