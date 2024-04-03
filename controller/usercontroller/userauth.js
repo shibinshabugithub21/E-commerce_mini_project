@@ -337,6 +337,7 @@ const home = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
 const logout = (req, res) => {
   req.session.destroy((err) => {
     console.log("req.session logout", req.session);
