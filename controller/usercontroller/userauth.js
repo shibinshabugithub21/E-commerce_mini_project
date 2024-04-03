@@ -5,7 +5,7 @@ const collectionModel = require("../../models/userdb");
 const collectionOtp = require("../../models/otp");
 const collectionProduct = require("../../models/product");
 const collectionOrder = require("../../models/order");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const BannerDB = require("../../models/bannerdb");
 const collectionCat = require("../../models/category");
 
