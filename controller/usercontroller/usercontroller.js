@@ -26,7 +26,7 @@ const checkoutpage = async (req, res) => {
         const category = await collectionCat.find({ isBlocked: false })
 
         const userDetails = await collectionModel.findOne({ _id: userId });
-
+        console.log(userDetails, "user details from checkout")
         const user = userDetails._id;
         const cartItems = userDetails.cart.items;
         const cartCount = cartItems.length;
@@ -34,6 +34,7 @@ const checkoutpage = async (req, res) => {
         const cartProductIds = cartItems.map(item => item.productname);
 
         const cartProducts = await collectionProduct.find({ _id: { $in: cartProductIds } });
+        console.log(cartProducts, "from cartProducts")
 
         let totalPrice = 0;
         const result = [];
@@ -57,7 +58,7 @@ const checkoutpage = async (req, res) => {
         const coupons = await collectionCoupoun.find({});
         let checktotal = userDetails.cart.grantTotal + 10;
         const validCoupons = [];
-
+        console.log(result, "REsult from checkout ")
         coupons.forEach(coupon => {
             if (coupon.couponValue < checktotal) {
                 validCoupons.push(coupon);
@@ -247,9 +248,9 @@ const orderSuccess = async (req,res)=>{
 
     console.log(method)
   
-        console.log("hai")
-
-        await newOrder.save();
+    
+    await newOrder.save();
+    console.log(newOrder)
         for (let values of cartItems) {
             for (let products of cartProducts) {
                 if (new String(values.productname).trim() == new String(products._id).trim()) {
