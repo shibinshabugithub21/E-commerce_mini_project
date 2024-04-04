@@ -22,7 +22,7 @@ const BannerList = async(req,res)=>{
         const BannerList = await BannerDB.find({});
         
         // Render the product page with the fetched products
-        res.render('admin/banner', { Banner: BannerList });
+        res.render('admin/Banner', { Banner: BannerList });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
