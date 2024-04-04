@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(nocache()); // use destroy cache 
 app.use(flash());
 app.use('/productImages', express.static(path.resolve(__dirname, 'productImages')));
+app.use(express.static('./Public'))
 
 app.use(morgan('dev'));
 app.use(express.json()) 
@@ -40,7 +41,7 @@ const adminRouter = require('./routes/admin');
 
 
 
-app.use(express.static('public')); // In here, use the public folder as static.
+// app.use(express.static('public')); // In here, use the public folder as static.
 app.set('views', path.join(__dirname, 'views')); // Setting up path.
 app.set('view engine', 'ejs'); // Setting EJS as the view engine.
 
