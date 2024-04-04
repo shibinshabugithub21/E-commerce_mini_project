@@ -188,6 +188,7 @@ const orderSuccess = async (req,res)=>{
     const cartItems = foundUser.cart.items;
     const cartProductIds = cartItems.map(item => item.productname);
     const cartProducts = await collectionProduct.find({ _id: { $in: cartProductIds }});
+    console.log(cartProductIds, cartProducts)
 
     const paymentstatus = dataa.paymentstatus
     const paymentStatus =  paymentstatus || "confirmed"

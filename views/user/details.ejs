@@ -399,9 +399,9 @@
                         <% if (!errorMessage) { %>
                         <form action="/cart/<%= product._id %>" method="post">
                             <button class="add-to-cart btn btn-warning"  data-product-id="<%= product._id %>" data-product-price="<%= product.Price %>" type="submit">Add to Cart</button>
-                            <div type="button" class="btn btn-primary btn-lg btn-block">
+                            <!-- <div type="button" class="btn btn-primary btn-lg btn-block">
                                 <a href="/buy-product?productId=<%=product._id%>" style="text-decoration: none; color: white;">Buy Now</a>
-                            </div>
+                            </div> -->
                         </form>                  
                         <% } else { %>
                             <p id="error"><%= errorMessage %></p>
