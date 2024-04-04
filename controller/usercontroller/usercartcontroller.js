@@ -85,8 +85,6 @@ const Addcart = async (req, res) => {
 
     const cartItemsCount = user.cart.items.length;
 
-    // Return the updated user object or any other response as needed
-    // return res.status(200).json({ message: 'Cart updated successfully', cartItemsCount });
   } catch (error) {
     console.error("Error from Addcart:", error);
     return res.status(500).json({ error: "Internal server error" });

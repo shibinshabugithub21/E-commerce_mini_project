@@ -55,7 +55,7 @@ const checkoutpage = async (req, res) => {
         totalPrice += deliveryCharge;
 
         const coupons = await collectionCoupoun.find({});
-        let checktotal = userDetails.cart.grantTotal;
+        let checktotal = userDetails.cart.grantTotal + 10;
         const validCoupons = [];
 
         coupons.forEach(coupon => {
@@ -67,7 +67,7 @@ const checkoutpage = async (req, res) => {
         res.render('user/checkout', { 
             user: userDetails, 
             result, 
-            total: totalPrice, // Pass totalPrice instead of userDetails.cart.grantTotal
+            total: checktotal, // Pass totalPrice instead of userDetails.cart.grantTotal
             cartCount, 
             validCoupons, 
             category,

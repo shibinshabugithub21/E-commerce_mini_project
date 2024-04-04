@@ -115,11 +115,15 @@
                                         </div>
                                     <% }); %>
 
-                                    <% if (order.paymentstatus === "confirmed" && product.status === "Delivered") { %>
+                                    <% if (order.paymentstatus === "confirmed") { %>
 
-                                    <button class="btn btn-primary" onclick="generateInvoice('<%= order._id %>', '<%= product._id %>')">Generate Invoice</button>
+                                  
                                     
-                                    
+                                    <% if (product.status === "Delivered") { %>
+
+                                        <button class="btn btn-primary" onclick="generateInvoice('<%= order._id %>', '<%= product._id %>')">Generate Invoice</button>
+                                        
+                                <% } %>
                                     <% if (product.status === "Shipped" || product.status === "Processing") { %>
                                 <button class="btn btn-outline-danger cancel-btn" onclick="productcancel('<%= order._id %>','<%= product.p_id %>')" >Cancel Order</button>
                             <% } else if (product.status === "Delivered") { %>

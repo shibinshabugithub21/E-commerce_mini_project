@@ -30,8 +30,8 @@ app.use(session({
 
     mongoose.connect(process.env.DATABASE).then(()=>{
         console.log('mongodb had connected');
-    }).catch(()=>{
-        console.log('mongodb has not connected');
+    }).catch((e)=>{
+        console.log('mongodb has not connected',e);
     })
 
 
