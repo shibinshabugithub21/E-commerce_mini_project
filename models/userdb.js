@@ -71,7 +71,7 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  wishlist: [
+  wishlist:[
     {
       productId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -98,6 +98,7 @@ const schema = new mongoose.Schema({
     },
   ],
 });
+
 
 const collectionModel = mongoose.model("userdetails", schema);
 module.exports = collectionModel;

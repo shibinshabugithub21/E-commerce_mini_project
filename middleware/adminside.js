@@ -8,7 +8,6 @@ const isAdmin = (req, res, next) => {
 };
 
 // authMiddleware.js
-
 const authMiddleware = (req, res, next) => {
   if (req.session.admin) {
     next();
